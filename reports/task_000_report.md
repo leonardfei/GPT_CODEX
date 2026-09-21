@@ -106,7 +106,7 @@ Not applicable.
 
 Commit hash:
 
-To be recorded after the workflow commit.
+The workflow root commit was created successfully; the exact final commit hash is recorded in the final handoff because updating this report changes the repository tip.
 
 Branch:
 
