@@ -2,7 +2,7 @@
 
 ## Current task
 
-Task 002 — CellViT++ diagnostic and targeted classifier-head optimization — PENDING
+Task 002 — CellViT++ diagnostic and targeted classifier-head optimization — COMPLETED (candidate not promoted)
 
 ## Last completed task
 
@@ -10,15 +10,15 @@ Task 001 — CellViT++ classifier-head optimization
 
 ## Repository status
 
-Task 001 has been completed and synchronized. Task 002 has now been added to the repository for diagnostic bottleneck analysis and targeted second-round classifier-head optimization. Scientific source data and the pretrained CellViT-SAM-H-x40-AMP backbone must remain unchanged. Remote Task 002 outputs should be written under `/data/lf_data/result/task002`.
+Task 001 and Task 002 have been completed and the workflow summaries/scripts are synchronized. Task 002 outputs are under `/data/lf_data/result/task002`. Scientific source data, workflow rules, and the pretrained CellViT-SAM-H-x40-AMP backbone were left unchanged.
 
 ## GitHub synchronization
 
-- Remote: `https://github.com/leonardfei/GPT_CODEX.git`
+- Remote: `git@github.com:leonardfei/GPT_CODEX.git`
 - Remote name: `origin`
 - Branch: `main`
-- Task 001 workflow and reports are synchronized.
-- Task 002 specification has been added to `tasks/task_002.md`.
+- Task 001 and Task 002 workflow code/reports are synchronized.
+- Before Task 002 execution, `origin/main` was fetched and fast-forwarded locally.
 - No force-push should be used.
 - Credentials and tokens must not be committed.
 
@@ -40,17 +40,19 @@ Task 001 has been completed and synchronized. Task 002 has now been added to the
 - Performance was heterogeneous across classes; Plasma cell, Myeloid and Neutrophil were the weakest classes, while Tumor was the strongest.
 - Native CellViT++ classifier evaluation is based on detected cells paired to ground truth, so detector/matching quality and classifier quality must be interpreted separately.
 
+## Task 002 result
+
+- GT cells: 159,349; detected cells: 252,899; matched cells: 94,662; GT match rate: 0.594.
+- Matching showed 36,775 ambiguous GT assignments, with no duplicate assignments or out-of-bounds coordinates.
+- Frozen-embedding geometry was weak: class silhouette -0.0209 and nearest-neighbor class purity 0.2492; UMAP was unavailable and a deterministic t-SNE fallback was recorded.
+- Best grouped-CV candidate: macro-F1 0.3440 versus baseline 0.3417; lowest-three-class mean F1 0.2054 versus 0.1929.
+- Promotion was rejected because the improvements (+0.0024 macro-F1 and +0.0125 lowest-three-class F1) did not meet the predefined +0.03 thresholds. Fold variance and strong-class loss checks were acceptable.
+- The independent test set was not used for Task 002 selection, and `/data/lf_data/result/model_best.pth` was preserved with SHA256 `f161afbb90f42ccfbfe9c6843cae6eafd7a12a2bc25620d5b4489e7e3faf6164`.
+- Detailed report: `reports/task_002_report.md`; remote artifacts: `/data/lf_data/result/task002`.
+
 ## Outstanding QC issues
 
-Task 002 must determine the dominant bottleneck among:
-
-- annotation/registration noise;
-- detection-to-ground-truth matching;
-- batch/domain shift;
-- weak frozen-embedding separability;
-- classifier-head optimization;
-- class imbalance;
-- mixed causes.
+Task 002 identified mixed causes dominated by incomplete/ambiguous detection-to-ground-truth matching and weak frozen-embedding separability, with class imbalance contributing.
 
 ## Open scientific questions
 
@@ -61,7 +63,7 @@ Task 002 must determine the dominant bottleneck among:
 
 ## Pending tasks
 
-- Task 002 — Diagnose the dominant CellViT++ bottleneck and perform targeted classifier-head optimization.
+- Review Task 002 findings before starting Task 003.
 - Do not start Task 003 until Task 002 is completed and reviewed by Web GPT.
 
 ## Latest workflow files
@@ -69,12 +71,16 @@ Task 002 must determine the dominant bottleneck among:
 - `tasks/task_001.md`
 - `reports/task_001_report.md`
 - `tasks/task_002.md`
+- `scripts/python/task002_diagnostics.py`
+- `scripts/python/task002_optimize.py`
+- `scripts/python/task002_finalize.py`
+- `reports/task_002_report.md`
 - `PROJECT_STATUS.md`
 
 ## Next execution command
 
 ```text
-Execute task_002.
+Review Task 002, then decide whether to define Task 003.
 ```
 
 Codex should pull `origin/main` before execution and follow `AGENTS.md` and `tasks/task_002.md`.
