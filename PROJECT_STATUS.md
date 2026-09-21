@@ -2,15 +2,15 @@
 
 ## Current task
 
-None
+Task 001 — CellViT++ classifier-head optimization — COMPLETED
 
 ## Last completed task
 
-Task 000 — workflow validation
+Task 001 — CellViT++ classifier-head optimization
 
 ## Repository status
 
-Initialized GPT-Codex workflow framework and completed Task 000 validation. No scientific data or pre-existing analysis code was present during initialization.
+The workflow framework was used to execute Task 001 on the authorized remote CellViT++ environment. Scientific source data and the pretrained backbone were preserved. Remote outputs are under `/data/lf_data/result`.
 
 ## GitHub synchronization
 
@@ -18,35 +18,43 @@ Initialized GPT-Codex workflow framework and completed Task 000 validation. No s
 - Remote name: `origin`
 - Branch: `main`
 - Initial synchronization: successful via ordinary `git push` (no force-push).
-- Local and remote branches were synchronized at commit `67f41bc` before this status update.
+- Local and remote branches were synchronized at commit `67f41bc` before this status update; this task's workflow audit update is pending the next ordinary commit and push.
 - Credentials and tokens were not committed.
 
 ## Recent completed analyses
 
-None. Task 000 validated the repository/workflow structure only.
+- Task 001: CellViT++ classifier-head optimization; final checkpoint and complete report generated remotely.
 
 ## Important findings
 
-The initial repository contains no `data/` directory, scientific input files, R project, Python analysis package, or configured Git remote.
+- The remote CellViT++ path is not a Git repository, so no source commit hash was available.
+- The supplied fold files mixed batches across train and validation; derived batch-grouped folds were used for selection.
+- The original remote dataset path was read only; derived caches and outputs were written under `/data/lf_data/result`.
 
 ## Outstanding QC issues
 
-No scientific QC was performed. Input data and project-specific scientific decisions remain to be configured.
+- Native CellViT++ classifier evaluation is based on 89,189 detected cells paired to ground truth; detector and classifier performance should be interpreted separately.
+- No remote repository commit metadata was available for the CellViT++ source directory.
 
 ## Open scientific questions
 
-Control definitions, cell-type definitions, statistical thresholds, spatial conventions, and survival-analysis conventions are not yet defined.
+No additional scientific decision was introduced beyond the attached task specification. Any biological interpretation of the class-level results remains outside this computational execution report.
 
 ## Pending tasks
 
-None.
+None for Task 001. Remote artifact review or biological interpretation can be performed as a separate task.
 
 ## Latest generated files
 
-- `reports/task_000_report.md`
-- `PROJECT_CONTEXT.md`
+- `tasks/task_001.md`
+- `reports/task_001_report.md`
+- `scripts/python/task001_dataset_qc.py`
+- `scripts/python/task001_build_grouped_splits.py`
+- `scripts/python/task001_head_optimization.py`
+- `scripts/python/task001_test_evaluate.py`
+- `scripts/python/task001_make_report.py`
 - `PROJECT_STATUS.md`
 
 ## Last update
 
-2026-09-21 17:28:03 CST
+2026-09-21 19:05:00 CST
