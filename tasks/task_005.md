@@ -1,7 +1,17 @@
 # Task 005 — Multi-Backbone, Stain-Domain, and Neutrophil Detection Benchmark
 
 ## Status
-PENDING
+COMPLETED
+
+## Execution result
+
+Task 005 completed on 2026-09-22 under `/data/lf_data/result/task005_backbone_domain`.
+
+- Only the installed official-compatible SAM-H checkpoint was available and tested; UNI, Virchow, Virchow2, and ViT256 checkpoints were not present and were not downloaded.
+- RAW and official `STAIN_NORMALIZED` conditions were evaluated with the fixed official CellViT++ recipe and grouped batch 5-fold splits.
+- RAW was the best overall and Neutrophil-F1 condition, but neither condition met the promotion guardrails.
+- The production model was not changed, no test evaluation was run, and Task 006 was not started.
+- Detailed results are in `/data/lf_data/result/task005_backbone_domain/TASK005_REPORT.md` and `reports/task_005_report.md`.
 
 ## Objective
 

@@ -2,17 +2,17 @@
 
 ## Current task
 
-Task 005 — multi-backbone, stain-domain, and Neutrophil detection benchmark — PENDING
+Task 005 — multi-backbone, stain-domain, and Neutrophil detection benchmark — COMPLETED
 
 ## Last completed/closed task
 
-Task 004 — high-confidence CellViT–Xenium label reconstruction and retraining — PARTIAL, primary experiment reviewed and closed for decision-making
+Task 005 — multi-backbone, stain-domain, and Neutrophil detection benchmark — COMPLETED; no condition promoted and production unchanged
 
 ## Repository status
 
 Tasks 001–003 are complete. Task 004 primary three-tier experiment is complete and has been reviewed. The remaining secondary threshold-sensitivity CV matrix is not required before proceeding because the primary result already showed that stricter centroid-only filtering did not materially improve seven-class or weak-class performance.
 
-Task 005 has been created to benchmark alternative CellViT++ backbones and stain/domain handling while explicitly auditing Neutrophil detection, conditional classification, and end-to-end recognition.
+Task 005 has been completed under `/data/lf_data/result/task005_backbone_domain`. Only the installed official-compatible SAM-H checkpoint was available; RAW and official stain-normalized conditions were evaluated with the fixed recipe and grouped batch 5-fold splits. No condition met the promotion guardrails, so the production model remains unchanged and Task 006 has not started.
 
 Scientific source data must remain unchanged.
 
@@ -100,10 +100,19 @@ All comparisons must use:
 - the official CellViT++ classifier training stack;
 - one fixed primary classifier recipe.
 
+## Task 005 result
+
+- SAM-H RAW: macro-F1 `0.3324 ± 0.0134`, macro-AUPRC `0.3413 ± 0.0281`, lowest-three F1 `0.1748 ± 0.0213`.
+- SAM-H STAIN_NORMALIZED: macro-F1 `0.3295 ± 0.0121`, macro-AUPRC `0.3467 ± 0.0310`, lowest-three F1 `0.1603 ± 0.0185`.
+- Best overall and best Neutrophil-F1 condition: SAM-H RAW.
+- Neutrophil detection recall / conditional recall / end-to-end recall: RAW `0.5467 / 0.0824 / 0.0450`; normalized `0.5870 / 0.0678 / 0.0398`.
+- Promotion: `not_promoted`; no final candidate or test evaluation; production model unchanged.
+- Remote report: `/data/lf_data/result/task005_backbone_domain/TASK005_REPORT.md`.
+- Local report: `reports/task_005_report.md`.
+
 ## Pending tasks
 
-- Task 005 — execute the multi-backbone/stain-domain benchmark plus class-specific detection audit.
-- Do not start Task 006 until Task 005 is completed and reviewed by Web GPT.
+- Task 006 — not started; do not start until Task 005 is reviewed by Web GPT.
 
 ## Latest workflow files
 
@@ -116,6 +125,7 @@ All comparisons must use:
 - `tasks/task_004.md`
 - `reports/task_004_report.md`
 - `tasks/task_005.md`
+- `reports/task_005_report.md`
 - `PROJECT_STATUS.md`
 
 ## Next execution command
