@@ -2,7 +2,7 @@
 
 ## Current task
 
-Task 006 — Xenium re-annotation, H&E nuclear-integrity QC, and high-quality CellViT retraining — PENDING
+Task 006 — Xenium re-annotation, H&E nuclear-integrity QC, and high-quality CellViT retraining — COMPLETED; no v2 tier promoted
 
 ## Last completed task
 
@@ -10,7 +10,7 @@ Task 005 — multi-backbone, stain-domain, and Neutrophil detection benchmark �
 
 ## Repository status
 
-Tasks 001–005 are complete. Task 006 has been created because the working hypothesis has shifted upstream: the original Xenium-derived training labels may contain substantial biological annotation error, low-quality cells, and necrosis-associated/no-nucleus objects, including false Neutrophil labels from residual RNA.
+Tasks 001–006 are complete. Task 006 tested the upstream ground-truth hypothesis: the original Xenium-derived training labels contain substantial biological annotation uncertainty, low-quality cells, and no-nucleus/debris objects, including many original Neutrophil labels that did not survive independent QC. The v2 tiers did not improve controlled SAM-H RAW grouped CV, so no model was promoted.
 
 Task 006 will rebuild the Xenium ground truth before further CellViT model development.
 
@@ -92,9 +92,17 @@ SHA256:
 
 Task 001 remains production until a future model satisfies predefined grouped-CV promotion criteria.
 
+## Task 006 result
+
+- v2 annotation: 990,850 cells; HQ_CORE 73,960; HQ_EXTENDED 74,181.
+- OLD_LABELS macro-F1: 0.3324 ± 0.0134; V2_CORE: 0.3030 ± 0.0236; V2_EXTENDED: 0.3027 ± 0.0284.
+- Original Neutrophil: 24,167; v2 Neutrophil: 666; HQ_CORE Neutrophil: 445.
+- Promotion: not approved; test run not performed; production remains `/data/lf_data/result/model_best.pth`.
+- Remote report: `/data/lf_data/result/task006_xenium_reannotation/TASK006_REPORT.md`.
+- Unresolved: OME physical-scale metadata conflicts with historical notebook geometry; expert review is needed before physical-distance claims or further relabeling.
+
 ## Pending tasks
 
-- Task 006 — rebuild Xenium annotations and high-quality training labels, then perform controlled retraining.
 - Do not start Task 007 until Task 006 is completed and reviewed by Web GPT.
 
 ## Latest workflow files
@@ -115,7 +123,7 @@ Task 001 remains production until a future model satisfies predefined grouped-CV
 ## Next execution command
 
 ```text
-Execute task_006.
+Review Task 006 outputs before defining Task 007.
 ```
 
 Codex must pull `origin/main` before execution and follow `AGENTS.md` plus `tasks/task_006.md`.

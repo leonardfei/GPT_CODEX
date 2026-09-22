@@ -1,7 +1,7 @@
 # Task 006 — Xenium Re-annotation, H&E Nuclear-Integrity QC, and High-Quality CellViT Retraining
 
 ## Status
-PENDING
+COMPLETED
 
 ## Scientific motivation
 
@@ -834,6 +834,21 @@ It must explicitly answer:
 ### L. What should Task 007 do next?
 
 Do not start Task 007.
+
+---
+
+## Execution record — 2026-09-22
+
+Task 006 was completed under `/data/lf_data/result/task006_xenium_reannotation` without modifying the source AnnData, H&E, registration matrix, or preprocessing notebook. The frozen v2 annotation used the historical `obs['cl1']` label audit, inverse registration, batch-aware transcript QC, independent marker scoring, H&E nuclear-integrity QC, and explicit neutrophil safeguards. CellViT predictions were not used for annotation or quality-tier assignment.
+
+- Total cells: 990,850; label-change rate: 89.6722%.
+- HQ_CORE: 73,960 cells; HQ_EXTENDED: 74,181 cells including 221 additional extended neutrophils.
+- OLD_LABELS SAM-H RAW grouped-CV macro-F1: 0.3324 ± 0.0134.
+- V2_CORE grouped-CV macro-F1: 0.3030 ± 0.0236.
+- V2_EXTENDED grouped-CV macro-F1: 0.3027 ± 0.0284.
+- Neither v2 tier met promotion criteria; the frozen test split was not evaluated and the production model was not overwritten.
+- An OME physical-scale metadata discrepancy remains unresolved and is documented in the report.
+- Report: `/data/lf_data/result/task006_xenium_reannotation/TASK006_REPORT.md`.
 
 ---
 
