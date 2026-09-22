@@ -2,7 +2,7 @@
 
 ## Current task
 
-Task 003 — strict official CellViT++ classifier retraining — COMPLETED (candidate not promoted)
+Task 004 — high-confidence CellViT–Xenium label reconstruction and retraining — PENDING
 
 ## Last completed task
 
@@ -10,72 +10,70 @@ Task 003 — strict official CellViT++ classifier retraining — COMPLETED (cand
 
 ## Repository status
 
-Tasks 001–003 are complete. Task 003 retrained the seven-class classifier strictly through the official CellViT++ training stack and compared it directly with the Task 001 hybrid/custom-head training result.
+Tasks 001–003 are complete. Task 004 has been added to test whether stricter CellViT↔Xenium one-to-one matching and higher-confidence training labels can improve seven-class CellViT++ classification performance.
 
 Scientific source data and the pretrained CellViT-SAM-H-x40-AMP backbone must remain unchanged.
 
-Task 003 remote outputs were written under:
+Task 004 remote outputs must be written under:
 
-`/data/lf_data/result/task003_official`
+`/data/lf_data/result/task004_high_confidence`
 
 ## GitHub synchronization
 
 - Repository: `leonardfei/GPT_CODEX`
 - Branch: `main`
-- Task 001 workflow/report synchronized.
-- Task 002 workflow/report synchronized.
-- Task 003 specification added at `tasks/task_003.md`.
-- Task 003 workflow/report and reproducible helper scripts synchronized after completion.
+- Tasks 001–003 workflow reports are synchronized.
+- Task 004 specification added at `tasks/task_004.md`.
 - No force-push should be used.
 - Credentials and tokens must not be committed.
 
-## Task 001 baseline
+## Current production model
 
-- Production model: `/data/lf_data/result/model_best.pth`
-- Grouped 5-fold CV macro-F1: approximately 0.342.
-- Independent-test macro-F1: 0.3440.
-- Balanced accuracy: 0.3514.
-- Macro-AUROC: 0.7400.
-- Macro-AUPRC: 0.3441.
+`/data/lf_data/result/model_best.pth`
 
-## Task 002 diagnostic result
+Task 001 remains the production model.
 
-- GT cells: 159,349.
-- Detected cells: 252,899.
-- Matched cells: 94,662.
-- GT match rate: 0.594.
-- Ambiguous GT assignments: 36,775.
-- Frozen-embedding class silhouette: -0.0209.
-- Nearest-neighbor class purity: 0.2492.
-- Best Task 002 grouped-CV macro-F1: 0.3440 versus Task 001 baseline 0.3417.
-- Lowest-three-class mean F1: 0.2054 versus baseline 0.1929.
-- Task 002 candidate was not promoted.
-- Task 001 production model remains unchanged.
+## Evidence motivating Task 004
 
-## Rationale for Task 003
+### Task 001
+- grouped-CV macro-F1: approximately 0.342
+- independent-test macro-F1: 0.3440
 
-Task 001 used official CellViT++ token extraction, official LinearClassifier architecture, and native official inference/evaluation, but the classifier optimization/training loop itself was custom.
+### Task 002
+- GT cells: 159,349
+- detected cells: 252,899
+- matched cells: 94,662
+- GT match rate: 0.594
+- ambiguous GT assignments: 36,775
+- frozen-embedding class silhouette: -0.0209
+- nearest-neighbor class purity: 0.2492
+- nearest-neighbor batch purity: 0.4530
 
-Task 003 will therefore test whether this custom training loop materially limited performance by retraining through the strict official workflow:
+### Task 003
+- strict official grouped-CV macro-F1: 0.3324 ± 0.0134
+- strict official pipeline did not outperform Task 001
+- official candidate was not promoted
 
-`train_cell_classifier_head.py → ExperimentCellVitClassifier → CellViTHeadTrainer → official checkpoint/evaluation`
+These results suggest the training-loop implementation is unlikely to be the dominant limitation. Upstream detection-to-Xenium matching quality, label ambiguity, class imbalance, and weak frozen representation are now the main suspected bottlenecks.
 
-## Task 003 result
+## Task 004 primary experiment
 
-- Strict official CellViT++ CLI was used for all five grouped folds and the final all-training run; no custom PyTorch training loop was used.
-- Grouped 5-fold CV: macro-F1 `0.3324±0.0134`, balanced accuracy `0.3455±0.0195`, macro-AUROC `0.7314±0.0167`, macro-AUPRC `0.3413±0.0281`, lowest-three-class F1 `0.1748±0.0213`.
-- Official native test: classifier-global F1 `0.3986`, AUROC `0.7439`, AP `0.3495`; CellViT detection F1 `0.3563`; TIA binary detection F1 `0.3472`.
-- Final official candidate: `/data/lf_data/result/task003_official/model_official_best.pth`.
-- Final configuration used the baseline official head (`hidden_dim=100`, `drop_rate=0`, AdamW `lr=0.001`, weight decay `0.0001`, batch size `2048`, cosine scheduler) for 7 fixed epochs, selected by the median official AUROC-selected epoch across folds.
-- WandB was not used because the remote environment had no configured API key; official CLI fallback configs were used and documented.
-- Promotion thresholds were not met: official grouped-CV macro-F1 and lowest-three-class F1 did not improve by `+0.03`. The production model remains `/data/lf_data/result/model_best.pth`.
-- Full remote report, metrics, native JSON, source hashes, environment records, run manifest, and seven vector figures are under `/data/lf_data/result/task003_official`.
+Compare three training-label tiers while keeping the backbone, seven classes, grouped folds and official classifier training recipe fixed:
 
-The leakage-safe grouped folds from Task 001 will be retained only as split definitions.
+1. ALL_MATCHED
+2. HIGH_CONFIDENCE
+3. ULTRA_HIGH_CONFIDENCE
+
+Task 004 must test whether stricter one-to-one geometric matching improves:
+- frozen-embedding class separability;
+- grouped-CV macro-F1;
+- lowest-three-class F1;
+- Myeloid, Neutrophil and Plasma-cell performance.
 
 ## Pending tasks
 
-- Do not start Task 004 until Task 003 is reviewed by Web GPT.
+- Task 004 — reconstruct high-confidence CellViT↔Xenium labels and retrain with the official CellViT++ trainer.
+- Do not start Task 005 until Task 004 is completed and reviewed by Web GPT.
 
 ## Latest workflow files
 
@@ -85,17 +83,16 @@ The leakage-safe grouped folds from Task 001 will be retained only as split defi
 - `reports/task_002_report.md`
 - `tasks/task_003.md`
 - `reports/task_003_report.md`
-- `scripts/python/task003_prepare.py`
-- `scripts/python/task003_configure_winner.py`
-- `scripts/python/task003_aggregate.py`
-- `scripts/python/task003_finalize.py`
+- `tasks/task_004.md`
 - `PROJECT_STATUS.md`
 
-## Next action
+## Next execution command
 
-Review Task 003 before starting any later task.
+```text
+Execute task_004.
+```
 
-Codex must pull `origin/main` before any later execution and follow `AGENTS.md` plus the relevant task specification.
+Codex must pull `origin/main` before execution and follow `AGENTS.md` plus `tasks/task_004.md`.
 
 ## Last update
 
