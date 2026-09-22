@@ -2,32 +2,85 @@
 
 ## Current task
 
-Task 005 — multi-backbone, stain-domain, and Neutrophil detection benchmark — COMPLETED
+Task 006 — Xenium re-annotation, H&E nuclear-integrity QC, and high-quality CellViT retraining — PENDING
 
-## Last completed/closed task
+## Last completed task
 
-Task 005 — multi-backbone, stain-domain, and Neutrophil detection benchmark — COMPLETED; no condition promoted and production unchanged
+Task 005 — multi-backbone, stain-domain, and Neutrophil detection benchmark — COMPLETED; no condition promoted
 
 ## Repository status
 
-Tasks 001–003 are complete. Task 004 primary three-tier experiment is complete and has been reviewed. The remaining secondary threshold-sensitivity CV matrix is not required before proceeding because the primary result already showed that stricter centroid-only filtering did not materially improve seven-class or weak-class performance.
+Tasks 001–005 are complete. Task 006 has been created because the working hypothesis has shifted upstream: the original Xenium-derived training labels may contain substantial biological annotation error, low-quality cells, and necrosis-associated/no-nucleus objects, including false Neutrophil labels from residual RNA.
 
-Task 005 has been completed under `/data/lf_data/result/task005_backbone_domain`. Only the installed official-compatible SAM-H checkpoint was available; RAW and official stain-normalized conditions were evaluated with the fixed recipe and grouped batch 5-fold splits. No condition met the promotion guardrails, so the production model remains unchanged and Task 006 has not started.
+Task 006 will rebuild the Xenium ground truth before further CellViT model development.
 
-Scientific source data must remain unchanged.
+## Task 006 input files
 
-Task 005 remote outputs must be written under:
+- Xenium AnnData:
+  `/data/lf_data/xenium_data/adata_harmony_remove_necrosis.h5ad`
+- Original H&E:
+  `/data/lf_data/xenium_data/ID0060276.ome.tif`
+- Registration matrix:
+  `/data/lf_data/xenium_data/matrix.csv`
+- Previous preprocessing notebook:
+  `/data/lf_data/xenium_data/Prepare_allcelltype_batch8_train8_test.ipynb`
 
-`/data/lf_data/result/task005_backbone_domain`
+Task 006 outputs must be written under:
 
-## GitHub synchronization
+`/data/lf_data/result/task006_xenium_reannotation`
 
-- Repository: `leonardfei/GPT_CODEX`
-- Branch: `main`
-- Tasks 001–004 workflow reports/specifications are synchronized.
-- Task 005 specification added at `tasks/task_005.md`.
-- No force-push should be used.
-- Credentials and gated-model tokens must not be committed.
+Source inputs must not be modified.
+
+## Scientific rationale
+
+Task 005 showed:
+- SAM-H RAW grouped-CV macro-F1: 0.3324 ± 0.0134
+- Neutrophil F1: 0.1145
+- Neutrophil detection recall: 0.5467
+- Neutrophil conditional classifier recall: 0.0824
+- Neutrophil end-to-end recall: 0.0450
+- stain normalization reduced batch structure but did not materially improve classification
+
+Earlier tasks also showed that:
+- classifier-head optimization did not materially improve performance;
+- strict official CellViT++ training did not improve performance;
+- stricter centroid-only matching did not improve weak-class performance.
+
+The next hypothesis is therefore that ground-truth quality itself is limiting performance.
+
+## Task 006 design
+
+Task 006 will independently combine:
+
+1. Xenium transcriptomic QC;
+2. seven-class biological re-annotation;
+3. H&E nuclear-integrity QC after registration;
+4. explicit Neutrophil debris/no-nucleus safeguards;
+5. frozen Xenium-v2 labels;
+6. controlled old-label vs Xenium-v2 CellViT retraining.
+
+The seven training classes remain:
+- Endothelial
+- Mesenchymal
+- Myeloid
+- Neutrophil
+- Plasma cell
+- T and B
+- Tumor
+
+Non-training states are allowed:
+- Uncertain
+- Mixed_lineage
+- Low_quality
+- Artifact_or_no_nucleus
+
+Cells must not be forced into one of the seven classes.
+
+## Anti-circularity rule
+
+CellViT classifier predictions must not be used to decide which Xenium cells are high quality.
+
+The Xenium-v2 annotation/QC rules must be frozen before viewing new CellViT cross-validation results.
 
 ## Current production model
 
@@ -37,82 +90,12 @@ SHA256:
 
 `f161afbb90f42ccfbfe9c6843cae6eafd7a12a2bc25620d5b4489e7e3faf6164`
 
-Task 001 remains the production model.
-
-## Evidence motivating Task 005
-
-### Task 001
-- grouped-CV macro-F1: approximately 0.342
-- test macro-F1: 0.3440
-
-### Task 002
-- GT match rate: 0.594
-- ambiguous GT assignments: 36,775
-- frozen SAM-H class silhouette: approximately -0.02
-- nearest-neighbor class purity: approximately 0.25
-- nearest-neighbor batch purity substantially higher than class purity
-
-### Task 003
-- strict official grouped-CV macro-F1: 0.3324 ± 0.0134
-- strict official training did not outperform Task 001
-
-### Task 004
-- ALL_MATCHED macro-F1: 0.3324 ± 0.0134
-- HIGH_CONFIDENCE macro-F1: 0.3401 ± 0.0164
-- ULTRA_HIGH_CONFIDENCE macro-F1: 0.3226 ± 0.0199
-- HIGH_CONFIDENCE improved macro-F1 only +0.0077
-- lowest-three-class F1 decreased under stricter filtering
-- Neutrophil F1 decreased by more than 0.03 in HIGH_CONFIDENCE
-- stricter filtering increased nearest-neighbor batch purity more than class purity
-
-These results suggest that the dominant remaining limitations are likely:
-- backbone representation quality;
-- histology/stain/domain shift;
-- CellViT detection recall;
-- insufficient Neutrophil-specific morphology representation.
-
-## Task 005 primary questions
-
-1. Which already-available official CellViT++ backbone best supports the seven-class HCC taxonomy?
-2. Does official stain normalization reduce batch/domain structure without hurting class performance?
-3. What is per-class detection recall?
-4. What is Neutrophil detection recall?
-5. What is Neutrophil conditional classifier recall?
-6. What is Neutrophil end-to-end recall?
-7. Which backbone/condition best balances overall macro-F1 and Neutrophil F1/AUPRC?
-
-## Task 005 design
-
-Primary candidate backbones, only if already installed and compatible:
-- SAM-H
-- UNI
-- Virchow2
-- optional Virchow
-- optional ViT256 reference
-
-Primary stain conditions:
-- RAW
-- official STAIN_NORMALIZED
-
-All comparisons must use:
-- the same seven classes;
-- the same leakage-safe grouped 5-fold split definitions;
-- the official CellViT++ classifier training stack;
-- one fixed primary classifier recipe.
-
-## Task 005 result
-
-- SAM-H RAW: macro-F1 `0.3324 ± 0.0134`, macro-AUPRC `0.3413 ± 0.0281`, lowest-three F1 `0.1748 ± 0.0213`.
-- SAM-H STAIN_NORMALIZED: macro-F1 `0.3295 ± 0.0121`, macro-AUPRC `0.3467 ± 0.0310`, lowest-three F1 `0.1603 ± 0.0185`.
-- Best overall and best Neutrophil-F1 condition: SAM-H RAW.
-- Neutrophil detection recall / conditional recall / end-to-end recall: RAW `0.5467 / 0.0824 / 0.0450`; normalized `0.5870 / 0.0678 / 0.0398`.
-- Promotion: `not_promoted`; no final candidate or test evaluation; production model unchanged.
-- Remote report: `/data/lf_data/result/task005_backbone_domain/TASK005_REPORT.md`.
-- Local report: `reports/task_005_report.md`.
+Task 001 remains production until a future model satisfies predefined grouped-CV promotion criteria.
 
 ## Pending tasks
 
-- Task 006 — not started; do not start until Task 005 is reviewed by Web GPT.
+- Task 006 — rebuild Xenium annotations and high-quality training labels, then perform controlled retraining.
+- Do not start Task 007 until Task 006 is completed and reviewed by Web GPT.
 
 ## Latest workflow files
 
@@ -126,15 +109,16 @@ All comparisons must use:
 - `reports/task_004_report.md`
 - `tasks/task_005.md`
 - `reports/task_005_report.md`
+- `tasks/task_006.md`
 - `PROJECT_STATUS.md`
 
 ## Next execution command
 
 ```text
-Execute task_005.
+Execute task_006.
 ```
 
-Codex must pull `origin/main` before execution and follow `AGENTS.md` plus `tasks/task_005.md`.
+Codex must pull `origin/main` before execution and follow `AGENTS.md` plus `tasks/task_006.md`.
 
 ## Last update
 
