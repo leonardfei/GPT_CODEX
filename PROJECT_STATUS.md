@@ -2,90 +2,108 @@
 
 ## Current task
 
-Task 004 — high-confidence CellViT–Xenium label reconstruction and retraining — PARTIAL
+Task 005 — multi-backbone, stain-domain, and Neutrophil detection benchmark — PENDING
 
-## Last completed task
+## Last completed/closed task
 
-Task 003 — strict official CellViT++ classifier retraining — COMPLETED (candidate not promoted)
+Task 004 — high-confidence CellViT–Xenium label reconstruction and retraining — PARTIAL, primary experiment reviewed and closed for decision-making
 
 ## Repository status
 
-Tasks 001–003 are complete. Task 004 primary three-tier retraining is complete, but the requested candidate-specific CV for every secondary threshold-sensitivity rule was not run; therefore Task 004 is marked PARTIAL.
+Tasks 001–003 are complete. Task 004 primary three-tier experiment is complete and has been reviewed. The remaining secondary threshold-sensitivity CV matrix is not required before proceeding because the primary result already showed that stricter centroid-only filtering did not materially improve seven-class or weak-class performance.
 
-Scientific source data and the pretrained CellViT-SAM-H-x40-AMP backbone must remain unchanged.
+Task 005 has been created to benchmark alternative CellViT++ backbones and stain/domain handling while explicitly auditing Neutrophil detection, conditional classification, and end-to-end recognition.
 
-Task 004 remote outputs must be written under:
+Scientific source data must remain unchanged.
 
-`/data/lf_data/result/task004_high_confidence`
+Task 005 remote outputs must be written under:
 
-Task 004 primary outcome: HIGH_CONFIDENCE improved macro-F1 by only +0.0077 versus ALL_MATCHED while lowering lowest-three-class F1 by -0.0077 and reducing Neutrophil F1 by more than 0.03; ULTRA_HIGH_CONFIDENCE did not improve. No tier met promotion criteria, no test evaluation was run, and production was unchanged.
+`/data/lf_data/result/task005_backbone_domain`
 
 ## GitHub synchronization
 
 - Repository: `leonardfei/GPT_CODEX`
 - Branch: `main`
-- Tasks 001–003 workflow reports are synchronized.
-- Task 004 specification added at `tasks/task_004.md`.
+- Tasks 001–004 workflow reports/specifications are synchronized.
+- Task 005 specification added at `tasks/task_005.md`.
 - No force-push should be used.
-- Credentials and tokens must not be committed.
+- Credentials and gated-model tokens must not be committed.
 
 ## Current production model
 
 `/data/lf_data/result/model_best.pth`
 
+SHA256:
+
+`f161afbb90f42ccfbfe9c6843cae6eafd7a12a2bc25620d5b4489e7e3faf6164`
+
 Task 001 remains the production model.
 
-## Evidence motivating Task 004
+## Evidence motivating Task 005
 
 ### Task 001
 - grouped-CV macro-F1: approximately 0.342
-- independent-test macro-F1: 0.3440
+- test macro-F1: 0.3440
 
 ### Task 002
-- GT cells: 159,349
-- detected cells: 252,899
-- matched cells: 94,662
 - GT match rate: 0.594
 - ambiguous GT assignments: 36,775
-- frozen-embedding class silhouette: -0.0209
-- nearest-neighbor class purity: 0.2492
-- nearest-neighbor batch purity: 0.4530
+- frozen SAM-H class silhouette: approximately -0.02
+- nearest-neighbor class purity: approximately 0.25
+- nearest-neighbor batch purity substantially higher than class purity
 
 ### Task 003
 - strict official grouped-CV macro-F1: 0.3324 ± 0.0134
-- strict official pipeline did not outperform Task 001
-- official candidate was not promoted
+- strict official training did not outperform Task 001
 
-These results suggest the training-loop implementation is unlikely to be the dominant limitation. Upstream detection-to-Xenium matching quality, label ambiguity, class imbalance, and weak frozen representation are now the main suspected bottlenecks.
+### Task 004
+- ALL_MATCHED macro-F1: 0.3324 ± 0.0134
+- HIGH_CONFIDENCE macro-F1: 0.3401 ± 0.0164
+- ULTRA_HIGH_CONFIDENCE macro-F1: 0.3226 ± 0.0199
+- HIGH_CONFIDENCE improved macro-F1 only +0.0077
+- lowest-three-class F1 decreased under stricter filtering
+- Neutrophil F1 decreased by more than 0.03 in HIGH_CONFIDENCE
+- stricter filtering increased nearest-neighbor batch purity more than class purity
 
-## Task 004 primary experiment
+These results suggest that the dominant remaining limitations are likely:
+- backbone representation quality;
+- histology/stain/domain shift;
+- CellViT detection recall;
+- insufficient Neutrophil-specific morphology representation.
 
-Compare three training-label tiers while keeping the backbone, seven classes, grouped folds and official classifier training recipe fixed:
+## Task 005 primary questions
 
-1. ALL_MATCHED
-2. HIGH_CONFIDENCE
-3. ULTRA_HIGH_CONFIDENCE
+1. Which already-available official CellViT++ backbone best supports the seven-class HCC taxonomy?
+2. Does official stain normalization reduce batch/domain structure without hurting class performance?
+3. What is per-class detection recall?
+4. What is Neutrophil detection recall?
+5. What is Neutrophil conditional classifier recall?
+6. What is Neutrophil end-to-end recall?
+7. Which backbone/condition best balances overall macro-F1 and Neutrophil F1/AUPRC?
 
-Task 004 must test whether stricter one-to-one geometric matching improves:
-- frozen-embedding class separability;
-- grouped-CV macro-F1;
-- lowest-three-class F1;
-- Myeloid, Neutrophil and Plasma-cell performance.
+## Task 005 design
 
-## Task 004 result summary
+Primary candidate backbones, only if already installed and compatible:
+- SAM-H
+- UNI
+- Virchow2
+- optional Virchow
+- optional ViT256 reference
 
-- Matching: official CellViT++ Hungarian/Munkres global one-to-one assignment with a post-assignment 15 px radius filter; available geometry was centroid-only.
-- Retained cells: ALL_MATCHED 94,662; HIGH_CONFIDENCE 37,029; ULTRA_HIGH_CONFIDENCE 25,066.
-- Grouped-CV macro-F1: 0.3324±0.0134, 0.3401±0.0164, and 0.3226±0.0199 respectively.
-- Lowest-three-class F1: 0.1748±0.0213, 0.1671±0.0169, and 0.1565±0.0298 respectively.
-- Promotion: not promoted; production remains `/data/lf_data/result/model_best.pth` with SHA256 `f161afbb90f42ccfbfe9c6843cae6eafd7a12a2bc25620d5b4489e7e3faf6164`.
-- Remote report and artifacts: `/data/lf_data/result/task004_high_confidence/TASK004_REPORT.md`.
-- Limitation: threshold-sensitivity retention/ambiguity counts were generated, but candidate-specific official CV was not run; the complete unmatched detection pool was also not archived.
+Primary stain conditions:
+- RAW
+- official STAIN_NORMALIZED
+
+All comparisons must use:
+- the same seven classes;
+- the same leakage-safe grouped 5-fold split definitions;
+- the official CellViT++ classifier training stack;
+- one fixed primary classifier recipe.
 
 ## Pending tasks
 
-- Review whether to complete the secondary sensitivity-CV matrix and archive the full detection candidate graph before any further model selection.
-- Do not start Task 005 until Task 004 is completed and reviewed by Web GPT.
+- Task 005 — execute the multi-backbone/stain-domain benchmark plus class-specific detection audit.
+- Do not start Task 006 until Task 005 is completed and reviewed by Web GPT.
 
 ## Latest workflow files
 
@@ -97,20 +115,16 @@ Task 004 must test whether stricter one-to-one geometric matching improves:
 - `reports/task_003_report.md`
 - `tasks/task_004.md`
 - `reports/task_004_report.md`
-- `scripts/python/task004_prepare.py`
-- `scripts/python/task004_configs.py`
-- `scripts/python/task004_aggregate.py`
-- `scripts/python/task004_figures.py`
-- `scripts/python/task004_report.py`
+- `tasks/task_005.md`
 - `PROJECT_STATUS.md`
 
 ## Next execution command
 
 ```text
-Review Task 004 partial result before deciding whether to complete secondary sensitivity CV.
+Execute task_005.
 ```
 
-Codex must pull `origin/main` before execution and follow `AGENTS.md` plus `tasks/task_004.md`.
+Codex must pull `origin/main` before execution and follow `AGENTS.md` plus `tasks/task_005.md`.
 
 ## Last update
 
