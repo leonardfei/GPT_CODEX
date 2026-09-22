@@ -1,7 +1,7 @@
 # Task 004 — High-Confidence CellViT–Xenium Label Reconstruction and Retraining
 
 ## Status
-PENDING
+PARTIAL
 
 ## Objective
 
