@@ -1,7 +1,7 @@
 # Task 008 — Neutrophil Nucleus-Centered H&E QC Recalibration
 
 ## Status
-PARTIAL
+COMPLETED
 
 ## Objective
 
@@ -615,3 +615,26 @@ Return:
 20. recommendation on whether to begin CellViT retraining.
 
 Do not start CellViT retraining.
+
+
+---
+
+## Manual review acceptance — 2026-09-23
+
+The supervising user manually reviewed the Task 008 H&E montage and reported that the large majority of target-centered Neutrophil candidates show normal nuclei.
+
+Decision:
+- accept the target-centered Task 008 H&E QC framework;
+- treat the Task 007 whole-crop debris rule as over-calling debris;
+- freeze Task 007 biological identity;
+- accept Task 008 Neutrophil H&E training eligibility for downstream model testing;
+- use TRAINABLE_CORE as the primary Neutrophil training definition;
+- use TRAINABLE_EXTENDED only as a prespecified sensitivity condition;
+- preserve MANUAL_REVIEW, NO_TARGET_NUCLEUS, FRAGMENTED_TARGET_SUSPECT, and registration-uncertain cells as non-primary training cells;
+- proceed to a new CellViT retraining task without changing annotation rules based on model performance.
+
+Accepted primary Neutrophil counts:
+- TRAINABLE_CORE: 21,639
+- TRAINABLE_EXTENDED: 22,107
+
+No source biological labels were changed by this acceptance step.
