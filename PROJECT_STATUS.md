@@ -2,7 +2,7 @@
 
 ## Current task
 
-Task 010 — Public pathology foundation model representation benchmark: CellViT token vs Phikon-v2 vs Midnight-12k — BLOCKED (official public model downloads unreachable)
+Task 010 — Phikon-first local pathology foundation model representation benchmark — PENDING / READY TO RUN
 
 ## Last completed task
 
@@ -23,47 +23,45 @@ Task009 regenerated all V3 datasets from the original OME-TIFF and showed that c
 - V3_EXTENDED Neutrophil F1 0.1084
 - Neutrophil end-to-end recall ~0.055
 
-The current hypothesis is therefore that the dominant limitation is representation/classification rather than label eligibility alone.
+The current hypothesis is that the dominant limitation is representation/classification rather than label eligibility alone.
 
-## Task010 revision after MUSK block
+## Task010 history
 
-The first Task010 attempt correctly stopped at BLOCKED_MUSK_ACCESS because the official MUSK checkpoint required gated Hugging Face authorization.
+The MUSK-based plan was blocked by gated model access.
 
-The MUSK access block is retained as provenance but no longer blocks the project.
+The first public-encoder revision was then blocked because the server could not reach Hugging Face.
 
-Task010 has been revised to use two publicly accessible pathology foundation models:
+The user has now manually uploaded Phikon-v2 to the server. Task010 is therefore revised to a local-only Phikon-first execution.
 
-### Primary encoder
-Phikon-v2
-Official model ID:
-`owkin/phikon-v2`
+Midnight-12k is still uploading and must NOT block Phase A.
 
-### Independent confirmation encoder
-Midnight-12k
-Official model ID:
-`kaiko-ai/midnight`
-
-Use only the public Midnight-12k weights, not restricted Midnight-92k variants.
-
-## Task010 primary representations
+## Task010 Phase A primary representations
 
 1. CellViT_TOKEN
 2. PHIKON_V2_SMALL
 3. PHIKON_V2_CONTEXT
-4. MIDNIGHT12K_SMALL
-5. MIDNIGHT12K_CONTEXT
 
-All five must use exactly the same:
-- V3_CORE labels;
-- SHARED_DETECTED_CORE cell IDs;
-- matched H&E nucleus centers;
-- Task009 V3_CORE held-out batch folds;
-- linear-probe procedure;
-- secondary MLP-probe procedure.
+All three use:
+- V3_CORE frozen labels;
+- the same model-independent SHARED_DETECTED_CORE cell IDs;
+- the same matched H&E nucleus center;
+- the exact Task009 V3_CORE held-out batch folds;
+- identical linear-probe and secondary MLP-probe procedures.
 
-No foundation-model fine-tuning is allowed in the primary Task010 comparison.
+No encoder fine-tuning is allowed in Phase A.
 
-The revised execution audited the frozen inputs and physical H&E scale, but the remote server and local diagnostic environment both timed out when connecting to the official Hugging Face host for Phikon-v2 and Midnight-12k. No official checkpoint was loaded, no substitute encoder was used, and no benchmark metrics were generated. Production and frozen ground truth remain unchanged.
+## Local Phikon rule
+
+Codex must search local storage first and must NOT attempt network download before local discovery.
+
+Preferred local path:
+`/data/lf_data/models/phikon-v2`
+
+If not present there, search under `/data/lf_data` and the user model/cache directories.
+
+Load fully offline with `local_files_only=True`.
+
+If the local upload is incomplete, stop and report the exact missing files.
 
 ## Frozen ground truth
 
@@ -76,7 +74,7 @@ Task008 Neutrophil eligibility:
 Primary label set:
 `V3_CORE`
 
-Do not change annotation/QC rules based on Task010 results.
+Do not modify ground truth based on model results.
 
 ## Data sources
 
@@ -89,22 +87,28 @@ Registration:
 Task009 regenerated CORE dataset:
 `/data/lf_data/result/task009_v3_retraining/work/CellViT_dataset_v3_CORE`
 
+Task009 split manifest:
+`/data/lf_data/result/task009_v3_retraining/metrics/split_manifest.csv`
+
 Forbidden historical dataset:
 `/data/lf_data/xenium_data/CellViT_dataset`
 
-The forbidden historical dataset may not be used as an image, label, split, metadata, or embedding source.
+No forbidden historical dataset file may be used.
 
 ## Physical crop conditions
 
+Use validated project scale, approximately:
+`0.2125 μm/px`
+
 SMALL:
-approximately 16 × 16 μm field of view.
+~16 μm FOV, preferred 75×75 native px.
 
 CONTEXT:
-approximately 56 × 56 μm field of view.
+~56 μm FOV, preferred 263×263 native px.
 
-The native H&E crop size must be calculated from the validated physical pixel scale before encoder-specific resizing.
+Both crops are centered on the matched H&E CellViT nucleus centroid, then processed by the official local Phikon preprocessing.
 
-## Key endpoints
+## Phase A endpoints
 
 Overall:
 - macro-F1
@@ -117,39 +121,32 @@ Neutrophil:
 - F1
 - AUROC
 - AUPRC
-- Neutrophil→Myeloid
-- Neutrophil→T/B
+- N→Myeloid
+- N→T/B
 
 Binary diagnostics:
 - Neutrophil vs Myeloid
 - Neutrophil vs T/B
 
-Context-value comparisons:
-- PHIKON_V2_CONTEXT vs PHIKON_V2_SMALL
-- MIDNIGHT12K_CONTEXT vs MIDNIGHT12K_SMALL
+Context value:
+- PHIKON_V2_CONTEXT − PHIKON_V2_SMALL
 
-Cross-encoder confirmation:
-- determine whether Phikon-v2 and Midnight-12k independently support the same conclusion.
+Representation geometry:
+- class separation vs batch separation
 
-Secondary morphology upper bound:
-- Phikon-v2 and Midnight-12k on ALL_V3_CORE_GT_CENTERED cells, including cells not detected by CellViT.
+Secondary:
+- identical MLP probe
+- Phikon GT-centered morphology upper bound
 
-## Interpretation
+## Midnight Phase B
 
-If both public encoders show CONTEXT > SMALL > CellViT:
-- proceed to multiscale pathology-FM fusion and neighborhood auxiliary modeling.
+When Midnight-12k finishes uploading:
+- verify it locally;
+- reuse the frozen SHARED_DETECTED_CORE manifest;
+- reuse exact SMALL/CONTEXT crops and folds;
+- add Midnight SMALL/CONTEXT as independent confirmation.
 
-If SMALL > CellViT but context adds little:
-- proceed to local morphology specialist / limited encoder fine-tuning.
-
-If immune binary tasks improve but seven-class remains weak:
-- proceed to hierarchical immune classification.
-
-If only one encoder improves:
-- verify encoder-specific preprocessing and representation effects first.
-
-If neither improves:
-- reassess H&E separability ceiling and consider limited fine-tuning rather than immediately building a complex model.
+Do not alter the shared cohort after Phase A.
 
 ## Current production model
 
@@ -166,9 +163,10 @@ Production remains unchanged.
 
 ## Pending tasks
 
-- Restore access to the official public Phikon-v2 and Midnight-12k weights, then rerun revised Task010 from model provenance.
-- Preserve the previous MUSK access-block artefacts as provenance.
-- Do not build Task011 until Task010 identifies the useful encoder/scale.
+- Execute Task010 Phase A now using the locally uploaded Phikon-v2.
+- Do not wait for Midnight-12k.
+- Preserve earlier blocked-run artefacts as provenance.
+- Do not start Task011 until Phase A has been reviewed.
 - Do not modify production.
 - Do not modify frozen ground truth.
 
@@ -177,19 +175,15 @@ Production remains unchanged.
 - `tasks/task_009.md`
 - `reports/task_009_report.md`
 - `tasks/task_010.md`
-- `reports/task_010_report.md`
-- `config/phikon_v2_provenance.json`
-- `config/midnight12k_provenance.json`
-- `config/foundation_model_environment.txt`
-- `qc/public_model_provenance.md`
-- `qc/pixel_scale_audit.md`
 - `PROJECT_STATUS.md`
 
-## Task 010 status artefacts
+## Next execution command
 
-Blocked-run artefacts are recorded under `/data/lf_data/result/task010_representation_benchmark/`. No embeddings, crops, model checkpoints, benchmark metrics, or figures were generated.
+```text
+Execute task_010.
+```
 
-After official public weights are made reachable, Codex must pull `origin/main` before rerunning `Execute task_010.` and follow `AGENTS.md` plus the revised `tasks/task_010.md`.
+Codex must pull `origin/main` before execution and follow `AGENTS.md` plus the revised `tasks/task_010.md`.
 
 ## Last update
 
