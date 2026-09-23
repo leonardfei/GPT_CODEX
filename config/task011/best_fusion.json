@@ -1,0 +1,7 @@
+{
+  "candidate": "B0_raw",
+  "baseline": "FOV12",
+  "qualifying_raw_fusions": [],
+  "criterion": "macro-F1 +0.015 OR Neutrophil F1/AUPRC +0.03, with positive macro-F1 delta in >=4/5 folds",
+  "primary_mode": "raw branch-wise concatenation"
+}

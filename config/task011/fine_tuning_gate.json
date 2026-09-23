@@ -1,0 +1,41 @@
+{
+  "status": "EXECUTED_F1_FINAL_BLOCK",
+  "best_frozen_macro_f1": 0.4204130296841945,
+  "task010_midnight16_macro_f1": 0.4115773954169853,
+  "best_frozen_neutrophil_f1": 0.21378330019328998,
+  "plateau_definition": "no >=0.015 macro-F1 or >=0.03 Neutrophil F1 frozen improvement over Task010 Midnight 16 \u03bcm",
+  "production_model_modified": false,
+  "fine_tuning_executed": true,
+  "f1_candidate": "F1_FINAL_BLOCK",
+  "lora_stage": "NOT_RUN_NO_LOCAL_IMPLEMENTATION",
+  "f1_summary": {
+    "model": "Task011 F1 final block",
+    "candidate": "F1_FINAL_BLOCK",
+    "macro_f1": 0.4524265330530269,
+    "macro_auprc": 0.4882860570248442,
+    "lowest_three_f1": 0.2869834750130199,
+    "accuracy": 0.4963698676008671,
+    "balanced_accuracy": 0.4787429434686204,
+    "neutrophil_f1": 0.23226985538262354,
+    "neutrophil_auprc": 0.19594236098182155,
+    "n_vs_myeloid_auroc": 0.713887849349922,
+    "n_vs_myeloid_auprc": 0.5147762000126362,
+    "n_vs_tb_auroc": 0.7480594019106721,
+    "n_vs_tb_auprc": 0.3678243360977855,
+    "knn_batch_purity": 0.66374,
+    "spatial_knn_purity": 0.03399,
+    "class_knn_purity": 0.33518,
+    "n_vs_all_immune_auroc": NaN,
+    "n_vs_all_immune_auprc": NaN
+  },
+  "promotion": {
+    "macro_f1_gain": 0.03201350336883241,
+    "neutrophil_f1_gain": 0.018486555189333648,
+    "n_vs_myeloid_auprc_gain": 0.11945396079865644,
+    "outer_folds_improved_macro_f1": 5,
+    "purity_delta_batch": 0.045520000000000005,
+    "purity_delta_spatial": -0.0010799999999999976,
+    "criteria": "macro-F1 >= +0.03 AND (Neutrophil F1 or AUPRC) >= +0.03, >=4/5 fold macro-F1 improvements, and no purity increase >0.05",
+    "promoted_within_task011": true
+  }
+}

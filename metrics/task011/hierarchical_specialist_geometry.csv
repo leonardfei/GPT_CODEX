@@ -1,0 +1,2 @@
+candidate,n_geometry,class_separation_ratio,batch_separation_ratio,spatial_separation_ratio,knn_class_purity,knn_batch_purity,spatial_knn_purity
+HIERARCHICAL_SPECIALIST,10000,1.0269629955291748,1.099308967590332,1.5453200340270996,0.28883,0.61822,0.03507

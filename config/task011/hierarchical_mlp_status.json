@@ -1,0 +1,5 @@
+{
+  "status": "NOT_RUN",
+  "reason": "Secondary MLP heads are only authorized when the linear hierarchy improves or is within 0.01 macro-F1 of the flat best; observed hierarchy delta will be recorded in the report.",
+  "hierarchy_delta_vs_flat": -0.013901631733142461
+}

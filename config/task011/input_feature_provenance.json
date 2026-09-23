@@ -1,0 +1,31 @@
+{
+  "canonical": "/data/lf_data/result/task010_representation_benchmark/metrics/canonical_cell_order.csv.gz",
+  "features": {
+    "CELLVIT_TOKEN_ALIGNED": {
+      "path": "/data/lf_data/result/task010_representation_benchmark/features/cellvit_tokens_aligned.pt",
+      "shape": [
+        96044,
+        1280
+      ],
+      "dtype": "float32"
+    },
+    "PHIKON_V2_SMALL": {
+      "path": "/data/lf_data/result/task010_representation_benchmark/features/phikon_v2_small_aligned.pt",
+      "shape": [
+        96044,
+        1024
+      ],
+      "dtype": "float32"
+    },
+    "MIDNIGHT16": {
+      "path": "/data/lf_data/result/task010_representation_benchmark/features/midnight12k_small.pt",
+      "shape": [
+        96044,
+        3072
+      ],
+      "dtype": "float32"
+    }
+  },
+  "fold_source": "/data/lf_data/result/task009_v3_retraining/metrics/split_manifest.csv",
+  "seed": 20260923
+}

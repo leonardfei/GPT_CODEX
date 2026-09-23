@@ -1,0 +1,2 @@
+candidate,n_geometry,knn_class_purity,knn_batch_purity,spatial_knn_purity
+F1_FINAL_BLOCK,10000,0.33518,0.66374,0.03399

@@ -1,0 +1,14 @@
+{
+  "selection_rule": [
+    "highest mean macro-F1",
+    "within 0.01: higher true N-vs-Myeloid AUPRC",
+    "then lower batch/spatial kNN purity"
+  ],
+  "candidate": "FOV12",
+  "best_macro_f1": 0.4204130296841945,
+  "close_candidates": [
+    "FOV12"
+  ],
+  "physical_fov_um": 12,
+  "native_side_px": 57
+}

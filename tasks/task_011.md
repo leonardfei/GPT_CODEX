@@ -1,7 +1,9 @@
 # Task 011 — Midnight Local-Morphology Optimization and Hierarchical Immune Specialist
 
 ## Status
-PENDING
+COMPLETED
+
+Completion note: Task011 completed on the canonical 96,044-cell cohort with exact Task009 V3_CORE folds. FOV12 was selected; frozen fusion, hierarchy, specialist, and TTA gates were evaluated; the triggered F1 final-block gate completed and met the within-Task011 promotion criteria. No biological ground truth or production model was changed. See `reports/task_011_report.md`.
 
 ## Goal
 

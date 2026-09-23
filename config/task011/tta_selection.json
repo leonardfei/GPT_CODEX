@@ -1,0 +1,23 @@
+{
+  "best": "SINGLE",
+  "base": "SINGLE",
+  "decisions": [
+    {
+      "candidate": "TTA4",
+      "macro_f1_delta": 0.006410738805404215,
+      "neutrophil_auprc_delta": 0.0073867189025596525,
+      "batch_purity_delta": 0.011750000000000038,
+      "spatial_purity_delta": 0.0018500000000000044,
+      "eligible": false
+    },
+    {
+      "candidate": "TTA8",
+      "macro_f1_delta": 0.006263945983214503,
+      "neutrophil_auprc_delta": 0.009255165083805694,
+      "batch_purity_delta": 0.012539999999999996,
+      "spatial_purity_delta": 0.002230000000000003,
+      "eligible": false
+    }
+  ],
+  "normalization": "L2-normalize each view, average, L2-normalize final"
+}

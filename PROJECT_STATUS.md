@@ -2,7 +2,7 @@
 
 ## Current task
 
-Task 011 — Midnight local-morphology optimization and hierarchical immune specialist — PENDING / READY TO RUN
+Task 011 — Midnight local-morphology optimization and hierarchical immune specialist — COMPLETED
 
 ## Last completed benchmark
 
@@ -136,6 +136,20 @@ AND
 
 These are internal development targets, not claims of patient-level generalization.
 
+## Task011 completed results
+
+Canonical cohort: `96,044` cells; exact Task009 V3_CORE five held-out batch folds; seed `20260923`.
+
+- BEST_FOV: Midnight FOV12, 57 native px, macro-F1 `0.4204 ± 0.0330`.
+- Task010 FOV16 was not optimal; FOV12 improved macro-F1 by `+0.0116`.
+- BEST_FUSION: `B0_raw`; CellViT raw fusion reached `0.4344` (+0.0140) but did not meet the +0.015 promotion criterion. PCA-controlled fusion did not reproduce the gain.
+- Hierarchy: macro-F1 `0.4065`; N specialist: `0.3799`; neither promoted.
+- TTA4/TTA8 macro-F1: `0.4268/0.4267`; both below the keep threshold, so `SINGLE` retained.
+- Fine-tuning gate triggered after frozen optimization plateaued. F1 final-block macro-F1 `0.4524 ± 0.0335`, Neutrophil F1 `0.2323`, Neutrophil AUPRC `0.1959`; macro-F1 improved in 5/5 folds, batch purity delta `+0.0455`, spatial purity delta `−0.0011`.
+- Final preferred validation candidate: `F1_FINAL_BLOCK` at FOV12. It meets the minimum meaningful internal target, but not the strong or excellent target.
+
+No frozen biological ground truth, Task009 output, or `/data/lf_data/result/model_best.pth` was modified. Task011 remains diagnostic and requires independent-slide/patient validation before production consideration.
+
 ## Canonical data
 
 Task010 canonical order:
@@ -170,7 +184,7 @@ Production remains unchanged.
 
 ## Pending tasks
 
-- Execute Task011.
+- Design and execute Task012 independent-slide/patient validation for `F1_FINAL_BLOCK`.
 - Preserve strict canonical cell alignment and exact grouped folds.
 - Do not change frozen biological labels.
 - Do not promote Task011 model to production without independent-slide/patient validation.
@@ -180,16 +194,20 @@ Production remains unchanged.
 - tasks/task_010.md
 - reports/task_010_report.md
 - tasks/task_011.md
+- reports/task_011_report.md
+- scripts/python/task011_midnight_optimization.py
+- scripts/python/task011_finetune_f1.py
+- scripts/python/task011_finalize.py
 - PROJECT_STATUS.md
 
 ## Next execution command
 
 ```text
-Execute task_011.
+Prepare Task012 independent-slide/patient validation.
 ```
 
 Codex must pull origin/main and follow AGENTS.md plus tasks/task_011.md.
 
 ## Last update
 
-2026-09-23
+2026-09-24
