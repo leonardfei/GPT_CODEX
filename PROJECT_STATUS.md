@@ -2,7 +2,7 @@
 
 ## Current task
 
-Task 010 — Public pathology foundation model representation benchmark: CellViT token vs Phikon-v2 vs Midnight-12k — PENDING
+Task 010 — Public pathology foundation model representation benchmark: CellViT token vs Phikon-v2 vs Midnight-12k — BLOCKED (official public model downloads unreachable)
 
 ## Last completed task
 
@@ -62,6 +62,8 @@ All five must use exactly the same:
 - secondary MLP-probe procedure.
 
 No foundation-model fine-tuning is allowed in the primary Task010 comparison.
+
+The revised execution audited the frozen inputs and physical H&E scale, but the remote server and local diagnostic environment both timed out when connecting to the official Hugging Face host for Phikon-v2 and Midnight-12k. No official checkpoint was loaded, no substitute encoder was used, and no benchmark metrics were generated. Production and frozen ground truth remain unchanged.
 
 ## Frozen ground truth
 
@@ -164,7 +166,7 @@ Production remains unchanged.
 
 ## Pending tasks
 
-- Execute revised Task010.
+- Restore access to the official public Phikon-v2 and Midnight-12k weights, then rerun revised Task010 from model provenance.
 - Preserve the previous MUSK access-block artefacts as provenance.
 - Do not build Task011 until Task010 identifies the useful encoder/scale.
 - Do not modify production.
@@ -175,15 +177,19 @@ Production remains unchanged.
 - `tasks/task_009.md`
 - `reports/task_009_report.md`
 - `tasks/task_010.md`
+- `reports/task_010_report.md`
+- `config/phikon_v2_provenance.json`
+- `config/midnight12k_provenance.json`
+- `config/foundation_model_environment.txt`
+- `qc/public_model_provenance.md`
+- `qc/pixel_scale_audit.md`
 - `PROJECT_STATUS.md`
 
-## Next execution command
+## Task 010 status artefacts
 
-```text
-Execute task_010.
-```
+Blocked-run artefacts are recorded under `/data/lf_data/result/task010_representation_benchmark/`. No embeddings, crops, model checkpoints, benchmark metrics, or figures were generated.
 
-Codex must pull `origin/main` before execution and follow `AGENTS.md` plus the revised `tasks/task_010.md`.
+After official public weights are made reachable, Codex must pull `origin/main` before rerunning `Execute task_010.` and follow `AGENTS.md` plus the revised `tasks/task_010.md`.
 
 ## Last update
 

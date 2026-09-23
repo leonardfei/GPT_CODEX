@@ -1,10 +1,17 @@
 {
-  "status": "BLOCKED_MUSK_ACCESS",
-  "native_h_and_e_pixel_scale_um_per_pixel": null,
-  "scale_audit_performed": false,
-  "musk_input_size_px": 384,
-  "musk_small_physical_fov_um": [16, 16],
-  "musk_context_physical_fov_um": [56, 56],
-  "native_crop_geometry_px": null,
-  "note": "Geometry is intentionally not applied until official MUSK access is authorized and the native H&E scale audit is completed."
+  "status": "BLOCKED_PUBLIC_MODEL_DOWNLOAD",
+  "native_h_and_e_pixel_scale_um_per_pixel": 0.2125,
+  "scale_source": "historical validated notebook Prepare_allcelltype_batch8_train8_test.ipynb, PIXEL_SIZE = 0.2125",
+  "ome_metadata_physical_size_um": {
+    "x": 352.77777777777777,
+    "y": 352.77777777777777,
+    "unit": "um",
+    "note": "Inconsistent with validated registration scale; not used."
+  },
+  "small_physical_fov_um": [16, 16],
+  "context_physical_fov_um": [56, 56],
+  "small_native_crop_side_px_float": 75.29411764705883,
+  "context_native_crop_side_px_float": 263.52941176470586,
+  "crop_generation_performed": false,
+  "note": "Physical geometry audited but not applied because public model checkpoints were unreachable."
 }

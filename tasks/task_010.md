@@ -1,7 +1,7 @@
 # Task 010 — Public Pathology Foundation Model Representation Benchmark
 
 ## Status
-PENDING (revised after MUSK access block)
+BLOCKED (official public Phikon-v2 and Midnight-12k downloads unreachable; no benchmark run)
 
 ## Objective
 

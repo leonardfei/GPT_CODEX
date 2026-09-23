@@ -1,0 +1,20 @@
+{
+  "status": "BLOCKED_PUBLIC_MODEL_DOWNLOAD",
+  "model_id": "kaiko-ai/midnight",
+  "official_source": "https://huggingface.co/kaiko-ai/midnight",
+  "official_repository": "https://github.com/kaiko-ai/Midnight",
+  "variant": "Midnight-12k",
+  "revision": null,
+  "checkpoint_path": null,
+  "sha256": null,
+  "license": "MIT",
+  "input_size": [224, 224],
+  "normalization_mean": [0.5, 0.5, 0.5],
+  "normalization_std": [0.5, 0.5, 0.5],
+  "feature_rule": "concatenate CLS token and mean patch-token embedding",
+  "expected_embedding_dim": 3072,
+  "download_attempt": "Official huggingface.co host timed out from both remote server and local diagnostic environment.",
+  "loaded": false,
+  "substitute_used": false,
+  "restricted_variants_used": false
+}

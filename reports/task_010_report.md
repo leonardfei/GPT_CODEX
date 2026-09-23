@@ -1,71 +1,79 @@
-# Task 010 — Frozen representation benchmark
+# Task 010 — Public pathology foundation model representation benchmark
 
-Status: **BLOCKED_MUSK_ACCESS**
+Status: **BLOCKED** — official public model downloads were unreachable; no benchmark interpretation was performed.
 
 ## Executive result
 
-Task010 stopped at the required official-MUSK access gate. The server has no existing official MUSK installation, checkpoint, or cache, and the official Hugging Face model requires gated-term acceptance plus a Hugging Face write token. Those credentials and manual authorization were not available. No substitute encoder was used and no representation benchmark was started.
+The revised Task010 correctly moved from the prior MUSK-only access block to the public Phikon-v2 and Midnight-12k comparison. Both official model repositories were identified and their documented extraction rules were reviewed, but the execution environment could not connect to `huggingface.co` to download either checkpoint. No unofficial mirror, random initialization, or substitute encoder was used. The task stopped before shared-cohort feature extraction and classification.
 
-## A. MUSK availability and provenance
+The previous MUSK access-block artefacts remain under `/data/lf_data/result/task010_representation_benchmark/config/` and are retained as provenance; they are not the reason for this revised block.
 
-The official code source is [lilab-stanford/MUSK](https://github.com/lilab-stanford/MUSK). Its documented model reference is `hf_hub:xiangjx/musk` with model ID `xiangjx/musk`. The official README requires accepting the Hugging Face model terms and logging in with a Hugging Face write token before model access.
+## A–B. Public model provenance and access
 
-Server checks under `/data/lf_data` found no MUSK installation, checkpoint, or cache. `musk` and `MUSK` were not importable; `transformers` and `open_clip` were also unavailable in the existing CellViT environment. A no-credential Hugging Face metadata request could not complete because the server could not establish the external connection; in any event, the official README's gated-access requirement is sufficient to trigger the task-defined blocker.
+### Phikon-v2
 
-No checkpoint was downloaded or loaded:
+- official model: `owkin/phikon-v2`
+- official source: [Owkin Phikon-v2](https://huggingface.co/owkin/phikon-v2)
+- architecture documented by the model card: ViT-L/16 via DINOv2
+- official feature rule: CLS token from `last_hidden_state[:, 0, :]`
+- expected feature dimension: 1024; no runtime dimension was obtained
+- license: Owkin non-commercial licence; no downstream licensing assumption was made
+- revision, local checkpoint, and SHA256: unavailable because download did not complete
 
-- checkpoint path: none
-- checkpoint SHA256: none
-- model verification: not performed because access was blocked
-- blocker: Hugging Face gated terms plus write-token login and manual authorization
+### Midnight-12k
 
-The CANVAS repository also states that MUSK must be installed first: [lilab-stanford/CANVAS](https://github.com/lilab-stanford/CANVAS).
+- official model: `kaiko-ai/midnight`
+- official source: [Kaiko Midnight](https://huggingface.co/kaiko-ai/midnight) and [official repository](https://github.com/kaiko-ai/Midnight)
+- model variant: Midnight-12k only; Midnight-92k and Midnight-92k/392 were not used
+- official preprocessing: 224×224, mean `(0.5, 0.5, 0.5)`, standard deviation `(0.5, 0.5, 0.5)`
+- official classification feature: concatenated CLS token and mean patch-token embedding
+- expected feature dimension: 3072 from the documented 1536-wide representation; no runtime dimension was obtained
+- license: MIT
+- revision, local checkpoint, and SHA256: unavailable because download did not complete
 
-## B. Benchmark scope not executed
+Access attempts were made against the official Hugging Face host only. The remote server timed out on both official model URLs after 20 seconds. A local diagnostic request to the same official host also timed out after 30 seconds. The remote environment had no model cache and did not contain either encoder. `transformers` was not installed in the existing CellViT environment, but dependency installation was not started because the required public checkpoints were unreachable. Exact gate records are in `qc/public_model_provenance.md` and the two JSON files under `config/`.
 
-Because the access gate blocked the task before benchmarking, the following were intentionally not generated:
+## C. H&E scale and crop geometry audit
 
-- `SHARED_DETECTED_CORE` manifest and class/batch counts;
-- MUSK_SMALL and MUSK_CONTEXT crops, embeddings, and crop montages;
-- CellViT token re-extraction and representation comparison;
-- Task009-equivalent five-fold linear or MLP probes;
-- binary Neutrophil-vs-Myeloid and Neutrophil-vs-T/B diagnostics;
-- MUSK-only GT-centered upper-bound analysis;
-- representation geometry, UMAP, figures, and benchmark metrics.
+The original H&E exists and was metadata-audited without reading the full pixel array. It is a 50,000 × 23,451 RGB uint8 OME-TIFF. Its OME metadata reports `PhysicalSizeX = PhysicalSizeY = 352.77777777777777 µm`, which would imply an implausible scale of approximately 0.00706 µm/px and is inconsistent with the validated project registration workflow.
 
-Therefore, macro-F1/AUPRC, Neutrophil metrics, confusion flows, binary metrics, paired fold deltas, and upper-bound results are **not estimable from this blocked run**. No performance claim or next-model promotion decision is made.
+The historical validated notebook records `PIXEL_SIZE = 0.2125` µm/px. Task010 therefore preserves that validated scale for the planned geometry audit. The intended physical fields are 16 × 16 µm (SMALL) and 56 × 56 µm (CONTEXT), corresponding to approximately 75.29 and 263.53 native pixels per side before encoder-specific resizing. No crop was generated while the model access gate was blocked. See `qc/pixel_scale_audit.md` and `config/crop_geometry.json`.
 
-## C. Frozen inputs and safety checks
+## D–E. Frozen inputs and fold audit
 
-The task was started only after `git pull --ff-only origin main`. The intended frozen inputs were not modified:
+The required frozen inputs exist and their schemas were inspected:
 
 - Task007 annotation: `/data/lf_data/result/task007_xenium5k_panelaware/metrics/xenium_v3_annotations.csv.gz`
 - Task008 eligibility: `/data/lf_data/result/task008_neutrophil_he_recalibration/metrics/neutrophil_training_eligibility_task008.csv.gz`
 - original H&E: `/data/lf_data/xenium_data/ID0060276.ome.tif`
-- registration: `/data/lf_data/xenium_data/matrix.csv`
-- Task009 regenerated CORE dataset: `/data/lf_data/result/task009_v3_retraining/work/CellViT_dataset_v3_CORE`
-- historical `/data/lf_data/xenium_data/CellViT_dataset`: not accessed as an input
+- registration matrix: `/data/lf_data/xenium_data/matrix.csv`
+- Task009 V3_CORE dataset: `/data/lf_data/result/task009_v3_retraining/work/CellViT_dataset_v3_CORE`
+- Task009 split manifest: `/data/lf_data/result/task009_v3_retraining/metrics/split_manifest.csv`
 
-Production `/data/lf_data/result/model_best.pth` was not modified. Frozen Task007/Task008 ground truth was not modified.
+The exact Task009 V3_CORE batch folds were recovered and would have been reused:
 
-## D. Environment observed at the gate
+| fold | train batches | validation batches |
+|---:|---|---|
+| 0 | s01A, s01B, s04B, s11, s22, s93 | s02A, s06A |
+| 1 | s01A, s01B, s02A, s04B, s06A, s11, s93 | s22 |
+| 2 | s01B, s02A, s04B, s06A, s22, s93 | s01A, s11 |
+| 3 | s01A, s02A, s04B, s06A, s11, s22, s93 | s01B |
+| 4 | s01A, s01B, s02A, s06A, s11, s22 | s04B, s93 |
 
-The existing remote environment was `cellvit_env`; no separate MUSK environment was created. Observed versions were recorded in `config/task010_musk_environment.txt`: Python 3.10.14, PyTorch 2.7.1+cu128, timm 1.0.8, huggingface_hub 0.22.2, Pillow 10.3.0, NumPy 1.23.5, pandas 1.4.3, scikit-learn 1.3.0, CUDA available. Installing or changing dependencies was avoided because the official weights were inaccessible.
+No historical `CellViT_dataset` file was used. Frozen labels, raw H&E, registration, Task009 data, and production checkpoint were not modified.
 
-## E. Physical scale and crop geometry
+## F–Q. Benchmark endpoints not estimable
 
-No crops were generated because Task010 is blocked before the benchmark. The requested geometry remains pending: 0.25 µm/pixel equivalent, MUSK_SMALL approximately 16 × 16 µm, MUSK_CONTEXT approximately 56 × 56 µm, with native-scale conversion and official 384 × 384 MUSK resizing to be audited only after access is authorized. No physical-scale claim is made from this blocked run.
+Because neither public encoder could be loaded, `SHARED_DETECTED_CORE` was not constructed and no cells entered the revised benchmark. Consequently there are no class/batch counts, crop manifests, feature matrices, linear-probe or MLP results, Neutrophil metrics, confusion flows, binary diagnostics, context deltas, cross-encoder agreement, geometry metrics, GT-centered upper-bound results, paired fold deltas, or best-representation decision.
 
-## F. Required interpretation and next step
+The following questions therefore remain unanswered by this run: whether Phikon-v2 or Midnight-12k improves over CellViT_TOKEN; whether CONTEXT improves over SMALL; whether either encoder reduces Neutrophil→Myeloid or Neutrophil→T/B confusion; whether gains replicate across encoders; and which Task011 branch is justified. No biological or model-ranking conclusion is made.
 
-No representation ranking can be inferred. The Task009 finding that CellViT detection/representation is a bottleneck remains the last completed evidence, but Task010 cannot distinguish CellViT-token limitation from MUSK morphology/context signal without the official encoder.
+## Safety and next step
 
-Recommended next action: obtain authorized access to the official `xiangjx/musk` model by completing the Hugging Face terms and providing an approved token through the secure server environment. Then rerun Task010 from the access gate, preserving V3_CORE labels, Task009 batch folds, and the shared-cell fairness design. Do not substitute another encoder and do not update production.
+Production `/data/lf_data/result/model_best.pth` was not changed. Task007/Task008 ground truth was not changed. No foundation-model checkpoint, embedding, crop, credential, or token was committed to Git.
+
+Next step: restore outbound access to the official Hugging Face repositories or stage the exact official Phikon-v2 and Midnight-12k files under `/data/lf_data` with their revisions and SHA256 values, then rerun Task010 from model provenance. Do not use a mirror, restricted Midnight variant, or another encoder as a substitute.
 
 ## Remote artefacts
 
-The blocked-run gate artefacts are stored under:
-
-`/data/lf_data/result/task010_representation_benchmark/`
-
-including `TASK010_REPORT.md`, `config/musk_model_provenance.md`, `config/musk_environment.txt`, `config/musk_checkpoint_sha256.json`, and `config/crop_geometry.json`. No embeddings, checkpoints, crops, or large datasets were created.
+Blocked-run audit files are under `/data/lf_data/result/task010_representation_benchmark/`, including `TASK010_REPORT.md`, `qc/public_model_provenance.md`, `qc/pixel_scale_audit.md`, the model provenance JSON files, `config/foundation_model_environment.txt`, and `config/crop_geometry.json`. No benchmark metrics or figures were generated.

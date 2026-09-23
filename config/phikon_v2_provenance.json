@@ -1,0 +1,15 @@
+{
+  "status": "BLOCKED_PUBLIC_MODEL_DOWNLOAD",
+  "model_id": "owkin/phikon-v2",
+  "official_source": "https://huggingface.co/owkin/phikon-v2",
+  "revision": null,
+  "checkpoint_path": null,
+  "sha256": null,
+  "license": "Owkin non-commercial licence",
+  "architecture": "ViT-L/16 via DINOv2",
+  "feature_rule": "CLS token, outputs.last_hidden_state[:, 0, :]",
+  "expected_embedding_dim": 1024,
+  "download_attempt": "Official huggingface.co host timed out from both remote server and local diagnostic environment.",
+  "loaded": false,
+  "substitute_used": false
+}
