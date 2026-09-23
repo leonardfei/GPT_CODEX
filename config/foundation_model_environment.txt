@@ -17,3 +17,7 @@ offline flags HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 model loading local_files_only=True
 CellViT token semantics official CellViTInfExpDetection._extract_tokens
 Phikon feature semantics last_hidden_state[:, 0, :]
+Midnight-12k loaded from /data/lf_data/models/midnight-12k with local_files_only=True
+Midnight runtime architecture Dinov2Model hidden_size=1536 patch_size=14
+Midnight classification feature last_hidden_state[:,0,:] concatenated with mean(last_hidden_state[:,1:,:])
+Midnight runtime embedding dimension 3072; preprocessing resize/center-crop 224 and mean/std 0.5

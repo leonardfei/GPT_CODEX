@@ -1,7 +1,7 @@
 # Task 010 — Corrected CellViT Alignment + Local Midnight-12k Integration
 
 ## Status
-PENDING-CORRECTION-AND-MIDNIGHT — correct the CellViT token alignment issue, then run a five-representation local-only benchmark including the user-uploaded Midnight-12k.
+PARTIAL-CORRECTED-FIVEWAY-COMPLETE — canonical alignment correction and shared-cohort five-representation benchmark completed; Midnight GT-centered secondary analysis remains pending.
 
 ## Why this correction is required
 

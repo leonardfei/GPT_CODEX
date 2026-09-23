@@ -1,112 +1,86 @@
-# Task 010 — Phikon-first local pathology foundation-model representation benchmark
+# Task 010 — Corrected CellViT alignment and local Midnight-12k integration
 
-Status: **PARTIAL-PHIKON-COMPLETE**. Phase A completed with the locally uploaded Phikon-v2. Midnight-12k Phase B remains pending and does not block this result.
+Status: **PARTIAL-CORRECTED-FIVEWAY-COMPLETE**. The corrected shared-cohort five-representation benchmark is complete. The secondary Midnight GT-centered upper bound remains pending.
 
 ## Executive result
 
-On the frozen Task009 V3_CORE training cells and exact five held-out batch folds, the frozen Phikon-v2 SMALL representation outperformed the official CellViT token representation in the identical linear probe:
+The previous Phase A CellViT baseline was misaligned. All 96,044 token rows changed positional index after reindexing by the canonical composite key. After correction, CellViT_TOKEN_ALIGNED is no longer near-random and is essentially tied with Phikon-v2 SMALL. Midnight-12k SMALL is the strongest representation in this diagnostic benchmark.
 
 | representation | macro-F1 mean ± SD | macro-AUPRC mean ± SD | Neutrophil F1 | Neutrophil AUPRC |
 |---|---:|---:|---:|---:|
-| CellViT_TOKEN | 0.1102 ± 0.0187 | 0.1388 ± 0.0068 | 0.0631 | 0.0500 |
-| PHIKON_V2_SMALL | **0.3366 ± 0.0243** | **0.3434 ± 0.0339** | **0.1885** | **0.1349** |
+| CELLVIT_TOKEN_ALIGNED | 0.3364 ± 0.0263 | 0.3418 ± 0.0260 | 0.1885 | 0.1327 |
+| PHIKON_V2_SMALL | 0.3366 ± 0.0243 | 0.3434 ± 0.0339 | 0.1885 | 0.1349 |
 | PHIKON_V2_CONTEXT | 0.2726 ± 0.0253 | 0.2834 ± 0.0315 | 0.1414 | 0.0998 |
+| MIDNIGHT12K_SMALL | **0.4116 ± 0.0312** | **0.4327 ± 0.0393** | **0.2175** | **0.1620** |
+| MIDNIGHT12K_CONTEXT | 0.2806 ± 0.0221 | 0.3072 ± 0.0305 | 0.1399 | 0.1045 |
 
-The SMALL gain versus CellViT was positive in all five paired folds. It satisfies the prespecified strong-gain thresholds, but Phikon features also showed substantially higher batch separation, so the result is evidence for a stronger frozen morphology representation—not yet evidence of a production-ready or batch-robust model.
+The prior claim of a +0.226 macro-F1 Phikon gain over CellViT is superseded. The corrected Phikon SMALL−CellViT macro-F1 delta is +0.0001; Midnight SMALL−CellViT is +0.0751.
 
-## A–C. Local model provenance and offline loading
+## A–D. Alignment correction and canonical cohort
 
-The uploaded model was found at `/data/lf_data/models/phikon-v2`. The archive was locally validated (`gzip -t`) and extracted without changing source data. The directory contained `model.safetensors`, `config.json`, `preprocessor_config.json`, `README.md`, `LICENSE.pdf`, and `.gitattributes`.
+The frozen `SHARED_DETECTED_CORE` manifest was reused unchanged: 96,044 cells, the same V3_CORE labels, matched H&E centers, and exact Task009 five held-out batch folds. A canonical order file was created with `cell_id`, composite key, class, batch, coordinates, and canonical index.
 
-- weight SHA256: `261ae680fa699b3b951597fd57aa19c02ef735805acb104b93af69b36d928569`
-- architecture: `Dinov2Model`, model type `dinov2`, patch size 16, configured hidden size 1024
-- runtime embedding: `last_hidden_state[:, 0, :]`, dimension 1024, finite float32 output
-- processor: resize shortest edge 224, center crop 224×224, RGB, rescale 1/255, ImageNet mean/std, bicubic resampling
-- loading: `AutoImageProcessor.from_pretrained(..., local_files_only=True)` and `AutoModel.from_pretrained(..., local_files_only=True)`
-- environment: Python 3.10.14, torch 2.7.1+cu128, NVIDIA RTX PRO 5000 72GB, isolated offline Transformers 4.45.2 / Hugging Face Hub 0.25.2 / safetensors 0.4.5
-- offline flags: `HF_HUB_OFFLINE=1`, `TRANSFORMERS_OFFLINE=1`
+The old CellViT token tensor and manifest each had 96,044 rows. The tensor was reindexed using `image|local_x|local_y|class_id`; key uniqueness, one-to-one coverage, no missing/extra cells, and exact post-reindex cell_id equality were asserted. **96,044/96,044 rows (100%) changed positional index.** The corrected token dimension is 1,280.
 
-No fallback model, mirror, credential, token, or online download was used. Full provenance is in `config/phikon_v2_provenance.json` and `qc/phikon_local_provenance.md`.
+The corrected CellViT macro-F1 (0.3364 ± 0.0263) is close to the Task009 V3_CORE classifier result (0.3330 ± 0.0222), although the universes and probe recipes differ. This strongly indicates that the former 0.1102 baseline was primarily caused by alignment, not by an intrinsically unusable CellViT token representation.
 
-## D–F. Frozen data, crop geometry, and cohort
+Phikon SMALL and CONTEXT payloads were revalidated against canonical cell IDs and saved as aligned copies. Both were exact-ID aligned before reuse, finite, and dimension 1,024.
 
-The source was the original `/data/lf_data/xenium_data/ID0060276.ome.tif` (50,000 × 23,451 × 3, uint8 RGB), not the forbidden historical CellViT dataset and not Task009 PNGs. The validated project scale was 0.2125 µm/px; inconsistent OME PhysicalSize metadata was not used.
+## E–G. Midnight-12k provenance and extraction
 
-- SMALL: 16 × 16 µm, 75 × 75 native pixels
-- CONTEXT: 56 × 56 µm, 263 × 263 native pixels
-- both centered on the matched CellViT H&E nucleus centroid
+The user-uploaded archive was found at `/data/lf_data/models/midnight-12k.tar.gz`, passed `gzip -t`, and was extracted to `/data/lf_data/models/midnight-12k`. Only the public Midnight-12k checkpoint was used; no Midnight-92k variant, network fallback, mirror, or credential was used.
 
-The model-independent `SHARED_DETECTED_CORE` was frozen before Phikon extraction. It contains 96,044 cells after V3_CORE label, Task009 training-batch, CellViT-detection/token, and both-crop in-bounds checks.
+- model weight SHA256: `52c14f20386ca17c2af8a7bf32c31c352668a8fbf6aefc88d86be6eaa0c72ca1`
+- runtime architecture: local `Dinov2Model`, hidden size 1,536, patch size 14
+- input: official README transform resize 224, center crop 224, mean/std `(0.5, 0.5, 0.5)`
+- runtime output: 257 tokens for 224×224 input
+- classification feature: concatenate CLS token and mean patch tokens, dimension 3,072
+- loading: `AutoModel.from_pretrained(..., local_files_only=True)` under `HF_HUB_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1`
 
-| class | cells |
-|---|---:|
-| Endothelial | 13,339 |
-| Mesenchymal | 16,988 |
-| Myeloid | 15,994 |
-| Neutrophil | 6,139 |
-| Plasma cell | 8,539 |
-| T and B | 21,018 |
-| Tumor | 14,027 |
+Midnight used the exact Phikon native crop centers and fields: 75×75 SMALL and 263×263 CONTEXT from the original OME-TIFF, followed by Midnight-specific preprocessing.
 
-Batch counts were s01A 10,359; s01B 6,714; s02A 2,170; s04B 19,124; s06A 17,062; s11 14,524; s22 16,484; s93 9,607. The exact Task009 V3_CORE held-out identities were reused:
+## H–L. True binary probes and context value
 
-| fold | train batches | validation batches |
-|---:|---|---|
-| 0 | s01A;s01B;s04B;s11;s22;s93 | s02A;s06A |
-| 1 | s01A;s01B;s02A;s04B;s06A;s11;s93 | s22 |
-| 2 | s01B;s02A;s04B;s06A;s22;s93 | s01A;s11 |
-| 3 | s01A;s02A;s04B;s06A;s11;s22;s93 | s01B |
-| 4 | s01A;s01B;s02A;s06A;s11;s22 | s04B;s93 |
+The old seven-class probability-ratio diagnostics were archived and are not treated as binary specialist results. Corrected results use separately trained class-balanced binary probes on each outer training fold.
 
-No train/validation batch overlap was present.
+Mean AUROC / AUPRC:
 
-## G–L. Linear probe, confusion, and geometry
-
-All three representations used the same standardization, class-balanced multinomial softmax linear probe, fixed C=1, fixed seed, and the same fold assignments. The GPU implementation is mathematically equivalent to multinomial logistic regression and was used to avoid an impractically slow CPU L-BFGS fit.
-
-Phikon SMALL improved over CellViT by +0.2263 macro-F1 and +0.2047 macro-AUPRC. CONTEXT was worse than SMALL by −0.0640 macro-F1 and −0.0601 macro-AUPRC in paired folds. Neutrophil metrics were:
-
-| representation | precision | recall | F1 | AUROC | AUPRC |
-|---|---:|---:|---:|---:|---:|
-| CellViT_TOKEN | 0.0453 | 0.1691 | 0.0631 | 0.4659 | 0.0500 |
-| PHIKON_V2_SMALL | 0.1491 | 0.2810 | 0.1885 | 0.6874 | 0.1349 |
-| PHIKON_V2_CONTEXT | 0.1169 | 0.1831 | 0.1414 | 0.6125 | 0.0998 |
-
-Binary specialist AUROC / AUPRC means were: CellViT 0.5002 / 0.2407 for Neutrophil-vs-Myeloid and 0.4605 / 0.1919 for Neutrophil-vs-T/B; Phikon SMALL 0.6240 / 0.3440 and 0.6932 / 0.3526; CONTEXT 0.5472 / 0.2811 and 0.6349 / 0.3045, respectively.
-
-The main confusion rates, averaged across folds, were N→Myeloid approximately 0.100 for CellViT, 0.143 for SMALL, and 0.158 for CONTEXT; N→T/B was approximately 0.134, 0.139, and 0.167. Thus the specialist AUROC/AUPRC improved, but the thresholded multiclass confusion flow did not uniformly decrease; this distinction is retained as an observed result.
-
-Geometry showed class-separation ratios of 1.000 (CellViT), 1.014 (SMALL), and 1.019 (CONTEXT), while batch-separation ratios were 1.020, 1.130, and 1.265. kNN batch purity was 0.340, 0.841, and 0.987, respectively. The Phikon gain is therefore accompanied by a major batch-structure signal, especially for CONTEXT.
-
-## M. MLP probe
-
-Using the same `Linear256 → ReLU → Dropout0.5 → Linear128 → ReLU → Dropout0.5 → Linear7` architecture and class-balanced AdamW training:
-
-| representation | MLP macro-F1 | MLP macro-AUPRC |
+| representation | Neutrophil vs Myeloid | Neutrophil vs T and B |
 |---|---:|---:|
-| CellViT_TOKEN | 0.1095 ± 0.0155 | 0.1398 ± 0.0046 |
-| PHIKON_V2_SMALL | 0.3008 ± 0.0213 | 0.3189 ± 0.0344 |
-| PHIKON_V2_CONTEXT | 0.2489 ± 0.0257 | 0.2700 ± 0.0319 |
+| CELLVIT_TOKEN_ALIGNED | 0.644 / 0.351 | 0.673 / 0.331 |
+| PHIKON_V2_SMALL | 0.617 / 0.339 | 0.683 / 0.349 |
+| PHIKON_V2_CONTEXT | 0.539 / 0.271 | 0.627 / 0.294 |
+| MIDNIGHT12K_SMALL | **0.671 / 0.380** | **0.707 / 0.371** |
+| MIDNIGHT12K_CONTEXT | 0.567 / 0.291 | 0.660 / 0.307 |
 
-The MLP did not reverse the representation ranking and did not exceed the linear probe on this frozen cohort.
+Both encoders independently show SMALL > CONTEXT. Corrected paired macro-F1 deltas were Phikon CONTEXT−SMALL −0.0640, Midnight CONTEXT−SMALL −0.1310, Midnight SMALL−Phikon SMALL +0.0750, and Phikon SMALL−corrected CellViT +0.0001.
 
-## N. GT-centered morphology upper bound
+## M–N. Nested MLP, geometry, and cross-encoder agreement
 
-An additional diagnostic used all 156,300 Task009 V3_CORE training cells with valid registered centers and both crop bounds, without requiring a CellViT detection. This is not the deployable shared-cell benchmark and does not change the frozen shared manifest.
+The corrected MLP uses training-only grouped inner validation: the prespecified last outer-training batch is the inner validation batch, the selected epoch is then refit from scratch on all outer-training cells, and the outer validation is evaluated once.
 
-- GT-centered SMALL: macro-F1 0.3379 ± 0.0231; macro-AUPRC 0.3431 ± 0.0265
-- GT-centered CONTEXT: macro-F1 0.2746 ± 0.0216; macro-AUPRC 0.2871 ± 0.0260
+| representation | nested MLP macro-F1 | nested MLP macro-AUPRC |
+|---|---:|---:|
+| CELLVIT_TOKEN_ALIGNED | 0.3239 ± 0.0354 | 0.3438 ± 0.0327 |
+| PHIKON_V2_SMALL | 0.3083 ± 0.0192 | 0.3349 ± 0.0343 |
+| PHIKON_V2_CONTEXT | 0.2593 ± 0.0155 | 0.2854 ± 0.0291 |
+| MIDNIGHT12K_SMALL | **0.3813 ± 0.0238** | **0.4151 ± 0.0329** |
+| MIDNIGHT12K_CONTEXT | 0.2624 ± 0.0218 | 0.2989 ± 0.0295 |
 
-The GT-centered upper bound is nearly identical to the shared-detected SMALL result, so the observed representation gain is not explained solely by excluding CellViT-undetected cells. CONTEXT remains lower than SMALL.
+On the same deterministic 10,000-cell subset, class-separation ratios were CellViT 1.015, Phikon SMALL 1.015, Phikon CONTEXT 1.019, Midnight SMALL 1.033, and Midnight CONTEXT 1.041. Batch-separation ratios were 1.034, 1.130, 1.263, 1.127, and 1.306. Batch kNN purity was 0.501, 0.841, 0.987, 0.731, and 0.957, respectively. These batch/spatial signals require caution when ranking pathology encoders.
 
-## O–Q. Interpretation and next direction
+Phikon/Midnight prediction agreement was 0.526 (Cohen κ 0.420) for SMALL and 0.510 (κ 0.380) for CONTEXT. SMALL correct/correct overlap was 0.294 and error/error overlap 0.445; the low-to-moderate agreement indicates that Midnight's gain is not simply identical to Phikon's errors.
 
-Observed evidence is most consistent with a meaningful frozen local morphology representation gain over the CellViT token baseline, with little support for CONTEXT helping under the current preprocessing and batches. However, the large increase in batch separation means that the next experiment should prioritize batch-robust validation/normalization and possibly local-morphology-focused or hierarchical immune classification. A multiscale model should be considered only after controlling the batch signal. No biological hypothesis is asserted from these representation metrics alone.
+## O–Q. Interpretation and Task011 recommendation
 
-Midnight-12k is still pending; Phase B has not been run. Production `/data/lf_data/result/model_best.pth`, Task007 labels, Task008 eligibility, and Task009 outputs were not modified.
+The alignment correction changes the interpretation materially: CellViT token representation is not the dominant bottleneck suggested by the previous invalid comparison. Phikon-v2 SMALL is approximately equal to corrected CellViT under this linear probe, while Midnight-12k SMALL provides a reproducible independent gain. Both encoders perform worse with the larger CONTEXT crop, and both show elevated batch/spatial separation relative to corrected CellViT.
+
+The evidence supports a Task011 focused on local-morphology representation with explicit batch/spatial robustness and specialist immune classification. A multiscale/contextual model should not be prioritized until the SMALL-versus-CONTEXT and batch-separation effects are controlled. These are computational representation findings, not biological conclusions.
+
+The Phikon GT-centered upper bound remains available from the prior run (SMALL macro-F1 0.3379; CONTEXT 0.2746). Midnight GT-centered extraction is pending as a secondary analysis and does not invalidate the completed corrected shared-cohort benchmark.
+
+Production `/data/lf_data/result/model_best.pth`, Task007 labels, Task008 eligibility, and Task009 datasets/metrics were not modified.
 
 ## Reproducibility and artefacts
 
-Primary scripts: `scripts/python/task010_phikon_phase_a.py`, `scripts/python/task010_gt_centered_upper_bound.py`, and `scripts/python/task010_finalize_figures.py`. The remote command used the isolated offline environment and the output root `/data/lf_data/result/task010_representation_benchmark`.
-
-Remote outputs include the frozen manifests, crop manifests, CellViT and Phikon feature tensors, fold-wise metrics, binary diagnostics, geometry, MLP and GT-centered metrics, all eleven Phase A figures, crop montages, and QC/provenance files. Large embeddings, crops, checkpoints, and server credentials are intentionally not committed to Git. Previous MUSK and public-download blocked-run artefacts remain in the remote output root as provenance.
+Corrected script: `scripts/python/task010_corrected_midnight.py`. The remote output root is `/data/lf_data/result/task010_representation_benchmark`. Corrected outputs include canonical alignment files, aligned tensors, five-way fold/per-class/Neutrophil metrics, true binary specialist metrics, corrected paired deltas, deterministic geometry, cross-encoder agreement, nested MLP metrics, corrected figures, model provenance, and the pre-alignment-fix archive. Large feature tensors, crops, checkpoints, and credentials are not committed to Git.

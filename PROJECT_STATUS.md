@@ -2,7 +2,7 @@
 
 ## Current task
 
-Task 010 — Corrected CellViT alignment + local Midnight-12k integration — PENDING / READY TO RUN
+Task 010 — Corrected CellViT alignment + local Midnight-12k integration — PARTIAL-CORRECTED-FIVEWAY-COMPLETE; Midnight GT-centered secondary pending
 
 ## Last completed task
 
@@ -22,9 +22,9 @@ Task009 regenerated all V3 datasets from the original OME-TIFF and showed that c
 - V3_EXTENDED Neutrophil F1 0.1084
 - Neutrophil end-to-end recall ~0.055
 
-## Task010 Phase A status
+## Task010 corrected benchmark status
 
-The locally uploaded Phikon-v2 Phase A completed on the frozen 96,044-cell SHARED_DETECTED_CORE.
+The locally uploaded Phikon-v2 Phase A completed on the frozen 96,044-cell SHARED_DETECTED_CORE. The subsequent correction reindexed all CellViT tokens by canonical composite identity and integrated local Midnight-12k.
 
 Observed pre-fix Phikon results:
 - PHIKON_V2_SMALL macro-F1 0.3366 ± 0.0243
@@ -32,15 +32,24 @@ Observed pre-fix Phikon results:
 - PHIKON_V2_SMALL Neutrophil F1 0.1885
 - PHIKON_V2_CONTEXT Neutrophil F1 0.1414
 
-However, review of the Phase A code identified a likely CellViT token-to-cell ordering error:
+Review of the Phase A code identified a CellViT token-to-cell ordering error:
 - CellViT tokens were saved in extraction/DataLoader order;
 - cohort metadata was subsequently merged/reordered;
 - the token tensor was not explicitly reindexed to the post-merge cohort order;
 - only length equality was checked.
 
-Therefore the pre-fix Task010 CellViT baseline (macro-F1 0.1102) is superseded and must not be used for scientific comparison until corrected.
+Therefore the pre-fix Task010 CellViT baseline (macro-F1 0.1102) is archived and superseded. All 96,044 rows changed positional index during canonical reindexing.
 
-The existing Phikon feature tensors are retained but must be revalidated against the canonical cell IDs before reuse.
+Corrected five-way linear macro-F1:
+- CELLVIT_TOKEN_ALIGNED 0.3364 ± 0.0263
+- PHIKON_V2_SMALL 0.3366 ± 0.0243
+- PHIKON_V2_CONTEXT 0.2726 ± 0.0253
+- MIDNIGHT12K_SMALL 0.4116 ± 0.0312
+- MIDNIGHT12K_CONTEXT 0.2806 ± 0.0221
+
+Midnight-12k was loaded fully offline from `/data/lf_data/models/midnight-12k`; weight SHA256 is `52c14f20386ca17c2af8a7bf32c31c352668a8fbf6aefc88d86be6eaa0c72ca1`. Production and frozen ground truth remain unchanged.
+
+The existing Phikon feature tensors were revalidated against the canonical cell IDs before reuse; both retained tensors match the canonical order exactly.
 
 ## Current corrected Task010 objective
 
@@ -141,7 +150,7 @@ Corrected canonical metrics use filenames ending in:
 
 ## Pending tasks
 
-- Execute the corrected Task010 now.
+- Complete the secondary Midnight GT-centered upper-bound analysis if required.
 - Do not start Task011 until corrected five-way results are reviewed.
 - Do not modify production.
 - Do not modify Task007/Task008 ground truth.
@@ -153,6 +162,7 @@ Corrected canonical metrics use filenames ending in:
 - reports/task_010_report.md
 - PROJECT_STATUS.md
 - scripts/python/task010_phikon_phase_a.py
+- scripts/python/task010_corrected_midnight.py
 
 ## Next execution command
 

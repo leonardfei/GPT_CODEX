@@ -1,0 +1,16 @@
+{
+  "status": "CORRECTED_FIVE_REPRESENTATION_COMPLETE",
+  "n_canonical": 96044,
+  "representations": [
+    "CELLVIT_TOKEN_ALIGNED",
+    "PHIKON_V2_SMALL",
+    "PHIKON_V2_CONTEXT",
+    "MIDNIGHT12K_SMALL",
+    "MIDNIGHT12K_CONTEXT"
+  ],
+  "old_cellvit_alignment_rows_reordered": 96044,
+  "true_binary_probes": true,
+  "nested_mlp": true,
+  "midnight_gt_centered": "PENDING_SECONDARY",
+  "production_model_modified": false
+}
