@@ -2,64 +2,60 @@
 
 ## Current task
 
-Task 006 — Xenium re-annotation, H&E nuclear-integrity QC, and high-quality CellViT retraining — COMPLETED; no v2 tier promoted
+Task 007 — Xenium 5K panel-aware reannotation and training-label QC — PENDING
 
 ## Last completed task
 
-Task 005 — multi-backbone, stain-domain, and Neutrophil detection benchmark — COMPLETED; no condition promoted
+Task 006 — Xenium re-annotation, H&E nuclear-integrity QC, and high-quality CellViT retraining — COMPLETED; v2 labels not adopted
 
 ## Repository status
 
-Tasks 001–006 are complete. Task 006 tested the upstream ground-truth hypothesis: the original Xenium-derived training labels contain substantial biological annotation uncertainty, low-quality cells, and no-nucleus/debris objects, including many original Neutrophil labels that did not survive independent QC. The v2 tiers did not improve controlled SAM-H RAW grouped CV, so no model was promoted.
+Tasks 001–006 are complete. Task 006 demonstrated that the upstream ground-truth problem is real, but its reannotation policy was not appropriate for a targeted Xenium 5K panel and caused severe over-filtering. The v2 labels must not be used as production ground truth.
 
-Task 006 will rebuild the Xenium ground truth before further CellViT model development.
+Task 007 has been created to rebuild the annotation using the actual Xenium panel, original `cl1` as a prior, batch-aware data-driven class signatures, conservative KEEP/RELABEL/REVIEW decisions, and independent H&E/segmentation quality control.
 
-## Task 006 input files
+Task 007 must stop before CellViT retraining.
+
+## Fixed source inputs
 
 - Xenium AnnData:
   `/data/lf_data/xenium_data/adata_harmony_remove_necrosis.h5ad`
-- Original H&E:
+- H&E:
   `/data/lf_data/xenium_data/ID0060276.ome.tif`
 - Registration matrix:
   `/data/lf_data/xenium_data/matrix.csv`
-- Previous preprocessing notebook:
+- Historical preprocessing notebook:
   `/data/lf_data/xenium_data/Prepare_allcelltype_batch8_train8_test.ipynb`
 
-Task 006 outputs must be written under:
+Task 007 output root:
 
-`/data/lf_data/result/task006_xenium_reannotation`
+`/data/lf_data/result/task007_xenium5k_panelaware`
 
-Source inputs must not be modified.
+Source files must remain unchanged.
 
-## Scientific rationale
+## Why Task 006 v2 is not accepted
 
-Task 005 showed:
-- SAM-H RAW grouped-CV macro-F1: 0.3324 ± 0.0134
-- Neutrophil F1: 0.1145
-- Neutrophil detection recall: 0.5467
-- Neutrophil conditional classifier recall: 0.0824
-- Neutrophil end-to-end recall: 0.0450
-- stain normalization reduced batch structure but did not materially improve classification
+Task 006 produced:
+- old→new label change rate: ~89.7%
+- HQ_CORE: 73,960 / 990,850 cells
+- T and B HQ_CORE: 1,386
+- Neutrophil HQ_CORE: 445
+- V2_CORE macro-F1 lower than OLD_LABELS
 
-Earlier tasks also showed that:
-- classifier-head optimization did not materially improve performance;
-- strict official CellViT++ training did not improve performance;
-- stricter centroid-only matching did not improve weak-class performance.
+The main methodological issue was that annotation confidence depended on external/canonical marker logic and uniform marker-support rules that are inappropriate for a targeted ~5,000-gene panel.
 
-The next hypothesis is therefore that ground-truth quality itself is limiting performance.
+Task 007 corrects this by:
+- using only genes actually present in `adata.var_names`;
+- deriving panel-aware class signatures from the data;
+- preserving original `cl1` as a prior;
+- separating biological identity from technical cell quality;
+- using batch-held-out cross-fitting for label consistency;
+- requiring high-specificity evidence for automatic relabeling;
+- treating ambiguity as REVIEW rather than Low_quality;
+- using full-resolution H&E review for all original/proposed Neutrophils.
 
-## Task 006 design
+## Seven-class taxonomy
 
-Task 006 will independently combine:
-
-1. Xenium transcriptomic QC;
-2. seven-class biological re-annotation;
-3. H&E nuclear-integrity QC after registration;
-4. explicit Neutrophil debris/no-nucleus safeguards;
-5. frozen Xenium-v2 labels;
-6. controlled old-label vs Xenium-v2 CellViT retraining.
-
-The seven training classes remain:
 - Endothelial
 - Mesenchymal
 - Myeloid
@@ -68,42 +64,38 @@ The seven training classes remain:
 - T and B
 - Tumor
 
-Non-training states are allowed:
-- Uncertain
-- Mixed_lineage
-- Low_quality
-- Artifact_or_no_nucleus
+Original finer labels such as `Neutrophil_CXCR4` must be preserved in separate audit fields.
 
-Cells must not be forced into one of the seven classes.
+## Task 007 anti-overfiltering safety rails
+
+Before any v3 annotation is called FINAL, automatically flag review if:
+- >30% of non-Low-quality original cells are biologically relabeled;
+- >40% of a major class is sent to identity REVIEW solely for transcriptional ambiguity;
+- TRAIN_EXTENDED retains <50% of technically valid cells for a major class without a documented artifact;
+- T/B or Neutrophil is depleted >50% by annotation evidence alone;
+- one batch is disproportionately depleted.
+
+If triggered, Task 007 must be marked PARTIAL and the v3 annotation PROVISIONAL.
 
 ## Anti-circularity rule
 
-CellViT classifier predictions must not be used to decide which Xenium cells are high quality.
+Do not use CellViT predictions or CellViT performance to define or modify v3 annotations.
 
-The Xenium-v2 annotation/QC rules must be frozen before viewing new CellViT cross-validation results.
+Task 007 must not train CellViT.
 
 ## Current production model
 
 `/data/lf_data/result/model_best.pth`
 
 SHA256:
-
 `f161afbb90f42ccfbfe9c6843cae6eafd7a12a2bc25620d5b4489e7e3faf6164`
 
-Task 001 remains production until a future model satisfies predefined grouped-CV promotion criteria.
-
-## Task 006 result
-
-- v2 annotation: 990,850 cells; HQ_CORE 73,960; HQ_EXTENDED 74,181.
-- OLD_LABELS macro-F1: 0.3324 ± 0.0134; V2_CORE: 0.3030 ± 0.0236; V2_EXTENDED: 0.3027 ± 0.0284.
-- Original Neutrophil: 24,167; v2 Neutrophil: 666; HQ_CORE Neutrophil: 445.
-- Promotion: not approved; test run not performed; production remains `/data/lf_data/result/model_best.pth`.
-- Remote report: `/data/lf_data/result/task006_xenium_reannotation/TASK006_REPORT.md`.
-- Unresolved: OME physical-scale metadata conflicts with historical notebook geometry; expert review is needed before physical-distance claims or further relabeling.
+Production remains unchanged.
 
 ## Pending tasks
 
-- Do not start Task 007 until Task 006 is completed and reviewed by Web GPT.
+- Task 007 — execute Xenium 5K panel-aware reannotation and training-label QC.
+- Do not start CellViT retraining until Task 007 is reviewed and v3 labels are accepted.
 
 ## Latest workflow files
 
@@ -118,16 +110,18 @@ Task 001 remains production until a future model satisfies predefined grouped-CV
 - `tasks/task_005.md`
 - `reports/task_005_report.md`
 - `tasks/task_006.md`
+- `reports/task_006_report.md`
+- `tasks/task_007.md`
 - `PROJECT_STATUS.md`
 
 ## Next execution command
 
 ```text
-Review Task 006 outputs before defining Task 007.
+Execute task_007.
 ```
 
-Codex must pull `origin/main` before execution and follow `AGENTS.md` plus `tasks/task_006.md`.
+Codex must pull `origin/main` before execution and follow `AGENTS.md` plus `tasks/task_007.md`.
 
 ## Last update
 
-2026-09-22
+2026-09-23
