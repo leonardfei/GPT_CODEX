@@ -1,14 +1,15 @@
-
-# Task 010 — Frozen Representation Benchmark: CellViT Token vs MUSK Nuclear and Contextual H&E Embeddings
+# Task 010 — Public Pathology Foundation Model Representation Benchmark
 
 ## Status
-BLOCKED_MUSK_ACCESS (official gated weights require authorized Hugging Face access; no benchmark run)
+PENDING (revised after MUSK access block)
 
 ## Objective
 
-Determine whether the main bottleneck identified in Task 009 is the CellViT cell-token representation, and whether a pathology foundation model using nucleus-centered H&E context provides substantially better cell-type separability.
+Determine whether the main bottleneck identified in Task009 is the CellViT cell-token representation, and whether publicly accessible pathology foundation models using nucleus-centered H&E context provide substantially better cell-type separability.
 
-This is deliberately a MINIMAL representation benchmark.
+The previous MUSK-only Task010 attempt stopped correctly at BLOCKED_MUSK_ACCESS because the official MUSK weights required gated Hugging Face authorization. That blocked attempt is retained for provenance but is superseded by this revised executable benchmark.
+
+This remains a MINIMAL representation benchmark.
 
 Do NOT build the final multiscale model yet.
 Do NOT add cellular-neighborhood auxiliary losses yet.
@@ -16,322 +17,353 @@ Do NOT modify Task007/Task008 ground truth.
 Do NOT tune labels based on model performance.
 Do NOT update the production model.
 
-Primary comparison:
-A. CellViT-SAM-H cell token
-B. MUSK small/nuclear-context crop
-C. MUSK large/local-context crop
+## 1. Primary representations
 
-All three primary conditions must:
-- use the same frozen V3_CORE biological labels;
-- use the same cells whenever technically possible;
-- use the same held-out batch folds;
-- use the same linear-probe evaluation;
-- differ only in representation.
+Compare exactly:
 
-## 1. Scientific rationale
+1. CellViT_TOKEN
+2. PHIKON_V2_SMALL
+3. PHIKON_V2_CONTEXT
+4. MIDNIGHT12K_SMALL
+5. MIDNIGHT12K_CONTEXT
+
+All five primary conditions must use:
+- the same frozen V3_CORE biological labels;
+- the same shared detected cells;
+- the same matched H&E nucleus centroid;
+- the same held-out batch folds;
+- the same linear-probe procedure;
+- the same secondary MLP-probe procedure;
+- the same evaluation metrics.
+
+The only intended difference is the representation.
+
+## 2. Scientific rationale
 
 Task009 showed:
-- V3_CORE macro-F1: 0.3330 ± 0.0222
-- V3_EXTENDED macro-F1: 0.3340 ± 0.0217
-- V3_EXTENDED Neutrophil recall: ~0.1006
-- V3_EXTENDED Neutrophil F1: ~0.1084
-- V3_EXTENDED Neutrophil AUPRC: ~0.1379
-- Neutrophil detector recall: ~0.55
-- conditional Neutrophil classification recall: ~0.10
+- V3_CORE macro-F1 0.3330 ± 0.0222;
+- V3_EXTENDED macro-F1 0.3340 ± 0.0217;
+- V3_EXTENDED Neutrophil F1 ~0.1084;
+- Neutrophil detector recall ~0.55;
+- conditional Neutrophil classification recall ~0.10.
 
-Thus, even when a Neutrophil nucleus is detected, the current CellViT-derived representation usually fails to separate it from other classes.
+Thus the dominant failure occurs after nucleus detection, during cell-type representation/classification.
 
-The CANVAS study motivates separating:
-- CellViT for nuclear detection/segmentation/localization;
-- pathology foundation-model embeddings for H&E morphology/context.
+The CANVAS design motivates keeping CellViT for nuclear localization while using a pathology foundation model for morphology/context encoding.
 
-Task010 tests that hypothesis directly.
+## 3. Frozen ground truth
 
-## 2. Frozen ground truth
+Task007 biological annotation:
+`/data/lf_data/result/task007_xenium5k_panelaware/metrics/xenium_v3_annotations.csv.gz`
 
-Biological labels:
- /data/lf_data/result/task007_xenium5k_panelaware/metrics/xenium_v3_annotations.csv.gz
-
-Neutrophil eligibility:
- /data/lf_data/result/task008_neutrophil_he_recalibration/metrics/neutrophil_training_eligibility_task008.csv.gz
+Task008 accepted Neutrophil eligibility:
+`/data/lf_data/result/task008_neutrophil_he_recalibration/metrics/neutrophil_training_eligibility_task008.csv.gz`
 
 Primary label condition:
-Use ONLY V3_CORE.
+`V3_CORE`
 
 Seven classes:
-0 Endothelial
-1 Mesenchymal
-2 Myeloid
-3 Neutrophil
-4 Plasma cell
-5 T and B
-6 Tumor
+- Endothelial
+- Mesenchymal
+- Myeloid
+- Neutrophil
+- Plasma cell
+- T and B
+- Tumor
 
-Neutrophil and Neutrophil_CXCR4 are merged into the broad Neutrophil output class, while subtype metadata must be preserved.
+Merge original `Neutrophil` and `Neutrophil_CXCR4` into the broad Neutrophil output class, but preserve subtype metadata.
 
 Do not use V3_EXTENDED in the primary benchmark.
 
-## 3. H&E and registration sources
+## 4. Data sources
 
 Original H&E:
- /data/lf_data/xenium_data/ID0060276.ome.tif
+`/data/lf_data/xenium_data/ID0060276.ome.tif`
 
 Registration:
- /data/lf_data/xenium_data/matrix.csv
+`/data/lf_data/xenium_data/matrix.csv`
 
-Task009 regenerated CORE dataset:
- /data/lf_data/result/task009_v3_retraining/work/CellViT_dataset_v3_CORE
+Task009 regenerated V3_CORE dataset:
+`/data/lf_data/result/task009_v3_retraining/work/CellViT_dataset_v3_CORE`
 
 Task009 result root:
- /data/lf_data/result/task009_v3_retraining
+`/data/lf_data/result/task009_v3_retraining`
 
-Historical old dataset:
- /data/lf_data/xenium_data/CellViT_dataset
+CellViT backbone:
+`/data/lf_data/CellViT-plus-plus/checkpoints/CellViT-SAM-H-x40-AMP.pth`
 
-is FORBIDDEN as an image, label, metadata, split, or embedding source.
+Historical dataset:
+`/data/lf_data/xenium_data/CellViT_dataset`
 
-No old CellViT_dataset file may be used.
+The historical dataset is FORBIDDEN as an image, label, split, metadata, or embedding source.
 
-## 4. Output root
+## 5. Output root
 
- /data/lf_data/result/task010_representation_benchmark
+`/data/lf_data/result/task010_representation_benchmark`
 
-Create:
-TASK010_REPORT.md
-config/
-code/
-metrics/
-features/
-models/
-figures/
-figure_data/
-qc/
-logs/
-work/
+Preserve the previous blocked MUSK-access artefacts under a clearly named provenance/archive subdirectory or leave them untouched.
+
+Create new executable-run outputs under:
+- `config/`
+- `code/`
+- `metrics/`
+- `features/`
+- `models/`
+- `figures/`
+- `figure_data/`
+- `qc/`
+- `logs/`
+- `work/`
 
 Do not overwrite Task009.
 
-## 5. MUSK availability and provenance gate
+## 6. Public model provenance and access verification
 
-Before any benchmark:
+### 6.1 Phikon-v2 — primary pathology encoder
 
-1. inspect the server for an existing official MUSK installation/checkpoint/cache;
-2. record package version, checkpoint path, model identifier, source, and SHA256;
-3. verify that the loaded model is the pathology MUSK model described in the CANVAS-style workflow, not a different model with the same acronym.
+Official model identifier:
+`owkin/phikon-v2`
 
-If MUSK is not already available:
+Expected characteristics to verify from the downloaded model/config:
+- pathology-specific ViT-L/16;
+- DINOv2-style pretrained backbone;
+- official image preprocessing from the model repository;
+- standard classification feature = CLS token;
+- expected CLS embedding dimension approximately 1024, but record the actual loaded dimension rather than assuming it.
 
-- if the official model can be downloaded programmatically from its official/public source without credentials, private tokens, click-through license acceptance, or manual authorization, download it to a dedicated model directory under /data/lf_data/ and record provenance + SHA256;
-- install dependencies in a dedicated environment or without breaking the existing CellViT environment;
-- do not overwrite existing CellViT dependencies.
+Download only from the official Owkin Hugging Face repository.
 
-If official MUSK access requires credentials, gated approval, private tokens, or manual license acceptance:
+Record:
+- exact revision/commit if available;
+- local checkpoint/cache path;
+- SHA256 for downloaded weight file(s);
+- model config;
+- preprocessing config;
+- license text/identifier;
+- transformers/torch versions.
 
-- mark Task010 BLOCKED_MUSK_ACCESS;
-- document the exact missing prerequisite;
-- do NOT silently substitute UNI, Virchow, ResNet, or another encoder.
+Phikon-v2 has a non-commercial license. Record this explicitly in the provenance report. Task010 is a research benchmark and must not make downstream licensing assumptions.
 
-Do not start performance comparisons with a substituted encoder under the MUSK label.
+### 6.2 Midnight-12k — independent confirmation encoder
+
+Official model identifier:
+`kaiko-ai/midnight`
+
+Use only the publicly available Midnight-12k weights.
+
+Verify from the official model/config:
+- DINOv2 pathology foundation model;
+- trained on public TCGA data;
+- input preprocessing for 224×224 images;
+- official normalization mean=(0.5,0.5,0.5), std=(0.5,0.5,0.5);
+- official classification embedding = concatenation of CLS token and mean patch-token embedding, unless the loaded official implementation specifies otherwise;
+- record actual output dimension rather than assuming it.
+
+Do not use Midnight-92k or Midnight-92k/392 restricted models.
+
+Record:
+- exact revision/commit if available;
+- local checkpoint/cache path;
+- SHA256;
+- config;
+- preprocessing;
+- MIT license;
+- environment versions.
+
+### 6.3 Access behavior
+
+Both selected models are expected to be publicly downloadable without gated authorization.
+
+If one model fails because of a transient download/runtime issue:
+- retry only with the official repository;
+- document the error;
+- do not silently substitute another encoder.
+
+If Phikon-v2 works but Midnight-12k fails, Task010 may continue as PARTIAL with CellViT + Phikon-v2, but must not claim the independent confirmation was completed.
+
+If Phikon-v2 itself cannot be loaded, stop before interpreting the representation hypothesis and mark PARTIAL/BLOCKED with the exact reason.
 
 Create:
-qc/musk_model_provenance.md
-config/musk_environment.txt
-config/musk_checkpoint_sha256.json
+- `qc/public_model_provenance.md`
+- `config/phikon_v2_provenance.json`
+- `config/midnight12k_provenance.json`
+- `config/foundation_model_environment.txt`
 
-## 6. Physical field-of-view normalization
+## 7. Physical field-of-view normalization
 
-The CANVAS workflow standardized H&E analysis to approximately 40× / 0.25 μm per pixel.
+Audit the H&E physical scale before crop extraction.
 
-Our source H&E must not trust obviously inconsistent OME physical-size metadata blindly.
+Do not trust the inconsistent OME PhysicalSize metadata blindly.
 
-First audit:
-- actual WSI dimensions;
-- historical validated registration geometry;
-- historical native H&E pixel size used in prior paired Xenium/H&E analyses;
-- any discrepancy with OME metadata.
+Use the historically validated Xenium–H&E registration geometry and native H&E scale from this project. The previously validated working scale is approximately 0.2125 μm/px; verify it from the source workflow and record the evidence.
 
-Use the validated native H&E scale from the historical project/registration workflow.
+Define crop conditions by PHYSICAL FIELD OF VIEW, referenced to a 0.25 μm/px 40× equivalent:
 
-Define two MUSK conditions by PHYSICAL FIELD OF VIEW:
+### SMALL
+Equivalent to 64×64 px at 0.25 μm/px:
+approximately 16×16 μm field of view.
 
-MUSK_SMALL:
-64 × 64 pixels at 0.25 μm/pixel equivalent
-approximately 16 × 16 μm field of view.
+### CONTEXT
+Equivalent to 224×224 px at 0.25 μm/px:
+approximately 56×56 μm field of view.
 
-MUSK_CONTEXT:
-224 × 224 pixels at 0.25 μm/pixel equivalent
-approximately 56 × 56 μm field of view.
+If native H&E scale is 0.2125 μm/px, compute the native crop dimensions needed to preserve those physical FOVs, then resize with the encoder's official preprocessing.
 
-If native H&E is not exactly 0.25 μm/pixel:
-- crop the equivalent physical field of view in native pixels;
-- then resize the crop to the official MUSK input size, expected 384 × 384 if confirmed by the loaded implementation.
-
-Do not distort the physical field of view simply by taking arbitrary 64/224 native pixels.
+Do not define SMALL/CONTEXT by blindly taking 64/224 native pixels.
 
 Create:
-qc/pixel_scale_audit.md
-config/crop_geometry.json
+- `qc/pixel_scale_audit.md`
+- `config/crop_geometry.json`
 
-## 7. Shared-cell cohort — critical fairness constraint
-
-The primary representation comparison must be performed on the SAME cells.
+## 8. Shared-cell cohort — mandatory fairness constraint
 
 Construct:
-SHARED_DETECTED_CORE
+`SHARED_DETECTED_CORE`
 
 Eligibility:
 1. frozen V3_CORE training-eligible biological label;
-2. located in the Task009 training batches;
-3. successfully matched to a CellViT-detected nucleus;
-4. valid CellViT token available;
-5. valid H&E small crop available;
-6. valid H&E context crop available;
-7. crop does not cross WSI boundary;
-8. no forbidden historical dataset dependency.
+2. cell belongs to Task009 training batches;
+3. successfully matched to a CellViT-detected H&E nucleus;
+4. valid CellViT token;
+5. valid SMALL crop;
+6. valid CONTEXT crop;
+7. both public encoders can process the crop;
+8. context crop is fully in-bounds;
+9. no historical CellViT_dataset dependency.
 
-Use the matched H&E CellViT nucleus centroid as the crop center for BOTH MUSK conditions.
+Use the matched H&E CellViT nucleus centroid as the crop center for all patch-encoder conditions.
 
-This ensures:
-same cell
-same center
-same label
-same fold
-different representation
+All five representations must use EXACTLY the same cell IDs in the primary benchmark.
 
 Save:
-metrics/shared_cell_manifest.csv.gz
-metrics/shared_cell_counts_by_class.csv
-metrics/shared_cell_counts_by_batch.csv
+- `metrics/shared_cell_manifest.csv.gz`
+- `metrics/shared_cell_counts_by_class.csv`
+- `metrics/shared_cell_counts_by_batch.csv`
+- `qc/shared_cohort_exclusion_summary.md`
 
-Report how many V3_CORE cells are lost when restricting to the shared detected cohort.
+Report how many V3_CORE cells are lost at each shared-cohort filtering step.
 
-## 8. CellViT token baseline
+## 9. CellViT token baseline
 
-Backbone:
- /data/lf_data/CellViT-plus-plus/checkpoints/CellViT-SAM-H-x40-AMP.pth
+Use Task009 regenerated V3_CORE data and the official CellViT-SAM-H checkpoint.
 
-Use the same cell-token extraction semantics as Task009 / official CellViT++.
+Reuse Task009 detector matches/tokens only when provenance is exact and they originate from the regenerated Task009 V3_CORE dataset.
 
-Preferred:
-- reuse Task009 regenerated V3_CORE images/metadata and Task009 detector matches if provenance is exact;
-- re-extract tokens if needed.
+Otherwise re-extract.
 
-Do NOT use embeddings from the historical /data/lf_data/xenium_data/CellViT_dataset.
+Do not use historical dataset embeddings.
 
-For every cell record:
+Record per cell:
 - cell_id;
 - batch;
 - class;
 - original subtype;
-- matched nucleus coordinate;
-- embedding dimension;
-- detector match distance.
+- matched H&E nucleus coordinate;
+- detector match distance;
+- embedding dimension.
 
 Save:
-features/cellvit_tokens.npy or .pt
-features/cellvit_token_manifest.csv.gz
+- `features/cellvit_tokens.pt` or equivalent;
+- `features/cellvit_token_manifest.csv.gz`.
 
-## 9. MUSK crop generation
+## 10. H&E crop generation
 
-Generate crops DIRECTLY from the original OME-TIFF.
+Generate all SMALL and CONTEXT crops directly from the original OME-TIFF.
 
-Do not crop from Task009 PNG patches if doing so would truncate the desired field of view or introduce double-resampling.
+Do not generate them from the old CellViT_dataset.
 
-Center each crop on the matched H&E nucleus centroid used for the CellViT token.
+Do not use the Task009 PNG as the primary crop source if it truncates context or causes double-resampling.
 
-Generate:
-MUSK_SMALL: approximately 16 μm FOV.
-MUSK_CONTEXT: approximately 56 μm FOV.
+Center on the matched H&E nucleus centroid.
 
-For QC, save only a stratified sample of crop montages, not every image to Git.
+One physical crop can be reused as input to both Phikon-v2 and Midnight-12k; preprocessing after crop extraction must remain encoder-specific.
 
-Create:
-qc/musk_small_crop_montage.pdf
-qc/musk_context_crop_montage.pdf
-metrics/crop_manifest.csv.gz
-
-The montage must include all seven classes and multiple batches, with dedicated Neutrophil and Neutrophil_CXCR4 examples.
-
-## 10. Frozen MUSK feature extraction
-
-PRIMARY Task010 must use a frozen MUSK encoder.
-
-Do NOT fine-tune MUSK in the primary benchmark.
-
-For each crop:
-- apply official preprocessing;
-- resize to official input shape;
-- extract the model's standard visual embedding;
-- record embedding dimension and pooling strategy.
-
-Conditions:
-MUSK_SMALL
-MUSK_CONTEXT
+Generate stratified QC montages showing:
+- all seven classes;
+- multiple batches;
+- conventional Neutrophil;
+- Neutrophil_CXCR4;
+- SMALL and CONTEXT paired views.
 
 Save:
-features/musk_small_embeddings.npy or .pt
-features/musk_context_embeddings.npy or .pt
+- `qc/small_crop_montage.pdf`
+- `qc/context_crop_montage.pdf`
+- `metrics/crop_manifest.csv.gz`.
 
-Check:
+## 11. Frozen feature extraction
+
+Primary Task010 uses FROZEN encoders only.
+
+Do not fine-tune CellViT, Phikon-v2, or Midnight-12k.
+
+### PHIKON_V2_SMALL / CONTEXT
+Use the official Owkin preprocessing and CLS-token feature extraction.
+
+### MIDNIGHT12K_SMALL / CONTEXT
+Use official Kaiko preprocessing and the documented classification embedding strategy.
+
+For every feature matrix:
+- same shared cell ordering;
 - no NaN/Inf;
-- identical cell ordering across representations;
-- exact shared cell IDs.
+- record feature dimension;
+- record dtype;
+- record extraction batch size;
+- record GPU used.
 
-## 11. Fold definition — reuse exact Task009 held-out batches
+Save:
+- `features/phikon_v2_small.*`
+- `features/phikon_v2_context.*`
+- `features/midnight12k_small.*`
+- `features/midnight12k_context.*`.
 
-Do not create a new random batch partition.
+## 12. Exact fold reuse from Task009
 
-Read the Task009 split manifest and recover the exact validation batch identities for folds 0–4.
+Do not generate a new split.
 
-Every Task010 cell inherits fold assignment from its batch.
+Read Task009 V3_CORE split manifests and recover exact held-out validation batches for folds 0–4.
 
-Required:
-train_batches(fold i) == Task009 train_batches(fold i)
-val_batches(fold i) == Task009 val_batches(fold i)
+Every Task010 cell inherits fold from its batch.
 
-No batch overlap is allowed.
+For each fold:
+- Task010 train batches must equal Task009 V3_CORE train batches;
+- Task010 validation batches must equal Task009 V3_CORE validation batches;
+- no batch overlap.
 
 Create:
-metrics/fold_manifest.csv
-qc/fold_equivalence_task009.md
+- `metrics/fold_manifest.csv`
+- `qc/fold_equivalence_task009.md`.
 
-If Task009 OLD_LABELS folds were not batch-identical to the V3 folds, document this. Task010 comparisons are only between the three Task010 representations and therefore remain internally paired.
+This is necessary so the five representation conditions are truly paired by fold.
 
-## 12. Primary classifier — identical linear probe
+## 13. Primary classifier — identical linear probe
 
-The main representation benchmark is a LINEAR PROBE.
+Primary representation benchmark = multinomial linear probe.
 
-For each representation:
-CellViT_TOKEN
-MUSK_SMALL
-MUSK_CONTEXT
+Representations:
+- CellViT_TOKEN
+- PHIKON_V2_SMALL
+- PHIKON_V2_CONTEXT
+- MIDNIGHT12K_SMALL
+- MIDNIGHT12K_CONTEXT
 
-Use:
+Use identical:
+- StandardScaler or equivalent feature standardization;
 - multinomial logistic regression;
-- standardized features where appropriate;
 - class-balanced weights;
-- same solver;
-- same regularization-selection procedure;
-- same training and validation cells;
-- no feature-specific hyperparameter tuning beyond a small common prespecified C grid.
+- solver;
+- stopping criteria;
+- common C grid: 0.01, 0.1, 1, 10;
+- inner selection procedure.
 
-Common C grid:
-0.01, 0.1, 1, 10
+Prefer grouped inner validation using training batches. If impossible because too few groups, use fixed C=1 for ALL representations rather than using representation-specific tuning.
 
-Select C using only training batches via inner grouped validation, or use fixed C=1 if inner grouping is impractical.
+Save fold-wise probabilities and predictions.
 
-The SAME selection rule must be applied to all representations.
+## 14. Secondary classifier — identical MLP probe
 
-Primary purpose:
-How linearly separable are the frozen representations?
+Only after linear probing is complete.
 
-Save fold-wise predictions and probabilities.
-
-## 13. Secondary identical MLP probe
-
-Only after the linear probe completes.
-
-Use the SAME MLP architecture for all representations after an input projection if required:
+For all five representations use an identical probe after necessary input projection:
 
 embedding
 → Linear 256
@@ -342,259 +374,292 @@ embedding
 → Dropout 0.5
 → Linear 7
 
-Use:
-- Adam;
-- identical learning rate;
-- identical epoch budget;
-- identical early-stopping rule;
-- identical class-imbalance strategy.
+Use identical:
+- optimizer;
+- learning rate;
+- weight decay;
+- epoch budget;
+- early stopping;
+- class-imbalance strategy;
+- random seed policy.
 
-Do not fine-tune either CellViT or MUSK.
+Do not fine-tune the foundation encoders.
 
-This secondary probe asks whether a modest nonlinear head changes the representation ranking.
+## 15. Seven-class metrics
 
-## 14. Primary 7-class metrics
-
-For both linear and MLP probes report:
-- accuracy
-- balanced accuracy
-- macro-F1
-- macro-AUPRC
-- macro-AUROC
-- weighted F1
-- MCC
-- lowest-three-class F1
+For linear and MLP probes report:
+- accuracy;
+- balanced accuracy;
+- macro-F1;
+- macro-AUPRC;
+- macro-AUROC;
+- weighted F1;
+- MCC;
+- lowest-three-class F1.
 
 Per class:
-- precision
-- recall
-- F1
-- AUROC
-- AUPRC
-- support
+- precision;
+- recall;
+- F1;
+- AUROC;
+- AUPRC;
+- support.
 
-Report mean ± SD across the same five folds.
+Report mean ± SD over the same five held-out batch folds.
 
-## 15. Neutrophil-specific endpoints
+## 16. Neutrophil-specific endpoints
 
-For each representation:
-- Neutrophil precision
-- recall
-- F1
-- AUROC
-- AUPRC
+For each representation/probe report:
+- precision;
+- recall;
+- F1;
+- AUROC;
+- AUPRC.
 
-Confusions:
-- Neutrophil → Myeloid
-- Myeloid → Neutrophil
-- Neutrophil → T and B
-- T and B → Neutrophil
-- Neutrophil → Plasma
-- Plasma → Neutrophil
+Confusion flows:
+- Neutrophil → Myeloid;
+- Myeloid → Neutrophil;
+- Neutrophil → T and B;
+- T and B → Neutrophil;
+- Neutrophil → Plasma;
+- Plasma → Neutrophil.
 
-Also report metrics separately for source subtype metadata where possible:
-Neutrophil
-Neutrophil_CXCR4
+Also stratify performance metadata for:
+- original Neutrophil;
+- Neutrophil_CXCR4.
 
-Do not make them separate output classes in the main seven-class model.
+Do not create separate output classes for the subtypes in the main model.
 
-## 16. Binary specialist diagnostic benchmarks
+## 17. Binary diagnostic benchmarks
 
-Use the same frozen representations and batch folds.
+Using the same shared cohort, representations, and held-out batch folds:
 
-Binary benchmark 1:
+### Binary 1
 Neutrophil vs Myeloid
 
-Binary benchmark 2:
+### Binary 2
 Neutrophil vs T and B
 
-Use the same linear-probe method.
+Use the same linear-probe policy for all representations.
 
 Report:
-- AUROC
-- AUPRC
-- balanced accuracy
-- F1
-- sensitivity
-- specificity
+- AUROC;
+- AUPRC;
+- balanced accuracy;
+- F1;
+- sensitivity;
+- specificity.
 
-These are diagnostic representation tests, not production classifiers.
+These are representation diagnostics, not production classifiers.
 
-Interpretation:
-- if MUSK_CONTEXT strongly improves these binaries, local context contains useful discriminatory signal;
-- if MUSK_SMALL improves but MUSK_CONTEXT does not, nucleus/local-cell morphology dominates;
-- if neither improves over CellViT, H&E separability may be intrinsically limited for these Xenium-defined identities.
+## 18. Context-value analysis
 
-## 17. Secondary MUSK morphology upper-bound cohort
+For each public encoder compare directly:
 
-After the fair shared-cell benchmark, run a SECONDARY analysis:
-ALL_V3_CORE_GT_CENTERED
+- PHIKON_V2_CONTEXT − PHIKON_V2_SMALL
+- MIDNIGHT12K_CONTEXT − MIDNIGHT12K_SMALL
 
-This cohort may include V3_CORE cells not detected by CellViT.
+for:
+- macro-F1;
+- macro-AUPRC;
+- Neutrophil F1;
+- Neutrophil AUPRC;
+- binary Neutrophil-vs-Myeloid AUROC/AUPRC;
+- binary Neutrophil-vs-T/B AUROC/AUPRC.
 
-For MUSK only:
-- center the crop using the accepted registered H&E target location from Task007/008;
+This directly answers whether local tissue context adds useful signal beyond the small cell-centered field.
+
+## 19. Cross-encoder agreement
+
+Compare Phikon-v2 and Midnight-12k to determine whether any gain is model-specific.
+
+Compute:
+- fold-wise performance correlation;
+- per-cell prediction agreement;
+- error overlap;
+- Neutrophil true-positive overlap;
+- shared vs encoder-specific errors.
+
+If both public encoders independently outperform CellViT token in the same direction, treat this as stronger evidence that the CellViT token is the bottleneck.
+
+## 20. Secondary GT-centered morphology upper bound
+
+After the shared-cell benchmark, run a secondary analysis on:
+`ALL_V3_CORE_GT_CENTERED`
+
+This may include V3_CORE cells not detected by CellViT.
+
+For BOTH Phikon-v2 and Midnight-12k:
+- center the crop using accepted registered H&E target coordinates;
 - extract SMALL and CONTEXT embeddings;
-- run the same grouped-batch linear probe.
+- run the same batch-grouped linear probe.
 
 Purpose:
-If the detector were perfect, how separable are the H&E crops?
+estimate morphology separability if detection were perfect.
 
-This analysis must be reported separately from the shared-cell primary benchmark.
+Report separately from the shared-cell benchmark.
 
-Do not compare its metrics directly against CellViT_TOKEN as if they used the same cell universe.
+Do not compare these metrics directly to CellViT token as if the cell universe were identical.
 
-## 18. Representation geometry diagnostics
+## 21. Representation geometry diagnostics
 
-For SHARED_DETECTED_CORE, compute for each representation:
+For SHARED_DETECTED_CORE compute for all five representations:
 - class centroid distances;
-- within-class vs between-class cosine distance;
+- within-class cosine distance;
+- between-class cosine distance;
 - kNN class purity;
 - silhouette score;
 - batch kNN purity;
 - class-vs-batch neighborhood mixing.
 
-Generate UMAP only as visualization; do not use UMAP for model training.
+UMAP is visualization only.
 
-Determine whether a representation improves biological class separation at the cost of stronger batch separation.
+Determine whether improved class separation is accompanied by stronger batch/domain separation.
 
-## 19. Predefined interpretation thresholds
+## 22. Predefined evidence thresholds
 
-Task010 is exploratory and must NOT promote a production model.
+Task010 is exploratory and cannot update production.
 
-Strong gain:
-MUSK versus CellViT_TOKEN:
+### Strong representation gain
+At least one public pathology encoder/scale versus CellViT_TOKEN:
 - macro-F1 +0.05 absolute or more;
 AND
-- Neutrophil F1 +0.10 absolute or Neutrophil AUPRC +0.10 absolute;
+- Neutrophil F1 +0.10 OR Neutrophil AUPRC +0.10 absolute;
 AND
-- improvement in at least 4/5 folds for macro-F1;
+- macro-F1 improves in at least 4/5 folds;
 AND
-- no major increase in batch separation.
+- batch separation does not materially worsen.
 
-Moderate gain:
+### Moderate gain
 - macro-F1 +0.02 to +0.05;
 OR
 - Neutrophil F1/AUPRC +0.05 to +0.10;
-with consistent fold direction.
+with reasonably consistent fold direction.
 
-No meaningful gain:
-Changes below these ranges or highly inconsistent across folds.
+### No meaningful gain
+Below those ranges or inconsistent across folds.
 
-These thresholds guide the next experiment only; they do not authorize production replacement.
+### Independent confirmation
+If both Phikon-v2 and Midnight-12k show concordant improvement over CellViT token, explicitly report that the result is replicated across two public pathology foundation models.
 
-## 20. Next-step decision tree
+## 23. Next-step decision tree
 
-If MUSK_CONTEXT >> MUSK_SMALL > CellViT:
-- next task: multi-scale MUSK fusion + cellular-neighborhood auxiliary head.
+If CONTEXT consistently > SMALL and both public encoders > CellViT:
+- Task011: multi-scale pathology-FM fusion + neighborhood auxiliary task.
 
-If MUSK_SMALL >> CellViT and MUSK_CONTEXT adds little:
-- next task: nucleus/local morphology specialist + limited MUSK fine-tuning.
+If SMALL > CellViT but CONTEXT adds little:
+- Task011: cell/nuclear morphology specialist + limited fine-tuning of the best public encoder.
 
-If MUSK_CONTEXT improves Neutrophil binaries but not seven-class:
-- next task: hierarchical immune classifier and specialist Neutrophil/Myeloid/T-B branch.
+If immune binary tasks improve strongly but seven-class remains weak:
+- Task011: hierarchical immune classifier with Neutrophil/Myeloid/T-B specialist branch.
 
-If frozen MUSK approximately equals CellViT:
-- next task: test limited MUSK fine-tuning or conclude H&E morphology has a low ceiling;
-- do not immediately build a complex multi-scale network.
+If only one public encoder improves:
+- verify preprocessing/model-specific effects before building a larger architecture.
 
-If MUSK cannot be accessed:
-- stop at model-access gate and report BLOCKED.
+If neither public encoder improves meaningfully:
+- test limited encoder fine-tuning and reassess the intrinsic H&E ceiling.
 
-## 21. Required metrics
+## 24. Required metrics
 
 Create:
-metrics/shared_cell_manifest.csv.gz
-metrics/shared_cell_counts_by_class.csv
-metrics/shared_cell_counts_by_batch.csv
-metrics/fold_manifest.csv
-metrics/linear_probe_fold_metrics.csv
-metrics/linear_probe_summary.csv
-metrics/linear_probe_per_class.csv
-metrics/mlp_probe_fold_metrics.csv
-metrics/mlp_probe_summary.csv
-metrics/mlp_probe_per_class.csv
-metrics/neutrophil_metrics.csv
-metrics/confusion_flows.csv
-metrics/binary_neutrophil_vs_myeloid.csv
-metrics/binary_neutrophil_vs_tb.csv
-metrics/musk_upper_bound_summary.csv
-metrics/representation_geometry.csv
-metrics/representation_paired_deltas.csv
-metrics/decision_summary.json
+- `metrics/shared_cell_manifest.csv.gz`
+- `metrics/shared_cell_counts_by_class.csv`
+- `metrics/shared_cell_counts_by_batch.csv`
+- `metrics/fold_manifest.csv`
+- `metrics/linear_probe_fold_metrics.csv`
+- `metrics/linear_probe_summary.csv`
+- `metrics/linear_probe_per_class.csv`
+- `metrics/mlp_probe_fold_metrics.csv`
+- `metrics/mlp_probe_summary.csv`
+- `metrics/mlp_probe_per_class.csv`
+- `metrics/neutrophil_metrics.csv`
+- `metrics/confusion_flows.csv`
+- `metrics/binary_neutrophil_vs_myeloid.csv`
+- `metrics/binary_neutrophil_vs_tb.csv`
+- `metrics/context_value_deltas.csv`
+- `metrics/cross_encoder_agreement.csv`
+- `metrics/gt_centered_upper_bound.csv`
+- `metrics/representation_geometry.csv`
+- `metrics/representation_paired_deltas.csv`
+- `metrics/decision_summary.json`.
 
-## 22. Required figures
+## 25. Required figures
 
-Generate vector PDFs plus source CSV where relevant:
-Fig1_task010_design.pdf
-Fig2_shared_cohort_composition.pdf
-Fig3_linear_probe_macroF1.pdf
-Fig4_linear_probe_per_class_F1.pdf
-Fig5_neutrophil_metrics.pdf
-Fig6_neutrophil_confusions.pdf
-Fig7_binary_specialist_results.pdf
-Fig8_representation_geometry.pdf
-Fig9_fold_paired_deltas.pdf
-Fig10_musk_gt_centered_upper_bound.pdf
+Generate vector PDFs plus source tables:
+- Fig1_task010_design.pdf
+- Fig2_shared_cohort_composition.pdf
+- Fig3_linear_probe_macroF1.pdf
+- Fig4_linear_probe_per_class_F1.pdf
+- Fig5_neutrophil_metrics.pdf
+- Fig6_neutrophil_confusions.pdf
+- Fig7_binary_specialist_results.pdf
+- Fig8_small_vs_context.pdf
+- Fig9_cross_encoder_agreement.pdf
+- Fig10_representation_geometry.pdf
+- Fig11_fold_paired_deltas.pdf
+- Fig12_gt_centered_upper_bound.pdf
 
-Also save crop QC montages.
+Also save SMALL/CONTEXT crop QC montages.
 
-## 23. Required report questions
+## 26. Required report questions
 
-TASK010_REPORT.md must answer:
+`TASK010_REPORT.md` must answer:
 
-A. Was the official MUSK model successfully obtained and verified? What exact checkpoint/model ID/SHA was used?
-B. What H&E pixel scale and physical crop sizes were used?
-C. How many V3_CORE cells entered SHARED_DETECTED_CORE by class and batch?
-D. Were the exact Task009 held-out batch folds reused?
-E. What were linear-probe macro-F1/AUPRC for CellViT_TOKEN, MUSK_SMALL, and MUSK_CONTEXT?
-F. What were MLP-probe results?
-G. Which representation had the best Neutrophil precision/recall/F1/AUPRC?
-H. Did MUSK reduce Neutrophil→Myeloid and Neutrophil→T/B confusion?
-I. How well did each representation separate Neutrophil vs Myeloid?
-J. How well did each representation separate Neutrophil vs T/B?
-K. Did larger context outperform the small nuclear-context crop?
-L. Did class separation improve without increasing batch/domain separation?
-M. What was the MUSK-only GT-centered upper-bound performance on all V3_CORE cells?
-N. Is the dominant bottleneck more consistent with CellViT representation, lack of local context, detector limitation, or intrinsic H&E ambiguity?
-O. Which next experiment is justified by the predefined decision tree?
+A. Were Phikon-v2 and Midnight-12k successfully downloaded from their official public repositories?
+B. What exact model revisions, SHA256 values, licenses, feature extraction rules, and dimensions were used?
+C. What H&E pixel scale and physical crop geometry were used?
+D. How many cells entered SHARED_DETECTED_CORE by class and batch?
+E. Were the exact Task009 V3_CORE held-out batches reused?
+F. What were linear-probe macro-F1/AUPRC for all five representations?
+G. What were MLP-probe results?
+H. Which representation gave the best Neutrophil precision/recall/F1/AUPRC?
+I. Did either public encoder reduce Neutrophil→Myeloid and Neutrophil→T/B confusion?
+J. How did each representation perform for Neutrophil vs Myeloid?
+K. How did each representation perform for Neutrophil vs T/B?
+L. Does CONTEXT outperform SMALL within Phikon-v2?
+M. Does CONTEXT outperform SMALL within Midnight-12k?
+N. Do Phikon-v2 and Midnight-12k independently support the same conclusion?
+O. Did class separation improve without excessive batch separation?
+P. What was the public-encoder GT-centered upper-bound performance on all V3_CORE cells?
+Q. Is the dominant bottleneck CellViT representation, missing local context, detector limitation, model-specific representation, or intrinsic H&E ambiguity?
+R. Which Task011 branch is justified?
 
 Do not update production.
 
-## 24. GitHub synchronization
+## 27. GitHub synchronization
 
 After execution:
-1. update tasks/task_010.md to COMPLETED / PARTIAL / BLOCKED;
-2. create reports/task_010_report.md;
-3. update PROJECT_STATUS.md;
-4. commit scripts, configs, small metrics, and reports only;
-5. do not commit large embeddings/checkpoints/crops;
-6. do not commit credentials/tokens;
+1. update `tasks/task_010.md` to COMPLETED / PARTIAL / BLOCKED;
+2. create or replace `reports/task_010_report.md` with the revised-run report while clearly preserving the previous MUSK access block in a provenance note;
+3. update `PROJECT_STATUS.md`;
+4. commit scripts/configs/small metrics/reports only;
+5. do not commit large embeddings, crops, or foundation-model checkpoints;
+6. do not commit credentials;
 7. push main;
 8. no force push.
 
-## 25. Final handoff
+## 28. Final handoff
 
 Return:
-1. MUSK availability/provenance;
-2. shared cohort size;
-3. class counts;
-4. fold/batch manifest;
-5. CellViT_TOKEN linear macro-F1/AUPRC;
-6. MUSK_SMALL linear macro-F1/AUPRC;
-7. MUSK_CONTEXT linear macro-F1/AUPRC;
-8. corresponding Neutrophil metrics;
-9. MLP results for all three;
-10. Neutrophil↔Myeloid confusion;
-11. Neutrophil↔T/B confusion;
-12. binary specialist metrics;
-13. representation geometry metrics;
-14. MUSK GT-centered upper-bound results;
-15. fold-paired deltas;
-16. best representation;
-17. strength of evidence;
-18. dominant bottleneck interpretation;
-19. report/figures paths;
+1. model provenance for Phikon-v2 and Midnight-12k;
+2. shared cohort size and class counts;
+3. exact fold/batch manifest;
+4. CellViT_TOKEN linear macro-F1/AUPRC;
+5. PHIKON_V2_SMALL linear metrics;
+6. PHIKON_V2_CONTEXT linear metrics;
+7. MIDNIGHT12K_SMALL linear metrics;
+8. MIDNIGHT12K_CONTEXT linear metrics;
+9. Neutrophil metrics for all five representations;
+10. MLP results;
+11. Neutrophil↔Myeloid confusion;
+12. Neutrophil↔T/B confusion;
+13. binary diagnostic metrics;
+14. SMALL-vs-CONTEXT deltas;
+15. cross-encoder agreement;
+16. representation geometry metrics;
+17. GT-centered upper-bound results;
+18. best representation;
+19. evidence strength and independent-confirmation status;
 20. recommended Task011.
 
 Do not modify production and do not modify frozen ground truth.
