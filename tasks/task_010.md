@@ -1,285 +1,417 @@
-# Task 010 — Phikon-first Local Pathology Foundation Model Representation Benchmark
+# Task 010 — Corrected CellViT Alignment + Local Midnight-12k Integration
 
 ## Status
-PARTIAL-PHIKON-COMPLETE — local Phikon-v2 Phase A completed. Midnight-12k is optional Phase B and remains pending.
+PENDING-CORRECTION-AND-MIDNIGHT — correct the CellViT token alignment issue, then run a five-representation local-only benchmark including the user-uploaded Midnight-12k.
 
-## Objective
+## Why this correction is required
 
-Test whether the CellViT cell-token representation is the main bottleneck in the current H&E seven-class cell-typing pipeline.
+The previous Phase A produced a valid Phikon-v2 signal but the Task010 CellViT_TOKEN baseline is not trusted.
 
-Primary immediate comparison:
+The previous implementation saved CellViT token features in extraction/DataLoader order and later merged the cohort metadata without explicitly reordering the token tensor to the post-merge cohort order. Length equality was checked, but exact feature-to-cell identity was not asserted. This can cause feature/label misalignment and can explain the near-random CellViT Task010 baseline.
 
-1. CellViT_TOKEN
-2. PHIKON_V2_SMALL
-3. PHIKON_V2_CONTEXT
+Therefore:
+- archive the pre-fix Task010 metrics/report as provenance;
+- do not use the pre-fix CellViT_TOKEN metrics for any scientific conclusion;
+- preserve the existing valid Phikon feature tensors, but verify their exact cell IDs before reuse;
+- regenerate all canonical Task010 comparison metrics after strict per-cell alignment;
+- integrate the locally uploaded Midnight-12k in the same corrected benchmark.
 
-Midnight-12k will be added later as an independent confirmation encoder after its local upload completes.
+Do NOT modify frozen biological labels, Task008 eligibility, Task009 outputs, or the production model.
 
-Do NOT:
-- modify Task007/Task008 ground truth;
-- tune labels in response to performance;
-- fine-tune CellViT or Phikon-v2 in Phase A;
-- build the final multiscale model yet;
-- update the production model.
+---
 
-## 1. Frozen ground truth
+## 1. Canonical frozen cohort
 
-Use only V3_CORE.
+The canonical shared cohort remains the already frozen:
 
-Task007 annotation:
-`/data/lf_data/result/task007_xenium5k_panelaware/metrics/xenium_v3_annotations.csv.gz`
-
-Task008 Neutrophil eligibility:
-`/data/lf_data/result/task008_neutrophil_he_recalibration/metrics/neutrophil_training_eligibility_task008.csv.gz`
-
-Seven output classes:
-- Endothelial
-- Mesenchymal
-- Myeloid
-- Neutrophil
-- Plasma cell
-- T and B
-- Tumor
-
-Merge original Neutrophil and Neutrophil_CXCR4 into broad Neutrophil while preserving subtype metadata.
-
-## 2. Data sources
-
-Original H&E:
-`/data/lf_data/xenium_data/ID0060276.ome.tif`
-
-Registration:
-`/data/lf_data/xenium_data/matrix.csv`
-
-Task009 regenerated V3_CORE dataset:
-`/data/lf_data/result/task009_v3_retraining/work/CellViT_dataset_v3_CORE`
-
-Task009 split manifest:
-`/data/lf_data/result/task009_v3_retraining/metrics/split_manifest.csv`
-
-CellViT backbone:
-`/data/lf_data/CellViT-plus-plus/checkpoints/CellViT-SAM-H-x40-AMP.pth`
-
-Forbidden historical dataset:
-`/data/lf_data/xenium_data/CellViT_dataset`
-
-No file from the forbidden historical dataset may be used as image, label, split, metadata, or embedding source.
-
-## 3. Local-only Phikon-v2 discovery and provenance
-
-The user has already uploaded Phikon-v2 to the server.
-
-DO NOT attempt internet or Hugging Face download before searching local storage.
-
-Search likely locations under:
-- `/data/lf_data/models/`
-- `/data/lf_data/`
-- user home cache/model directories if needed
-
-Prefer exact directory:
-`/data/lf_data/models/phikon-v2`
-
-If not found there, locate directories/files containing:
-- `phikon-v2`
-- `model.safetensors`
-- `config.json`
-- `preprocessor_config.json`
-
-The local model is usable only if the directory contains enough files for fully offline loading.
-
-Validate by loading with:
-- `local_files_only=True`
-- no network access
-- no fallback to another model
-
-Record:
-- actual local path;
-- all model/config files;
-- SHA256 of weight file(s);
-- architecture/config;
-- preprocessing config;
-- actual embedding dimension;
-- torch/transformers versions;
-- GPU and dtype.
-
-Create:
-- `qc/phikon_local_provenance.md`
-- `config/phikon_v2_provenance.json`
-- `config/foundation_model_environment.txt`
-
-If the local upload is incomplete, stop Phase A at `BLOCKED_LOCAL_PHIKON_INCOMPLETE` and report the exact missing files.
-
-## 4. Output root
-
-`/data/lf_data/result/task010_representation_benchmark`
-
-Preserve previous MUSK/Hugging Face blocked-run artefacts as provenance.
-
-New Phase A outputs should be clearly marked as the local-Phikon execution.
-
-## 5. Physical H&E crop geometry
-
-Use the historically validated project scale, not the inconsistent OME PhysicalSize metadata.
-
-Audit and document the validated native H&E scale. The working project value is approximately:
-`0.2125 μm/px`
-
-Define by physical field of view:
-
-### SMALL
-16 × 16 μm FOV.
-
-At 0.2125 μm/px:
-approximately 75 native pixels per side.
-
-Use an odd integer crop size centered exactly on the matched H&E nucleus centroid; preferred:
-`75 × 75 native px`
-
-### CONTEXT
-56 × 56 μm FOV.
-
-At 0.2125 μm/px:
-approximately 263 native pixels per side.
-
-Preferred:
-`263 × 263 native px`
-
-After native crop extraction, use Phikon-v2 official preprocessing/resizing.
-
-Create:
-- `qc/pixel_scale_audit.md`
-- `config/crop_geometry.json`
-
-## 6. Freeze a model-independent shared cohort
-
-Construct and freeze:
 `SHARED_DETECTED_CORE`
 
-Eligibility must NOT depend on Midnight-12k or on whether a specific foundation model happens to process a cell.
+Expected size from Phase A:
+`96,044` cells.
 
-Required:
-1. V3_CORE eligible biological label;
-2. Task009 training-batch membership;
-3. successfully matched to a CellViT-detected H&E nucleus;
-4. valid CellViT token;
-5. SMALL crop in-bounds;
-6. CONTEXT crop in-bounds;
-7. no forbidden historical dataset dependency.
+Canonical manifest:
+`/data/lf_data/result/task010_representation_benchmark/metrics/shared_cell_manifest.csv.gz`
 
-Use the matched CellViT H&E nucleus centroid as the center for BOTH Phikon crop conditions.
+This cohort MUST NOT be redefined because Midnight-12k is now available.
 
-Freeze the resulting cell IDs BEFORE extracting Phikon features.
+Required canonical ordering:
+- sort/order exactly as the saved shared manifest;
+- use `cell_id` as the primary identity;
+- retain a secondary composite key:
+  `image|local_x|local_y|class_id`
+  only for joining feature manifests that do not contain cell_id.
 
-Save:
-- `metrics/shared_cell_manifest.csv.gz`
-- `metrics/shared_cell_counts_by_class.csv`
-- `metrics/shared_cell_counts_by_batch.csv`
-- `qc/shared_cohort_exclusion_summary.md`
+Create:
+- `metrics/canonical_cell_order.csv.gz`
+- `qc/canonical_alignment_audit.md`
 
-This exact shared manifest must later be reused for Midnight-12k Phase B.
-
-## 7. CellViT token baseline
-
-Use the same CellViT token extraction semantics as Task009.
-
-Reuse Task009 token/detection outputs only if provenance is exact and they were generated from the regenerated V3_CORE dataset.
-
-Otherwise re-extract.
-
-Record:
+The canonical order file must contain:
+- canonical_index;
 - cell_id;
-- batch;
-- class;
-- original subtype;
-- matched nucleus coordinates;
-- match distance;
-- embedding dimension.
+- image;
+- local_x;
+- local_y;
+- class_id;
+- class_name;
+- batch.
 
-Save:
+---
+
+## 2. Archive the flawed pre-fix benchmark
+
+Before changing canonical metrics, create:
+
+`/data/lf_data/result/task010_representation_benchmark/archive/pre_alignment_fix/`
+
+Copy or move SMALL metric/report artefacts from the pre-fix run into this archive, including at minimum:
+- linear probe metrics;
+- MLP metrics;
+- binary diagnostic metrics;
+- confusion flows;
+- paired deltas;
+- representation geometry;
+- decision summary;
+- any report snapshot necessary to reconstruct the previous interpretation.
+
+Do NOT archive/remove the large valid Phikon feature tensors unless needed.
+
+Create:
+`qc/pre_alignment_fix_archive_manifest.md`
+
+Explicitly state:
+- Phikon SMALL/CONTEXT feature extraction itself was not identified as misaligned;
+- the corrected run nevertheless re-validates Phikon IDs against the canonical cohort;
+- all old comparison metrics are superseded by corrected canonical metrics.
+
+---
+
+## 3. Correct CellViT token alignment — mandatory
+
+Existing files:
 - `features/cellvit_tokens.pt`
 - `features/cellvit_token_manifest.csv.gz`
 
-## 8. Phikon-v2 crop generation
+The old token tensor may be reused only after reconstructing an exact identity map.
 
-Generate SMALL and CONTEXT crops directly from the original OME-TIFF.
+### 3.1 Build exact token identity
 
-Do not crop from the historical dataset.
+Join the CellViT token manifest to the canonical cohort using the strongest available identity:
 
-Do not rely on Task009 patch PNGs if they truncate the requested context or introduce double-resampling.
+Preferred:
+`cell_id`
 
-Create paired QC montages for all seven classes and multiple batches, including:
-- conventional Neutrophil;
-- Neutrophil_CXCR4.
+If the token manifest lacks cell_id, join on:
+`image + local_x + local_y + class_id`
 
-Save:
-- `qc/phikon_small_crop_montage.pdf`
-- `qc/phikon_context_crop_montage.pdf`
-- `metrics/crop_manifest.csv.gz`
+Then recover the canonical `cell_id`.
 
-## 9. Frozen Phikon-v2 feature extraction
+Required assertions:
+1. token-manifest key uniqueness;
+2. canonical cohort key uniqueness;
+3. exactly one token per canonical cell;
+4. exactly 96,044 canonical cells represented;
+5. no extra/duplicate token identity after the join;
+6. no missing canonical cell;
+7. token tensor row count equals token manifest row count BEFORE reindexing;
+8. after reindexing, the stored cell_id vector equals canonical_cell_order.cell_id element-for-element.
 
-Use the local Phikon-v2 model fully offline.
+Do NOT accept a mere length equality check.
 
-Primary feature:
-official CLS-token representation from the loaded implementation/config.
+### 3.2 Save corrected CellViT tensor
 
-Do not assume dimension; record actual runtime dimension.
-
-Conditions:
-- PHIKON_V2_SMALL
-- PHIKON_V2_CONTEXT
-
-Do not fine-tune the encoder.
-
-Ensure:
-- exact same cell ordering as SHARED_DETECTED_CORE;
-- no NaN/Inf;
-- deterministic eval mode;
-- fixed preprocessing.
+Reindex CellViT token features to canonical cell order.
 
 Save:
-- `features/phikon_v2_small.pt`
-- `features/phikon_v2_context.pt`
-- manifests with cell IDs and extraction metadata.
+- `features/cellvit_tokens_aligned.pt`
+- `features/cellvit_tokens_aligned_manifest.csv.gz`
 
-## 10. Reuse exact Task009 folds
-
-Do not create new folds.
-
-Read Task009 V3_CORE split manifest and reuse the exact held-out validation batch identities for folds 0–4.
-
-Every Task010 cell inherits fold membership by batch.
+The corrected tensor payload must include:
+- features;
+- ordered cell_ids;
+- ordered composite keys;
+- source checkpoint;
+- alignment method;
+- SHA256/checksum of the original token tensor if feasible.
 
 Create:
-- `metrics/fold_manifest.csv`
-- `qc/fold_equivalence_task009.md`
+`qc/cellvit_alignment_correction.md`
 
-No train/validation batch overlap is allowed.
+This audit must state how many rows changed positional index relative to the old tensor order.
 
-## 11. Phase A primary benchmark — identical linear probe
+### 3.3 Sanity check versus Task009
 
-Representations:
-- CellViT_TOKEN
-- PHIKON_V2_SMALL
-- PHIKON_V2_CONTEXT
+The corrected Task010 CellViT probe uses a different shared-cell universe/probe recipe from Task009, so exact equality is NOT required.
 
-Use the exact same cells and folds.
+However:
+- compare corrected CellViT macro-F1/AUPRC and Neutrophil metrics against Task009 V3_CORE;
+- if corrected CellViT remains near random, investigate further before interpreting pathology-FM gains;
+- explicitly determine whether the previous ~0.110 macro-F1 was primarily caused by alignment error.
 
-Use identical:
-- feature standardization;
-- multinomial logistic regression;
-- class-balanced weighting;
-- solver/stopping criteria;
-- common C grid `0.01, 0.1, 1, 10`;
-- inner selection rule.
+---
 
-If grouped inner validation is unstable because too few training batches exist, use fixed `C=1` for all representations rather than representation-specific tuning.
+## 4. Re-validate Phikon tensors against canonical cell IDs
 
-Save fold-wise probabilities and predictions.
+Existing:
+- `features/phikon_v2_small.pt`
+- `features/phikon_v2_context.pt`
 
-## 12. Seven-class metrics
+Both were saved with ordered `cell_ids`.
 
-For all three representations report:
+Before reuse assert:
+- len(cell_ids) == 96,044;
+- exact equality to canonical_cell_order.cell_id;
+- no duplicate/missing IDs;
+- feature row count matches IDs;
+- finite features.
+
+If exact equality fails:
+- reorder using stored cell_ids;
+- save corrected aligned copies.
+
+Canonical filenames:
+- `features/phikon_v2_small_aligned.pt`
+- `features/phikon_v2_context_aligned.pt`
+
+If already aligned exactly, symbolic/copy reuse is acceptable but record the audit.
+
+Create:
+`qc/phikon_alignment_audit.md`
+
+Do NOT re-extract Phikon features unless the saved IDs are invalid.
+
+---
+
+## 5. Local Midnight-12k discovery — local only
+
+The user has uploaded Midnight-12k to the server.
+
+DO NOT attempt any network/Hugging Face download before local discovery.
+
+Search likely paths:
+- `/data/lf_data/models/midnight-12k`
+- `/data/lf_data/models/midnight`
+- `/data/lf_data/`
+- user home/model/cache directories if needed.
+
+Also search for uploaded archives containing names such as:
+- midnight
+- midnight-12k
+- model.safetensors
+- config.json
+
+If an archive is found:
+- validate archive integrity;
+- extract into a dedicated directory under `/data/lf_data/models/`;
+- do not overwrite Phikon or CellViT environments/files.
+
+Use only the PUBLIC Midnight-12k model.
+Do NOT use restricted Midnight-92k variants.
+
+Load fully offline.
+No network fallback.
+No substitute encoder.
+
+If Midnight is incomplete, mark:
+`PARTIAL-CORRECTION-COMPLETE-MIDNIGHT-INCOMPLETE`
+and report exact missing files, but still complete the CellViT correction and corrected Phikon benchmark.
+
+---
+
+## 6. Midnight provenance and official feature rule
+
+Verify the locally uploaded model/config/README and record the actual runtime architecture.
+
+Expected public Midnight-12k behavior from the official project:
+- pathology DINOv2-family encoder;
+- input 224 × 224;
+- normalization mean=(0.5,0.5,0.5), std=(0.5,0.5,0.5), unless local official config states otherwise;
+- classification embedding is concatenation of:
+  - CLS token;
+  - mean patch-token embedding.
+
+Do NOT hard-code expected dimension.
+Record runtime dimension.
+
+Create:
+- `config/midnight12k_provenance.json`
+- `qc/midnight12k_local_provenance.md`
+
+Record:
+- local path;
+- file list/sizes;
+- SHA256 of weight file(s);
+- architecture/model type;
+- patch size;
+- input preprocessing;
+- feature extraction rule;
+- embedding dimension;
+- dtype;
+- environment versions;
+- GPU;
+- offline loading method.
+
+---
+
+## 7. Reuse exactly the Phase A physical crops
+
+Do not alter crop geometry after seeing Phikon results.
+
+Validated project scale:
+`0.2125 μm/px`
+
+SMALL:
+- 16 μm FOV;
+- 75 × 75 native px.
+
+CONTEXT:
+- 56 μm FOV;
+- 263 × 263 native px.
+
+Both are centered on the same matched H&E nucleus centroid.
+
+Use the existing canonical crop manifest:
+`metrics/crop_manifest.csv.gz`
+
+For Midnight:
+- extract the exact same native physical fields from the original OME-TIFF;
+- apply Midnight-specific official preprocessing after native crop extraction.
+
+Do NOT use a different cell center or FOV for Midnight.
+
+---
+
+## 8. Extract Midnight features in canonical order
+
+Generate:
+- `features/midnight12k_small.pt`
+- `features/midnight12k_context.pt`
+
+Each payload MUST include:
+- features;
+- ordered cell_ids;
+- condition;
+- embedding dimension;
+- preprocessing metadata;
+- feature rule;
+- seed.
+
+After extraction assert:
+`midnight_cell_ids == canonical_cell_ids`
+element-for-element.
+
+If extraction runs in a different order, explicitly reorder before saving canonical aligned tensors:
+- `features/midnight12k_small_aligned.pt`
+- `features/midnight12k_context_aligned.pt`
+
+No NaN/Inf.
+
+---
+
+## 9. Corrected five-representation primary benchmark
+
+Canonical representations:
+
+1. CELLVIT_TOKEN_ALIGNED
+2. PHIKON_V2_SMALL
+3. PHIKON_V2_CONTEXT
+4. MIDNIGHT12K_SMALL
+5. MIDNIGHT12K_CONTEXT
+
+All must use:
+- exact same 96,044 canonical cells;
+- exact same labels;
+- exact same Task009 V3_CORE held-out batch folds;
+- exact same standardization policy;
+- exact same linear probe;
+- exact same class weighting;
+- exact same C/regularization policy;
+- exact same seeds.
+
+No encoder fine-tuning.
+
+### Linear probe
+
+Use multinomial softmax/logistic regression.
+
+Keep the previous common fixed `C=1` if that is required for exact comparability, OR switch all five representations to the same nested training-only C-selection procedure. Do not use a different selection rule by representation.
+
+If changing the probe recipe from Phase A, rerun all five conditions.
+
+---
+
+## 10. TRUE binary specialist probes — replace old diagnostics
+
+The previous Task010 "binary" analysis derived pairwise probabilities from the seven-class model. That is not a true binary specialist classifier.
+
+Archive those old metrics as pre-fix diagnostics.
+
+Now train separate binary linear probes from scratch using only the relevant training cells.
+
+### Binary A
+`Neutrophil vs Myeloid`
+
+### Binary B
+`Neutrophil vs T and B`
+
+For every outer fold and every representation:
+- restrict training cells to the two target classes;
+- fit StandardScaler on outer-training cells only;
+- fit a class-balanced binary logistic/softmax linear probe;
+- evaluate only on the corresponding two classes in the untouched outer validation batches.
+
+Report:
+- AUROC;
+- AUPRC;
+- balanced accuracy;
+- F1;
+- sensitivity;
+- specificity;
+- precision.
+
+Save:
+- `metrics/true_binary_neutrophil_vs_myeloid.csv`
+- `metrics/true_binary_neutrophil_vs_tb.csv`
+- `metrics/true_binary_summary.csv`
+
+Do not label the old probability-ratio diagnostics as binary specialist models in the corrected report.
+
+---
+
+## 11. Fix MLP validation leakage
+
+The old MLP used outer validation performance for early stopping/model selection. This must not be used as canonical MLP performance.
+
+Archive old MLP metrics.
+
+For each outer fold and each representation:
+
+1. outer validation batches remain untouched until final evaluation;
+2. use ONLY outer-training batches for model selection;
+3. create grouped inner validation using training batches only;
+4. select epoch/early stopping based only on inner validation;
+5. then reinitialize the same architecture;
+6. refit on ALL outer-training cells for the selected epoch count;
+7. evaluate ONCE on outer validation.
+
+If grouped inner validation has too few batches:
+- use a deterministic prespecified epoch count chosen without outer validation;
+- apply the exact same rule to all five representations.
+
+Architecture remains:
+embedding → Linear256 → ReLU → Dropout0.5 → Linear128 → ReLU → Dropout0.5 → Linear7
+
+Save:
+- `metrics/mlp_probe_fold_metrics_corrected.csv`
+- `metrics/mlp_probe_summary_corrected.csv`
+- `qc/mlp_nested_validation_audit.md`
+
+---
+
+## 12. Corrected metrics and comparisons
+
+For the five canonical representations report:
+
+Overall:
 - accuracy;
 - balanced accuracy;
 - macro-F1;
@@ -297,11 +429,7 @@ Per class:
 - AUPRC;
 - support.
 
-Report mean ± SD over the same five folds.
-
-## 13. Neutrophil-specific analysis
-
-For each representation report:
+Neutrophil:
 - precision;
 - recall;
 - F1;
@@ -316,210 +444,191 @@ Confusion flows:
 - Neutrophil → Plasma;
 - Plasma → Neutrophil.
 
-Also stratify results by original subtype metadata:
-- Neutrophil;
-- Neutrophil_CXCR4.
+Paired fold deltas:
+- Phikon SMALL − corrected CellViT;
+- Phikon CONTEXT − corrected CellViT;
+- Midnight SMALL − corrected CellViT;
+- Midnight CONTEXT − corrected CellViT;
+- each CONTEXT − its corresponding SMALL;
+- Midnight SMALL − Phikon SMALL;
+- Midnight CONTEXT − Phikon CONTEXT.
 
-## 14. Binary diagnostic benchmarks
+---
 
-Run identical linear probes for:
+## 13. Representation geometry — corrected five-way comparison
 
-### Neutrophil vs Myeloid
-### Neutrophil vs T and B
-
-Report:
-- AUROC;
-- AUPRC;
-- balanced accuracy;
-- F1;
-- sensitivity;
-- specificity.
-
-These are diagnostic representation tests, not production models.
-
-## 15. Context-value analysis
-
-Directly compare:
-`PHIKON_V2_CONTEXT - PHIKON_V2_SMALL`
-
-for:
-- macro-F1;
-- macro-AUPRC;
-- Neutrophil F1;
-- Neutrophil AUPRC;
-- N-vs-Myeloid AUROC/AUPRC;
-- N-vs-T/B AUROC/AUPRC.
-
-Interpretation:
-- CONTEXT >> SMALL: local tissue context adds useful information;
-- SMALL >> CellViT but CONTEXT ≈ SMALL: pathology morphology representation helps, context adds little;
-- both ≈ CellViT: frozen Phikon does not solve the problem.
-
-## 16. Representation geometry
-
-For CellViT_TOKEN, PHIKON_V2_SMALL, PHIKON_V2_CONTEXT compute:
-- class centroid distances;
-- within/between-class cosine distance;
+Run the same geometry diagnostics for all five canonical representations:
+- within-class cosine distance;
+- between-class cosine distance;
+- class-separation ratio;
+- within-batch cosine distance;
+- between-batch cosine distance;
+- batch-separation ratio;
 - kNN class purity;
-- silhouette score;
-- batch kNN purity;
-- class-vs-batch mixing.
+- kNN batch purity;
+- silhouette score.
 
-UMAP is visualization only.
+Use the same deterministic 10k-cell subset across ALL five representations.
 
-## 17. Phase A stopping point and decision
+Save the selected 10k canonical cell IDs:
+`metrics/geometry_subset_cell_ids.csv`
 
-After the LINEAR benchmark and binary diagnostics complete, write an interim interpretation BEFORE doing anything more complex.
+This removes representation-specific sampling differences.
 
-Strong gain:
-- macro-F1 +0.05 or more vs CellViT;
-AND
-- Neutrophil F1 +0.10 OR AUPRC +0.10;
-AND
-- ≥4/5 folds improve macro-F1;
-AND
-- no major increase in batch separation.
+Interpret "batch" cautiously as spatial/batch structure because these batches derive from regions of the paired slide.
 
-Moderate gain:
-- macro-F1 +0.02 to +0.05;
-OR
-- N F1/AUPRC +0.05 to +0.10;
-with reasonably consistent folds.
+---
 
-No meaningful gain:
-below those ranges or inconsistent.
+## 14. Cross-encoder agreement
 
-## 18. Secondary MLP probe
+Compare Phikon and Midnight at matched scales.
 
-Run only after Phase A linear results are saved.
+For SMALL and CONTEXT separately compute:
+- per-cell predicted-class agreement;
+- Cohen's kappa;
+- correct/correct overlap;
+- error/error overlap;
+- Neutrophil true-positive overlap;
+- one-correct/one-wrong fractions;
+- fold-wise metric correlation.
 
-Use the same MLP for all three representations:
-embedding → Linear256 → ReLU → Dropout0.5 → Linear128 → ReLU → Dropout0.5 → Linear7
-
-Use identical optimizer, LR, weight decay, epoch budget, early stopping, class-imbalance handling, and seed policy.
-
-Do not fine-tune Phikon.
-
-## 19. GT-centered morphology upper bound
-
-After shared-cell benchmarking, run Phikon SMALL/CONTEXT on:
-`ALL_V3_CORE_GT_CENTERED`
-
-This may include V3_CORE cells not detected by CellViT.
-
-Center on accepted registered H&E target coordinates.
-
-Use the same grouped-batch linear probe.
-
-Report separately from the shared-cell comparison.
+Save:
+`metrics/cross_encoder_agreement.csv`
 
 Purpose:
-estimate H&E morphology separability if detection were perfect.
+determine whether any gain is pathology-FM general or specific to Phikon.
 
-## 20. Midnight-12k Phase B — do not block Phase A
+---
 
-Midnight-12k is still uploading.
+## 15. GT-centered upper bound
 
-DO NOT wait for it.
+Existing Phikon GT-centered features/results may be reused after provenance verification.
 
-After Midnight-12k is locally available:
-1. verify local provenance and SHA256;
-2. use the already frozen `SHARED_DETECTED_CORE` manifest;
-3. use the exact same SMALL/CONTEXT physical crops;
-4. extract MIDNIGHT12K_SMALL/CONTEXT;
-5. run identical linear/MLP probes;
-6. add cross-encoder agreement and independent confirmation.
+Add Midnight GT-centered SMALL/CONTEXT on the same ALL_V3_CORE_GT_CENTERED universe if computationally feasible.
 
-Do not alter the shared cohort after seeing Midnight availability.
+If Midnight GT-centered extraction is too expensive for the first corrected pass:
+- complete the corrected shared-cohort five-way benchmark first;
+- mark GT-centered Midnight as secondary pending;
+- do not delay the main corrected conclusion.
 
-## 21. Required Phase A metrics
+---
 
-Create:
-- `metrics/shared_cell_manifest.csv.gz`
-- `metrics/shared_cell_counts_by_class.csv`
-- `metrics/shared_cell_counts_by_batch.csv`
-- `metrics/fold_manifest.csv`
-- `metrics/linear_probe_fold_metrics.csv`
-- `metrics/linear_probe_summary.csv`
-- `metrics/linear_probe_per_class.csv`
-- `metrics/neutrophil_metrics.csv`
-- `metrics/confusion_flows.csv`
-- `metrics/binary_neutrophil_vs_myeloid.csv`
-- `metrics/binary_neutrophil_vs_tb.csv`
-- `metrics/context_value_deltas.csv`
-- `metrics/representation_geometry.csv`
-- `metrics/representation_paired_deltas.csv`
-- `metrics/decision_summary.json`
+## 16. Required canonical output names
 
-Then add MLP and GT-centered upper-bound outputs.
+Create corrected canonical outputs:
 
-## 22. Required Phase A figures
+- `metrics/linear_probe_fold_metrics_corrected.csv`
+- `metrics/linear_probe_summary_corrected.csv`
+- `metrics/linear_probe_per_class_corrected.csv`
+- `metrics/neutrophil_metrics_corrected.csv`
+- `metrics/confusion_flows_corrected.csv`
+- `metrics/true_binary_neutrophil_vs_myeloid.csv`
+- `metrics/true_binary_neutrophil_vs_tb.csv`
+- `metrics/true_binary_summary.csv`
+- `metrics/representation_paired_deltas_corrected.csv`
+- `metrics/representation_geometry_corrected.csv`
+- `metrics/cross_encoder_agreement.csv`
+- `metrics/mlp_probe_fold_metrics_corrected.csv`
+- `metrics/mlp_probe_summary_corrected.csv`
+- `metrics/decision_summary_corrected.json`
 
-- Fig1_task010A_design.pdf
-- Fig2_shared_cohort_composition.pdf
-- Fig3_linear_probe_macroF1.pdf
-- Fig4_linear_probe_per_class_F1.pdf
-- Fig5_neutrophil_metrics.pdf
-- Fig6_neutrophil_confusions.pdf
-- Fig7_binary_specialist_results.pdf
-- Fig8_small_vs_context.pdf
-- Fig9_representation_geometry.pdf
-- Fig10_fold_paired_deltas.pdf
-- Fig11_gt_centered_upper_bound.pdf
+Do not overwrite the old files without archiving them first.
 
-Plus crop QC montages.
+---
 
-## 23. Required report questions
+## 17. Required corrected figures
 
-The revised report must answer:
+Generate corrected vector PDFs:
 
-A. Where was the locally uploaded Phikon-v2 found?
-B. Was it successfully loaded fully offline with `local_files_only=True`?
-C. What files, SHA256, config, preprocessing, embedding dimension, dtype, and environment were used?
-D. What validated H&E physical scale and native crop sizes were used?
-E. How many cells entered SHARED_DETECTED_CORE by class and batch?
-F. Were the exact Task009 V3_CORE held-out batches reused?
-G. What were linear macro-F1/AUPRC for CellViT_TOKEN, PHIKON_V2_SMALL, PHIKON_V2_CONTEXT?
-H. What were Neutrophil precision/recall/F1/AUPRC?
-I. Did Phikon reduce N→Myeloid and N→T/B confusion?
-J. What were N-vs-Myeloid and N-vs-T/B binary metrics?
-K. Did CONTEXT outperform SMALL?
-L. Did class separation improve without excessive batch separation?
-M. What did the MLP probe show?
-N. What was the GT-centered morphology upper bound?
-O. Is the main limitation more consistent with CellViT representation, lack of context, detector limitation, or intrinsic H&E ambiguity?
-P. Should Task011 be multiscale/contextual, local-morphology focused, hierarchical immune classification, or limited fine-tuning?
-Q. Is Midnight-12k still pending or has Phase B been completed?
+- Fig1_task010_corrected_design.pdf
+- Fig2_corrected_macroF1_fiveway.pdf
+- Fig3_corrected_macroAUPRC_fiveway.pdf
+- Fig4_corrected_per_class_F1.pdf
+- Fig5_corrected_neutrophil_metrics.pdf
+- Fig6_corrected_true_binary_results.pdf
+- Fig7_corrected_small_vs_context.pdf
+- Fig8_corrected_representation_geometry.pdf
+- Fig9_corrected_cross_encoder_agreement.pdf
+- Fig10_corrected_fold_paired_deltas.pdf
+- Fig11_corrected_MLP.pdf
 
-## 24. GitHub synchronization
+---
 
-After Phase A:
-1. update `tasks/task_010.md` status to PARTIAL-PHIKON-COMPLETE or COMPLETED if Midnight Phase B is also done;
-2. update `reports/task_010_report.md`;
+## 18. Corrected interpretation rules
+
+Do NOT retain the previous "Phikon +0.226 macro-F1 vs CellViT" claim unless it survives the corrected alignment.
+
+The corrected report must explicitly answer:
+
+A. Was the old CellViT Task010 baseline misaligned?
+B. What proportion/count of CellViT token rows changed position after canonical reindexing?
+C. What is the corrected CellViT macro-F1/AUPRC and Neutrophil F1/AUPRC?
+D. How does corrected CellViT compare with Task009 V3_CORE?
+E. Does Phikon SMALL still outperform corrected CellViT?
+F. Does Phikon CONTEXT still underperform Phikon SMALL?
+G. What are Midnight SMALL/CONTEXT metrics?
+H. Does Midnight independently reproduce the SMALL > CONTEXT pattern?
+I. Does Midnight independently outperform corrected CellViT?
+J. Which encoder is strongest at SMALL?
+K. Which encoder is strongest for Neutrophil?
+L. What do the TRUE binary specialist probes show?
+M. Does the corrected nested MLP change the ranking?
+N. How large is spatial/batch separation for each representation?
+O. Are Phikon and Midnight gains concordant at the per-cell level?
+P. Is the dominant bottleneck truly CellViT representation, local morphology extraction, domain/spatial batch structure, or intrinsic H&E ambiguity?
+Q. What Task011 experiment is justified?
+
+---
+
+## 19. Production and ground-truth guardrails
+
+Do NOT:
+- change `/data/lf_data/result/model_best.pth`;
+- change Task007 labels;
+- change Task008 eligibility;
+- modify Task009 datasets/metrics;
+- relabel cells based on model performance;
+- fine-tune encoders in Task010.
+
+Task010 remains diagnostic.
+
+---
+
+## 20. GitHub synchronization
+
+After the corrected run:
+
+1. set `tasks/task_010.md` to COMPLETED if Midnight shared-cohort Phase B is complete, otherwise PARTIAL with exact remaining item;
+2. replace `reports/task_010_report.md` with a corrected report that clearly marks the previous CellViT baseline as superseded;
 3. update `PROJECT_STATUS.md`;
-4. commit scripts/configs/small metrics/reports only;
-5. do not commit large embeddings, crops, checkpoints, or credentials;
-6. ordinary push only.
+4. commit:
+   - correction scripts;
+   - Midnight integration scripts;
+   - small configs;
+   - corrected metrics;
+   - reports;
+5. do not commit large feature tensors/crops/checkpoints;
+6. preserve pre-fix artefacts under archive/provenance;
+7. push main normally.
 
-## 25. Final handoff after Phase A
+## 21. Final handoff
 
 Return:
-1. local Phikon path/provenance;
-2. shared cohort size and class counts;
-3. fold/batch manifest;
-4. CellViT_TOKEN linear macro-F1/AUPRC;
-5. PHIKON_V2_SMALL linear macro-F1/AUPRC;
-6. PHIKON_V2_CONTEXT linear macro-F1/AUPRC;
-7. Neutrophil metrics for all three;
-8. confusion flows;
-9. binary diagnostic metrics;
-10. CONTEXT-SMALL deltas;
-11. representation geometry;
-12. MLP results;
-13. GT-centered upper bound;
-14. evidence strength;
+1. CellViT alignment audit;
+2. number/percent rows reordered;
+3. corrected five-way linear metrics;
+4. corrected Neutrophil metrics;
+5. true binary specialist metrics;
+6. corrected MLP metrics;
+7. Phikon SMALL vs CONTEXT delta;
+8. Midnight SMALL vs CONTEXT delta;
+9. corrected CellViT vs Phikon/Midnight deltas;
+10. representation geometry;
+11. cross-encoder agreement;
+12. GT-centered status/results;
+13. whether the prior Phase A conclusion changed;
+14. strongest encoder/scale;
 15. dominant bottleneck interpretation;
-16. recommended next branch;
-17. Midnight Phase B status.
+16. recommended Task011.
 
-Do not modify production or frozen ground truth.
+Do not modify production or frozen biological ground truth.
