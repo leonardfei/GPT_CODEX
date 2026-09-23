@@ -1,17 +1,11 @@
 {
-  "status": "BLOCKED_PUBLIC_MODEL_DOWNLOAD",
+  "status": "COMPLETED_LOCAL_PHIKON_PHASE_A",
+  "source_wsi": "/data/lf_data/xenium_data/ID0060276.ome.tif",
   "native_h_and_e_pixel_scale_um_per_pixel": 0.2125,
   "scale_source": "historical validated notebook Prepare_allcelltype_batch8_train8_test.ipynb, PIXEL_SIZE = 0.2125",
-  "ome_metadata_physical_size_um": {
-    "x": 352.77777777777777,
-    "y": 352.77777777777777,
-    "unit": "um",
-    "note": "Inconsistent with validated registration scale; not used."
-  },
-  "small_physical_fov_um": [16, 16],
-  "context_physical_fov_um": [56, 56],
-  "small_native_crop_side_px_float": 75.29411764705883,
-  "context_native_crop_side_px_float": 263.52941176470586,
-  "crop_generation_performed": false,
-  "note": "Physical geometry audited but not applied because public model checkpoints were unreachable."
+  "ome_metadata_note": "OME PhysicalSize metadata was inconsistent with the validated registration scale and was not used",
+  "small": {"physical_fov_um": [16, 16], "native_crop_side_px": 75},
+  "context": {"physical_fov_um": [56, 56], "native_crop_side_px": 263},
+  "center": "matched CellViT H&E nucleus centroid for SHARED_DETECTED_CORE; registered target center for GT-centered upper bound",
+  "preprocessing_after_native_crop": "local Phikon-v2 preprocessor_config.json"
 }

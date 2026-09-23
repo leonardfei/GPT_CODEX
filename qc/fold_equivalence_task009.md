@@ -1,6 +1,6 @@
 # Task010 fold equivalence audit
 
-Task010 did not run model evaluation because the official public encoders were unreachable. The Task009 V3_CORE split manifest was nevertheless inspected and the exact batch folds reserved for the future paired benchmark are:
+The exact Task009 V3_CORE split manifest was reused; no new partition was generated.
 
 | fold | train batches | validation batches |
 |---:|---|---|
@@ -10,4 +10,4 @@ Task010 did not run model evaluation because the official public encoders were u
 | 3 | s01A, s02A, s04B, s06A, s11, s22, s93 | s01B |
 | 4 | s01A, s01B, s02A, s06A, s11, s22 | s04B, s93 |
 
-No new partition was generated. No batch overlap was present in the source manifest.
+No train/validation batch overlap was detected in any fold. The same fold membership was used for CellViT_TOKEN, PHIKON_V2_SMALL, PHIKON_V2_CONTEXT, the MLP probe, and the GT-centered upper bound.

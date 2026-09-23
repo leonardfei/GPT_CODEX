@@ -1,0 +1,8 @@
+class_id,class_name,n_cells
+0,Endothelial,13339
+1,Mesenchymal,16988
+2,Myeloid,15994
+3,Neutrophil,6139
+4,Plasma cell,8539
+5,T and B,21018
+6,Tumor,14027

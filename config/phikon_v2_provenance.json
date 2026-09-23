@@ -1,15 +1,34 @@
 {
-  "status": "BLOCKED_PUBLIC_MODEL_DOWNLOAD",
-  "model_id": "owkin/phikon-v2",
-  "official_source": "https://huggingface.co/owkin/phikon-v2",
-  "revision": null,
-  "checkpoint_path": null,
-  "sha256": null,
-  "license": "Owkin non-commercial licence",
-  "architecture": "ViT-L/16 via DINOv2",
-  "feature_rule": "CLS token, outputs.last_hidden_state[:, 0, :]",
-  "expected_embedding_dim": 1024,
-  "download_attempt": "Official huggingface.co host timed out from both remote server and local diagnostic environment.",
-  "loaded": false,
-  "substitute_used": false
+  "status": "LOADED_OFFLINE",
+  "model_id": "local_upload_phikon-v2",
+  "path": "/data/lf_data/models/phikon-v2",
+  "files": {
+    "model.safetensors": 1213455560,
+    "config.json": 1214,
+    "preprocessor_config.json": 750,
+    "README.md": 18082,
+    "LICENSE.pdf": 157974,
+    ".gitattributes": 1519
+  },
+  "sha256_model_safetensors": "261ae680fa699b3b951597fd57aa19c02ef735805acb104b93af69b36d928569",
+  "architecture": ["Dinov2Model"],
+  "model_type": "dinov2",
+  "hidden_size": 1024,
+  "image_size": 224,
+  "patch_size": 16,
+  "torch_dtype": "float32",
+  "feature_rule": "last_hidden_state[:,0,:]",
+  "preprocessing": {
+    "resize_shortest_edge": 224,
+    "center_crop": [224, 224],
+    "image_mean": [0.485, 0.456, 0.406],
+    "image_std": [0.229, 0.224, 0.225],
+    "rescale_factor": 0.00392156862745098,
+    "convert_rgb": true,
+    "resample": 3
+  },
+  "offline_flags": ["HF_HUB_OFFLINE=1", "TRANSFORMERS_OFFLINE=1"],
+  "loaded_with_local_files_only": true,
+  "runtime_embedding_dimension": 1024,
+  "runtime_dtype": "float32"
 }

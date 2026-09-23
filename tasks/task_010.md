@@ -1,7 +1,7 @@
 # Task 010 — Phikon-first Local Pathology Foundation Model Representation Benchmark
 
 ## Status
-PENDING — local Phikon-v2 uploaded; run Phase A immediately. Midnight-12k is optional Phase B and must not block Phase A.
+PARTIAL-PHIKON-COMPLETE — local Phikon-v2 Phase A completed. Midnight-12k is optional Phase B and remains pending.
 
 ## Objective
 

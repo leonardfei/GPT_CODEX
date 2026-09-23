@@ -2,7 +2,7 @@
 
 ## Current task
 
-Task 010 — Phikon-first local pathology foundation model representation benchmark — PENDING / READY TO RUN
+Task 010 — Phikon-first local pathology foundation model representation benchmark — PARTIAL-PHIKON-COMPLETE / Phase A complete; Midnight-12k Phase B pending
 
 ## Last completed task
 
@@ -24,6 +24,8 @@ Task009 regenerated all V3 datasets from the original OME-TIFF and showed that c
 - Neutrophil end-to-end recall ~0.055
 
 The current hypothesis is that the dominant limitation is representation/classification rather than label eligibility alone.
+
+Task010 Phase A completed with the user-uploaded local Phikon-v2 at `/data/lf_data/models/phikon-v2`, loaded fully offline. On the frozen 96,044-cell SHARED_DETECTED_CORE and exact Task009 V3_CORE folds, linear macro-F1 was 0.1102 ± 0.0187 for CellViT_TOKEN, 0.3366 ± 0.0243 for PHIKON_V2_SMALL, and 0.2726 ± 0.0253 for PHIKON_V2_CONTEXT. Phikon SMALL improved Neutrophil F1 to 0.1885 versus 0.0631 for CellViT, but geometry QC showed increased batch separation (kNN batch purity 0.340, 0.841, 0.987 respectively). Production remains unchanged.
 
 ## Task010 history
 
@@ -163,14 +165,22 @@ Production remains unchanged.
 
 ## Pending tasks
 
-- Execute Task010 Phase A now using the locally uploaded Phikon-v2.
-- Do not wait for Midnight-12k.
-- Preserve earlier blocked-run artefacts as provenance.
+- Review Task010 Phase A results and batch-separation QC.
+- Run Midnight-12k Phase B only after the local upload is complete; reuse the frozen shared manifest.
+- Preserve earlier MUSK/public-download blocked-run artefacts as provenance.
 - Do not start Task011 until Phase A has been reviewed.
 - Do not modify production.
 - Do not modify frozen ground truth.
 
 ## Latest workflow files
+
+Task010 Phase A artefacts:
+
+- Remote output root: `/data/lf_data/result/task010_representation_benchmark`
+- Local report: `reports/task_010_report.md`
+- Local code: `scripts/python/task010_phikon_phase_a.py`, `scripts/python/task010_gt_centered_upper_bound.py`, `scripts/python/task010_finalize_figures.py`
+- Phikon weight SHA256: `261ae680fa699b3b951597fd57aa19c02ef735805acb104b93af69b36d928569`
+- Midnight-12k: pending; no Phase B result yet
 
 - `tasks/task_009.md`
 - `reports/task_009_report.md`

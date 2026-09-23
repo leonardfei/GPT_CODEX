@@ -1,0 +1,12 @@
+{
+  "status": "PHASE_A_LINEAR_AND_GEOMETRY_COMPLETE",
+  "n_shared_detected_core": 96044,
+  "representations": [
+    "CellViT_TOKEN",
+    "PHIKON_V2_SMALL",
+    "PHIKON_V2_CONTEXT"
+  ],
+  "c_grid": "fixed C=1 because identical grouped folds are the primary comparison",
+  "midnight_phase_b": "PENDING_OPTIONAL",
+  "production_model_modified": false
+}
