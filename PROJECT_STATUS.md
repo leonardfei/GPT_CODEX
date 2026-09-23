@@ -2,15 +2,15 @@
 
 ## Current task
 
-Task 009 — CellViT retraining with frozen panel-aware Xenium labels and recalibrated Neutrophil eligibility — PENDING
+Task 009 — CellViT retraining with frozen panel-aware Xenium labels and recalibrated Neutrophil eligibility — COMPLETED; promotion criteria not met
 
 ## Last completed task
 
-Task 008 — Neutrophil nucleus-centered H&E QC recalibration — COMPLETED after manual review acceptance
+Task 009 — CellViT retraining with frozen panel-aware Xenium labels and recalibrated Neutrophil eligibility — COMPLETED; no production promotion
 
 ## Repository status
 
-Tasks 001–008 are complete.
+Tasks 001–009 are complete.
 
 Task 007 corrected the Xenium 5K panel-awareness problem and produced a conservative panel-aware biological annotation:
 - KEEP 987,846
@@ -28,6 +28,13 @@ Task 008 corrected the Task 007 whole-crop H&E debris over-call using target-cen
 - TRAINABLE_EXTENDED Neutrophil 22,107
 
 The supervising user manually reviewed the Task 008 H&E montage and reported that the large majority of candidate nuclei are normal. The Task 008 review gate is therefore closed and its target-centered eligibility is accepted for downstream model testing.
+
+Task 009 regenerated new V3 CORE/EXTENDED datasets directly from the original OME-TIFF and frozen Task007/008 tables; no file from the historical `CellViT_dataset` was reused. The official SAM-H RAW five-fold benchmark completed:
+- OLD_LABELS macro-F1 0.3324 ± 0.0134; macro-AUPRC 0.3413 ± 0.0281
+- V3_CORE macro-F1 0.3330 ± 0.0222; macro-AUPRC 0.3485 ± 0.0262
+- V3_EXTENDED macro-F1 0.3340 ± 0.0217; macro-AUPRC 0.3488 ± 0.0265
+- V3_CORE / V3_EXTENDED Neutrophil F1 0.1072 / 0.1084 and end-to-end recall 0.0549 / 0.0554
+- Neither V3 condition met the predefined promotion rule; no final refit, external test, or production update was performed.
 
 ## Frozen annotation decision
 
@@ -99,9 +106,9 @@ Task 009 output root:
 
 ## Pending tasks
 
-- Execute Task 009.
+- Review Task 009 promotion decision, detection bottleneck, and end-to-end metrics before designing any follow-up model.
 - Do not modify frozen v3 annotation or Task008 eligibility based on model results.
-- Do not start a context-aware/specialist model task until Task009 is completed and reviewed.
+- Do not start a context-aware/specialist model task until Task009 is reviewed.
 
 ## Latest workflow files
 
@@ -110,15 +117,14 @@ Task 009 output root:
 - `tasks/task_008.md`
 - `reports/task_008_report.md`
 - `tasks/task_009.md`
+- `reports/task_009_report.md`
 - `PROJECT_STATUS.md`
 
-## Next execution command
+## Task 009 result root
 
-```text
-Execute task_009.
-```
+`/data/lf_data/result/task009_v3_retraining`
 
-Codex must pull `origin/main` before execution and follow `AGENTS.md` plus `tasks/task_009.md`.
+Production remains `/data/lf_data/result/model_best.pth` with SHA256 `f161afbb90f42ccfbfe9c6843cae6eafd7a12a2bc25620d5b4489e7e3faf6164`.
 
 ## Last update
 
