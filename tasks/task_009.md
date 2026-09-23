@@ -201,6 +201,120 @@ qc/dataset_reconstruction_audit.md
 
 Do not silently change historical geometry.
 
+
+---
+
+## 6A. Mandatory full dataset regeneration from source
+
+This requirement is mandatory and overrides any temptation to reuse the historical prepared dataset.
+
+### Forbidden source dataset
+
+Do NOT reuse any images, labels, split files, manifests, cached patch metadata, or other prepared artifacts from:
+
+```text
+/data/lf_data/xenium_data/CellViT_dataset
+```
+
+The old `CellViT_dataset` was generated from the historical annotation/QC policy and therefore must not be treated as a valid source for Task 009.
+
+It may be inspected only for format/audit purposes if absolutely necessary, but no file from that directory may be copied, symlinked, hard-linked, read as a training image source, or used as a label/split source in the new datasets.
+
+### Required regeneration inputs
+
+Regenerate all Task 009 patch images and labels directly from:
+
+```text
+/data/lf_data/xenium_data/ID0060276.ome.tif
+/data/lf_data/xenium_data/matrix.csv
+/data/lf_data/result/task007_xenium5k_panelaware/metrics/xenium_v3_annotations.csv.gz
+/data/lf_data/result/task008_neutrophil_he_recalibration/metrics/neutrophil_training_eligibility_task008.csv.gz
+```
+
+Use the historical preprocessing notebook only to reconstruct and document:
+- coordinate transformation;
+- patch size;
+- stride;
+- patch naming;
+- train/test batch assignment;
+- label-file schema;
+- patch-edge handling;
+- historical filtering logic that remains intentionally preserved.
+
+Do NOT reuse the notebook-generated old patch files themselves.
+
+### New output datasets
+
+Create entirely new datasets under Task 009:
+
+```text
+/data/lf_data/result/task009_v3_retraining/work/CellViT_dataset_v3_CORE
+/data/lf_data/result/task009_v3_retraining/work/CellViT_dataset_v3_EXTENDED
+```
+
+Each dataset must contain newly generated:
+- H&E patch image files;
+- label CSV files;
+- train/validation/test file lists;
+- grouped-CV split files;
+- dataset manifests;
+- cell-to-patch mapping tables;
+- per-cell frozen v3 biological labels;
+- Neutrophil CORE/EXTENDED eligibility metadata.
+
+### No image reuse
+
+Even when the new patch geometry is numerically identical to the historical geometry, Task 009 must re-export the image patches from the original OME-TIFF.
+
+Do not:
+- copy old PNG/TIFF/JPEG patches;
+- symlink old patch directories;
+- hard-link old patch files;
+- use old patch hashes as image inputs.
+
+The purpose is to guarantee that the new dataset is fully regenerated from the accepted ground truth and original source image.
+
+### Provenance audit
+
+Create:
+
+```text
+qc/dataset_regeneration_provenance.md
+metrics/dataset_regeneration_manifest.csv
+```
+
+The provenance report must explicitly state:
+
+1. whether any file from `/data/lf_data/xenium_data/CellViT_dataset` was used;
+2. exact source H&E path;
+3. exact registration-matrix path;
+4. exact Task 007 annotation-table path;
+5. exact Task 008 eligibility-table path;
+6. number of newly generated image patches;
+7. number of newly generated label files;
+8. number of cells assigned to patches;
+9. number of cells excluded and reason;
+10. SHA256 or another reproducible hash summary for the newly generated dataset manifests.
+
+The expected answer to item 1 must be:
+
+```text
+No old CellViT_dataset files were reused.
+```
+
+### Hard failure condition
+
+If the implementation detects that Task 009 training is reading patch images, labels, split lists, or metadata from:
+
+```text
+/data/lf_data/xenium_data/CellViT_dataset
+```
+
+stop execution and mark Task 009 BLOCKED rather than proceeding.
+
+Do not silently fall back to the historical dataset.
+
+
 ---
 
 ## 7. Primary training dataset composition
@@ -499,6 +613,7 @@ Create:
 Required metrics:
 ```text
 metrics/dataset_composition.csv
+metrics/dataset_regeneration_manifest.csv
 metrics/split_manifest.csv
 metrics/cv_fold_metrics.csv
 metrics/cv_summary.csv
@@ -533,31 +648,33 @@ Use editable vector PDF and source CSV.
 
 ## 20. Required report questions
 
-A. What exact labels and QC rules defined V3_CORE and V3_EXTENDED?
+A. Confirm that all Task 009 patch images, labels, split files, and manifests were newly regenerated from the original OME-TIFF and frozen Task007/008 labels, and confirm that no file from `/data/lf_data/xenium_data/CellViT_dataset` was reused.
 
-B. How many eligible cells per class and batch were available before capping?
+B. What exact labels and QC rules defined V3_CORE and V3_EXTENDED?
 
-C. How many cells per class were actually used for training?
+C. How many eligible cells per class and batch were available before capping?
 
-D. Did the corrected labels improve grouped-CV macro-F1?
+D. How many cells per class were actually used for training?
 
-E. Did Neutrophil precision/recall/F1/AUPRC improve?
+E. Did the corrected labels improve grouped-CV macro-F1?
 
-F. Did Myeloid↔Neutrophil confusion decrease?
+F. Did Neutrophil precision/recall/F1/AUPRC improve?
 
-G. What were per-class detection recalls under the new ground truth?
+G. Did Myeloid↔Neutrophil confusion decrease?
 
-H. What was Neutrophil end-to-end recall?
+H. What were per-class detection recalls under the new ground truth?
 
-I. Did CORE or EXTENDED perform better?
+I. What was Neutrophil end-to-end recall?
 
-J. Did any V3 condition satisfy the promotion rule?
+J. Did CORE or EXTENDED perform better?
 
-K. Was a final external test run performed?
+K. Did any V3 condition satisfy the promotion rule?
 
-L. Was production model updated?
+L. Was a final external test run performed?
 
-M. If not, what is the next dominant bottleneck: detector, representation, context, or another issue?
+M. Was production model updated?
+
+N. If not, what is the next dominant bottleneck: detector, representation, context, or another issue?
 
 ---
 
