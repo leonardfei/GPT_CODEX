@@ -1,6 +1,6 @@
 # Task 008 report — Neutrophil nucleus-centered H&E QC recalibration
 
-Status: PARTIAL / REVIEW_REQUIRED. Task007 biological identity was frozen; only H&E nuclear-quality status and Neutrophil training eligibility were recalibrated. No CellViT predictions were used and no CellViT model was trained.
+Status: COMPLETED after manual review acceptance on 2026-09-23. Task007 biological identity was frozen; only H&E nuclear-quality status and Neutrophil training eligibility were recalibrated. No CellViT predictions were used and no CellViT model was trained.
 
 ## Evidence and reproducibility
 
@@ -25,11 +25,11 @@ Runtime: Python 3.10.14, NumPy 1.23.5, pandas 1.4.3, h5py 3.9.0, SciPy 1.8.1, py
 13. Xenium/H&E agreement: agree_present 22,407; HE_absent_Xenium_present 1,513; HE_present_Xenium_absent 223; agree_absent 24. Conflicts are assigned MANUAL_REVIEW.
 14. Parameter stability: mean status stability **97.48%**; 94.77% of cells had stability ≥0.80. The sensitivity grid was one-at-a-time perturbation of H&E threshold, center tolerance, minimum component area, and lobe-group distance.
 15. Safety rails: **no computational safety rail triggered**. Hard-exclusion rate 0.099%; reference no-target rate 0%; batch hard-exclusion spread 0.338 percentage points; subtype spread 0.008 percentage points.
-16. Final eligibility status: **PARTIAL / REVIEW_REQUIRED**, because manual review is required before declaring the table final.
+16. Final eligibility status: **ACCEPTED / COMPLETED**. The supervising user manually reviewed the generated H&E montage and reported that the large majority of candidate nuclei are normal; Task008 target-centered eligibility was therefore accepted for downstream model testing.
 17. Eligibility table: `/data/lf_data/result/task008_neutrophil_he_recalibration/metrics/neutrophil_training_eligibility_task008.csv.gz`.
 18. Report: `/data/lf_data/result/task008_neutrophil_he_recalibration/TASK008_REPORT.md`.
 19. Manual-review montage: `/data/lf_data/result/task008_neutrophil_he_recalibration/figures/Fig7_task008_manual_review.pdf` and `/data/lf_data/result/task008_neutrophil_he_recalibration/qc/review_montages/Fig7_task008_manual_review.pdf`.
-20. CellViT retraining: **No**. Wait for manual review and explicit acceptance of Task008 eligibility.
+20. CellViT retraining: **Approved as the next task** using frozen Task007 biological labels plus Task008 eligibility; annotation rules must remain unchanged after model results are viewed.
 
 ## Interpretation boundary
 
@@ -49,3 +49,16 @@ The result supports the computational finding that Task007's whole-context compo
 - `/data/lf_data/result/task008_neutrophil_he_recalibration/metrics/parameter_sensitivity.csv`
 - `/data/lf_data/result/task008_neutrophil_he_recalibration/metrics/safety_rail_decision.json`
 - `/data/lf_data/result/task008_neutrophil_he_recalibration/metrics/neutrophil_training_eligibility_task008.csv.gz`
+
+
+## Manual review acceptance
+
+The supervising user manually reviewed the Task008 H&E montage and reported that the large majority of candidate nuclei are normal. This resolves the mandatory review gate.
+
+Downstream decision:
+- Task007 biological identity remains frozen.
+- Task008 target-centered H&E eligibility is accepted.
+- TRAINABLE_CORE (21,639 Neutrophils) is the primary training definition.
+- TRAINABLE_EXTENDED (22,107 Neutrophils) is retained as a prespecified sensitivity definition.
+- Hard exclusions and MANUAL_REVIEW cases remain outside the primary training set.
+- Subsequent CellViT results must not be used to retrospectively alter the accepted annotation/QC rules.
