@@ -1,7 +1,7 @@
 # Task 008 — Neutrophil Nucleus-Centered H&E QC Recalibration
 
 ## Status
-PENDING
+PARTIAL
 
 ## Objective
 

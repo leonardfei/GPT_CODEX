@@ -2,7 +2,7 @@
 
 ## Current task
 
-Task 008 — Neutrophil nucleus-centered H&E QC recalibration — PENDING
+Task 008 — Neutrophil nucleus-centered H&E QC recalibration — PARTIAL / REVIEW_REQUIRED
 
 ## Last completed task
 
@@ -19,7 +19,7 @@ Tasks 001–007 are complete. Task 007 successfully corrected the panel-awarenes
 
 However, Task 007 H&E triage flagged 22,164 Neutrophils as debris-suspect and retained only 1,969 as trainable. Review of the implementation showed that the debris rule depended on connected-component counts across the entire 128×128 H&E crop, which is likely confounded by neighboring nuclei in immune-dense tissue.
 
-Task 008 has therefore been created to recalibrate Neutrophil H&E eligibility using target-centered nuclear evidence.
+Task 008 recalibrated Neutrophil H&E eligibility using target-centered nuclear evidence. The computational safety rails did not trigger, but the task remains PARTIAL / REVIEW_REQUIRED because the specified manual review of the generated montage is mandatory before finalizing eligibility.
 
 ## Fixed biological annotation
 
@@ -97,8 +97,21 @@ Production remains unchanged.
 
 ## Pending tasks
 
-- Task 008 — execute target-centered Neutrophil H&E QC recalibration.
+- Review and approve the Task 008 target-centered H&E eligibility montage and provisional training table.
 - Do not start CellViT retraining until Task 008 is completed and reviewed.
+
+## Task 008 result summary
+
+- Output root: `/data/lf_data/result/task008_neutrophil_he_recalibration`
+- Reference cells: 9,000 across six non-Neutrophil classes and all batches.
+- Empirical centroid offset: median 8.73 px; 95th percentile 21.07 px; selected tolerance 21.07 px.
+- Frozen broad Neutrophil candidates: 24,167; Task007 debris-suspect: 22,164.
+- Task008 target evidence: TARGET_NUCLEUS_PRESENT 22,630; final NO_TARGET_NUCLEUS 13; FRAGMENTED_TARGET_SUSPECT 11; MANUAL_REVIEW 1,736.
+- Provisional eligibility: TRAINABLE_CORE 21,639; TRAINABLE_EXTENDED 22,107.
+- Conventional Neutrophil: core 12,903; extended 13,208. Neutrophil_CXCR4: core 8,736; extended 8,899.
+- Hard-exclusion rate: 0.099%; batch spread 0.338 percentage points; subtype spread 0.008 percentage points; mean status stability 97.48%.
+- Xenium/H&E agreement: agree_present 22,407; HE_absent_Xenium_present 1,513; HE_present_Xenium_absent 223; agree_absent 24.
+- No CellViT predictions were used and no CellViT model was trained.
 
 ## Latest workflow files
 
