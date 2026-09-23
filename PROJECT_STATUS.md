@@ -2,7 +2,7 @@
 
 ## Current task
 
-Task 007 — Xenium 5K panel-aware reannotation and training-label QC — PENDING
+Task 007 — Xenium 5K panel-aware reannotation and training-label QC — COMPLETED
 
 ## Last completed task
 
@@ -12,7 +12,7 @@ Task 006 — Xenium re-annotation, H&E nuclear-integrity QC, and high-quality Ce
 
 Tasks 001–006 are complete. Task 006 demonstrated that the upstream ground-truth problem is real, but its reannotation policy was not appropriate for a targeted Xenium 5K panel and caused severe over-filtering. The v2 labels must not be used as production ground truth.
 
-Task 007 has been created to rebuild the annotation using the actual Xenium panel, original `cl1` as a prior, batch-aware data-driven class signatures, conservative KEEP/RELABEL/REVIEW decisions, and independent H&E/segmentation quality control.
+Task 007 rebuilt the annotation using the actual Xenium panel, original `cl1` as a prior, batch-aware data-driven class signatures, conservative KEEP/RELABEL/REVIEW decisions, and independent H&E/segmentation quality control. The task completed with no non-exempt safety-rail trigger. A raw <50% Neutrophil TRAIN_EXTENDED retention flag was documented as a class-specific H&E debris-suspect artifact and remains a manual-review gate.
 
 Task 007 must stop before CellViT retraining.
 
@@ -92,10 +92,21 @@ SHA256:
 
 Production remains unchanged.
 
+## Task 007 result summary
+
+- Output root: `/data/lf_data/result/task007_xenium5k_panelaware`
+- Panel: 5,001 genes; `CD3D` absent and `CD3E` present.
+- Actions: KEEP 987,846; RELABEL 0; REVIEW 3,004.
+- Quality: Pass 782,410; Low_quality 140,877; Artifact_or_no_nucleus 66,250; Technical_fail 1,313.
+- TRAIN_CORE / TRAIN_EXTENDED: Tumor 354,569 / 354,569; T and B 120,909 / 120,909; Myeloid 103,566 / 103,566; Mesenchymal 88,182 / 88,182; Endothelial 61,488 / 61,488; Plasma cell 27,264 / 27,264; Neutrophil 1,969 / 1,969.
+- Original broad Neutrophil: 24,167; original `Neutrophil_CXCR4`: 9,520; biologically retained Neutrophil: 24,107.
+- Neutrophil H&E triage: no-visible-nucleus 0; debris-suspect 22,164; all registration candidates were in bounds.
+- Raw Neutrophil extended-retention flag was exempted only because the class-specific H&E artifact was documented; no non-exempt safety rail triggered. Annotation status: FINAL computational output, with manual review required before training.
+- CellViT was not trained or retrained.
+
 ## Pending tasks
 
-- Task 007 — execute Xenium 5K panel-aware reannotation and training-label QC.
-- Do not start CellViT retraining until Task 007 is reviewed and v3 labels are accepted.
+- Do not start CellViT retraining until the Task 007 REVIEW queue, H&E montage, safety-rail exception, and v3 labels are reviewed and accepted.
 
 ## Latest workflow files
 
