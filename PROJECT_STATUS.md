@@ -2,86 +2,89 @@
 
 ## Current task
 
-Task 007 — Xenium 5K panel-aware reannotation and training-label QC — COMPLETED
+Task 008 — Neutrophil nucleus-centered H&E QC recalibration — PENDING
 
 ## Last completed task
 
-Task 006 — Xenium re-annotation, H&E nuclear-integrity QC, and high-quality CellViT retraining — COMPLETED; v2 labels not adopted
+Task 007 — Xenium 5K panel-aware reannotation and training-label QC — COMPLETED; biological annotation retained, Neutrophil H&E eligibility requires recalibration
 
 ## Repository status
 
-Tasks 001–006 are complete. Task 006 demonstrated that the upstream ground-truth problem is real, but its reannotation policy was not appropriate for a targeted Xenium 5K panel and caused severe over-filtering. The v2 labels must not be used as production ground truth.
+Tasks 001–007 are complete. Task 007 successfully corrected the panel-awareness problem from Task 006 and preserved nearly all biological identities:
+- KEEP 987,846
+- RELABEL 0
+- REVIEW 3,004
+- broad original Neutrophil 24,167
+- biologically retained Neutrophil 24,107
 
-Task 007 rebuilt the annotation using the actual Xenium panel, original `cl1` as a prior, batch-aware data-driven class signatures, conservative KEEP/RELABEL/REVIEW decisions, and independent H&E/segmentation quality control. The task completed with no non-exempt safety-rail trigger. A raw <50% Neutrophil TRAIN_EXTENDED retention flag was documented as a class-specific H&E debris-suspect artifact and remains a manual-review gate.
+However, Task 007 H&E triage flagged 22,164 Neutrophils as debris-suspect and retained only 1,969 as trainable. Review of the implementation showed that the debris rule depended on connected-component counts across the entire 128×128 H&E crop, which is likely confounded by neighboring nuclei in immune-dense tissue.
 
-Task 007 must stop before CellViT retraining.
+Task 008 has therefore been created to recalibrate Neutrophil H&E eligibility using target-centered nuclear evidence.
 
-## Fixed source inputs
+## Fixed biological annotation
 
-- Xenium AnnData:
+Task 007 v3 panel-aware biological labels are frozen for Task 008.
+
+Task 008 must not change:
+- original_cl1
+- Neutrophil / Neutrophil_CXCR4 subtype labels
+- seven-class biological mapping
+- Task 007 panel-aware biological identity
+
+Task 008 changes only:
+- H&E nuclear-quality status
+- Neutrophil training eligibility
+
+## Task 008 principles
+
+- Use level-0 H&E.
+- Calibrate empirical centroid-to-nucleus offset using technically valid non-Neutrophil reference cells.
+- Judge the target cell from a center-associated nuclear component/group, not the total number of components in the 128×128 context crop.
+- Allow multilobulated Neutrophil nuclei.
+- Separate target-nucleus evidence from necrosis/debris context.
+- Integrate Xenium nucleus_count/nucleus_area as independent supporting evidence.
+- Ambiguous cells go to MANUAL_REVIEW rather than hard exclusion.
+- Do not use CellViT predictions.
+- Do not train CellViT in Task 008.
+
+## Inputs
+
+- Xenium source:
   `/data/lf_data/xenium_data/adata_harmony_remove_necrosis.h5ad`
 - H&E:
   `/data/lf_data/xenium_data/ID0060276.ome.tif`
-- Registration matrix:
+- registration:
   `/data/lf_data/xenium_data/matrix.csv`
-- Historical preprocessing notebook:
-  `/data/lf_data/xenium_data/Prepare_allcelltype_batch8_train8_test.ipynb`
+- Task 007 v3 annotation:
+  `/data/lf_data/result/task007_xenium5k_panelaware/metrics/xenium_v3_annotations.csv.gz`
 
-Task 007 output root:
+Task 008 output root:
 
-`/data/lf_data/result/task007_xenium5k_panelaware`
+`/data/lf_data/result/task008_neutrophil_he_recalibration`
 
-Source files must remain unchanged.
+## Task 007 result retained as biological baseline
 
-## Why Task 006 v2 is not accepted
+Panel:
+- 5,001 genes
+- CD3D absent
+- CD3E present
 
-Task 006 produced:
-- old→new label change rate: ~89.7%
-- HQ_CORE: 73,960 / 990,850 cells
-- T and B HQ_CORE: 1,386
-- Neutrophil HQ_CORE: 445
-- V2_CORE macro-F1 lower than OLD_LABELS
+Biological annotation:
+- KEEP 987,846
+- RELABEL 0
+- REVIEW 3,004
 
-The main methodological issue was that annotation confidence depended on external/canonical marker logic and uniform marker-support rules that are inappropriate for a targeted ~5,000-gene panel.
+Broad Neutrophil:
+- original 24,167
+- Neutrophil_CXCR4 9,520
+- biologically retained 24,107
 
-Task 007 corrects this by:
-- using only genes actually present in `adata.var_names`;
-- deriving panel-aware class signatures from the data;
-- preserving original `cl1` as a prior;
-- separating biological identity from technical cell quality;
-- using batch-held-out cross-fitting for label consistency;
-- requiring high-specificity evidence for automatic relabeling;
-- treating ambiguity as REVIEW rather than Low_quality;
-- using full-resolution H&E review for all original/proposed Neutrophils.
+Task 007 H&E triage:
+- no-visible-nucleus 0
+- debris-suspect 22,164
+- trainable 1,969
 
-## Seven-class taxonomy
-
-- Endothelial
-- Mesenchymal
-- Myeloid
-- Neutrophil
-- Plasma cell
-- T and B
-- Tumor
-
-Original finer labels such as `Neutrophil_CXCR4` must be preserved in separate audit fields.
-
-## Task 007 anti-overfiltering safety rails
-
-Before any v3 annotation is called FINAL, automatically flag review if:
-- >30% of non-Low-quality original cells are biologically relabeled;
-- >40% of a major class is sent to identity REVIEW solely for transcriptional ambiguity;
-- TRAIN_EXTENDED retains <50% of technically valid cells for a major class without a documented artifact;
-- T/B or Neutrophil is depleted >50% by annotation evidence alone;
-- one batch is disproportionately depleted.
-
-If triggered, Task 007 must be marked PARTIAL and the v3 annotation PROVISIONAL.
-
-## Anti-circularity rule
-
-Do not use CellViT predictions or CellViT performance to define or modify v3 annotations.
-
-Task 007 must not train CellViT.
+The Task 007 H&E debris status must not be treated as final training ground truth.
 
 ## Current production model
 
@@ -92,46 +95,25 @@ SHA256:
 
 Production remains unchanged.
 
-## Task 007 result summary
-
-- Output root: `/data/lf_data/result/task007_xenium5k_panelaware`
-- Panel: 5,001 genes; `CD3D` absent and `CD3E` present.
-- Actions: KEEP 987,846; RELABEL 0; REVIEW 3,004.
-- Quality: Pass 782,410; Low_quality 140,877; Artifact_or_no_nucleus 66,250; Technical_fail 1,313.
-- TRAIN_CORE / TRAIN_EXTENDED: Tumor 354,569 / 354,569; T and B 120,909 / 120,909; Myeloid 103,566 / 103,566; Mesenchymal 88,182 / 88,182; Endothelial 61,488 / 61,488; Plasma cell 27,264 / 27,264; Neutrophil 1,969 / 1,969.
-- Original broad Neutrophil: 24,167; original `Neutrophil_CXCR4`: 9,520; biologically retained Neutrophil: 24,107.
-- Neutrophil H&E triage: no-visible-nucleus 0; debris-suspect 22,164; all registration candidates were in bounds.
-- Raw Neutrophil extended-retention flag was exempted only because the class-specific H&E artifact was documented; no non-exempt safety rail triggered. Annotation status: FINAL computational output, with manual review required before training.
-- CellViT was not trained or retrained.
-
 ## Pending tasks
 
-- Do not start CellViT retraining until the Task 007 REVIEW queue, H&E montage, safety-rail exception, and v3 labels are reviewed and accepted.
+- Task 008 — execute target-centered Neutrophil H&E QC recalibration.
+- Do not start CellViT retraining until Task 008 is completed and reviewed.
 
 ## Latest workflow files
 
-- `tasks/task_001.md`
-- `reports/task_001_report.md`
-- `tasks/task_002.md`
-- `reports/task_002_report.md`
-- `tasks/task_003.md`
-- `reports/task_003_report.md`
-- `tasks/task_004.md`
-- `reports/task_004_report.md`
-- `tasks/task_005.md`
-- `reports/task_005_report.md`
-- `tasks/task_006.md`
-- `reports/task_006_report.md`
 - `tasks/task_007.md`
+- `reports/task_007_report.md`
+- `tasks/task_008.md`
 - `PROJECT_STATUS.md`
 
 ## Next execution command
 
 ```text
-Execute task_007.
+Execute task_008.
 ```
 
-Codex must pull `origin/main` before execution and follow `AGENTS.md` plus `tasks/task_007.md`.
+Codex must pull `origin/main` before execution and follow `AGENTS.md` plus `tasks/task_008.md`.
 
 ## Last update
 
