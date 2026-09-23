@@ -2,7 +2,7 @@
 
 ## Current task
 
-Task 010 — Frozen representation benchmark: CellViT token vs MUSK nuclear/contextual H&E embeddings — PENDING
+Task 010 — Frozen representation benchmark: CellViT token vs MUSK nuclear/contextual H&E embeddings — BLOCKED_MUSK_ACCESS
 
 ## Last completed task
 
@@ -22,6 +22,8 @@ Task009 regenerated all V3 datasets from the original OME-TIFF and showed that c
 - Neutrophil end-to-end recall ~0.055
 
 The current hypothesis is therefore that the dominant limitation is representation/classification rather than label eligibility alone.
+
+Task010 reached the required MUSK access gate but could not proceed. No official MUSK installation, checkpoint, or cache was found on the server. The official `xiangjx/musk` weights require gated-term acceptance and Hugging Face write-token login. No authorized token or manual acceptance was available, so no substitute encoder was used and no benchmark was started. Production and frozen ground truth remain unchanged.
 
 ## Task 010 objective
 
@@ -153,7 +155,7 @@ Production remains unchanged.
 
 ## Pending tasks
 
-- Execute Task010.
+- Obtain authorized access to the official `xiangjx/musk` checkpoint, then rerun Task010 from the access gate.
 - Do not build the final multiscale model until Task010 identifies which representation/scale carries useful signal.
 - Do not modify production.
 - Do not modify frozen ground truth.
@@ -163,13 +165,18 @@ Production remains unchanged.
 - tasks/task_009.md
 - reports/task_009_report.md
 - tasks/task_010.md
+- reports/task_010_report.md
+- config/task010_musk_model_provenance.md
+- config/task010_musk_environment.txt
+- config/task010_musk_checkpoint_sha256.json
+- config/task010_crop_geometry.json
 - PROJECT_STATUS.md
 
-## Next execution command
+## Task 010 status artefacts
 
-Execute task_010.
+Blocked-run artefacts are recorded under `/data/lf_data/result/task010_representation_benchmark/`. No embeddings, checkpoints, crops, or benchmark metrics were generated.
 
-Codex must pull origin/main before execution and follow AGENTS.md plus tasks/task_010.md.
+After authorized MUSK access is supplied, Codex must pull `origin/main` before rerunning `Execute task_010.` and follow `AGENTS.md` plus `tasks/task_010.md`.
 
 ## Last update
 

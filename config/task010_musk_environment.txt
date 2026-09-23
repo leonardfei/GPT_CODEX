@@ -1,0 +1,19 @@
+Task010 access-gate environment; no MUSK environment was created.
+Observed environment: cellvit_env
+python 3.10.14 | packaged by conda-forge | GCC 12.3.0
+torch 2.7.1+cu128
+timm 1.0.8
+huggingface_hub 0.22.2
+Pillow 10.3.0
+numpy 1.23.5
+pandas 1.4.3
+scikit-learn 1.3.0
+cuda_available True
+
+Import checks:
+musk unavailable
+MUSK unavailable
+transformers unavailable
+open_clip unavailable
+
+No dependencies were installed or changed because official MUSK access was blocked.

@@ -2,7 +2,7 @@
 # Task 010 — Frozen Representation Benchmark: CellViT Token vs MUSK Nuclear and Contextual H&E Embeddings
 
 ## Status
-PENDING
+BLOCKED_MUSK_ACCESS (official gated weights require authorized Hugging Face access; no benchmark run)
 
 ## Objective
 

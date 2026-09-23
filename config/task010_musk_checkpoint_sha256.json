@@ -1,0 +1,13 @@
+{
+  "status": "BLOCKED_MUSK_ACCESS",
+  "model_id": "xiangjx/musk",
+  "source_repository": "https://github.com/lilab-stanford/MUSK",
+  "loader_reference": "hf_hub:xiangjx/musk",
+  "checkpoint_path": null,
+  "sha256": null,
+  "downloaded": false,
+  "loaded": false,
+  "verified": false,
+  "blocker": "Official Hugging Face MUSK weights require gated-term acceptance and Hugging Face write-token login; no authorized token or manual acceptance was available.",
+  "server_search": "No official MUSK installation, checkpoint, or cache found under /data/lf_data."
+}

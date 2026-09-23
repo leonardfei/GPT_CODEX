@@ -1,0 +1,10 @@
+{
+  "status": "BLOCKED_MUSK_ACCESS",
+  "native_h_and_e_pixel_scale_um_per_pixel": null,
+  "scale_audit_performed": false,
+  "musk_input_size_px": 384,
+  "musk_small_physical_fov_um": [16, 16],
+  "musk_context_physical_fov_um": [56, 56],
+  "native_crop_geometry_px": null,
+  "note": "Geometry is intentionally not applied until official MUSK access is authorized and the native H&E scale audit is completed."
+}
