@@ -2,7 +2,9 @@
 
 ## Current task
 
-Task 011-MUSK — gated MUSK benchmark on the canonical H&E cell-typing cohort — PENDING / READY TO RUN WITH LOCAL MODEL
+Task 011-MUSK — gated MUSK benchmark on the canonical H&E cell-typing cohort — IN_PROGRESS
+
+Current execution: official local MUSK code/weights were verified and loaded offline; FOV8 completed, FOV12 extraction is running on the server. No Hugging Face token or network model download was used. Final metrics/report/push are pending completion of the server benchmark.
 
 ## Previous completed task
 
