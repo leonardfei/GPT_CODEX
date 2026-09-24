@@ -2,7 +2,17 @@
 
 ## Current task
 
-Task 011 correction — fine-tuning promotion gate and true binary probes — PENDING / READY TO RUN
+Task 011 correction — fine-tuning promotion gate and true binary probes — COMPLETED
+
+## Corrected Task011 outcome (2026-09-24)
+
+- Corrected F1_FINAL_BLOCK: macro-F1 `0.4522 ± 0.0294`; macro-AUPRC `0.4893 ± 0.0428`.
+- Relative to frozen FOV12: macro-F1 gain `+0.0318`; Neutrophil F1 gain `+0.0214`; Neutrophil one-vs-rest AUPRC gain `+0.0306`.
+- Macro-F1 improved in `5/5` outer folds; batch purity delta `+0.0483`; spatial purity delta `-0.00094`.
+- Corrected strict promotion gate: `PASS`, through the prespecified Neutrophil one-vs-rest AUPRC criterion. The previous Task011 promotion statement is superseded because it used the wrong gate metric and mislabeled probability-ratio diagnostics as true binary probes.
+- True independent binary probes, five-fold mean ± SD: N-vs-Myeloid AUROC `0.7202 ± 0.0221`, AUPRC `0.4385 ± 0.1787`, F1 `0.4561 ± 0.1453`; N-vs-T/B AUROC `0.7069 ± 0.0359`, AUPRC `0.3930 ± 0.2118`, F1 `0.4020 ± 0.1803`.
+- `F1_FINAL_BLOCK` is both the best observed development candidate and the strict gate-preferred candidate. Task012 remains pending independent slide/patient-level validation; production remains unchanged.
+- Original Task011 outputs were preserved in the remote pre-correction archive; corrected small outputs are tracked under `metrics/task011_correction/`, `config/task011_correction/`, and `qc/task011_correction/`.
 
 ## Background
 
@@ -96,14 +106,14 @@ SHA256:
 
 No production model, Task007 label, Task008 eligibility, or Task009 output may be modified.
 
-## Next execution command
+## Next planned action
 
 ```text
-Execute task_011_correction.
+Prepare Task012 independent validation only after its design and untouched slide/patient holdout are available.
 ```
 
 Codex must pull origin/main and follow AGENTS.md plus `tasks/task_011_correction.md`.
 
 ## Last update
 
-2026-09-24
+2026-09-24 — Task011 correction completed

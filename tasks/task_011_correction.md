@@ -1,7 +1,9 @@
 # Task 011 Correction — Fine-tuning Promotion Gate and True Binary Probes
 
 ## Status
-PENDING
+COMPLETED
+
+Completed 2026-09-24. The corrected five-fold rerun, independent binary probes, strict gate audit, archived provenance, report replacement, and Git synchronization were completed. See `reports/task_011_report.md` and the corrected metrics/config/QC directories.
 
 ## Purpose
 

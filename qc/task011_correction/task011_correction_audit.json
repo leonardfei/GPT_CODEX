@@ -1,0 +1,18 @@
+{
+  "old_promotion_bug_fixed": true,
+  "old_binary_labeling_bug_fixed": true,
+  "old_fold0_binary_summary_bug_fixed": true,
+  "old_outputs_preserved": true,
+  "corrected_outputs": [
+    "fine_tune_fold_metrics_corrected.csv",
+    "fine_tune_summary_corrected.csv",
+    "fine_tune_per_class_corrected.csv",
+    "fine_tune_true_binary_corrected.csv",
+    "fine_tune_true_binary_summary_corrected.csv",
+    "fine_tune_pairwise_probability_diagnostics_corrected.csv",
+    "fine_tune_geometry_corrected.csv",
+    "model_ladder_corrected.csv",
+    "decision_summary_corrected.json",
+    "fine_tuning_gate_corrected.json"
+  ]
+}

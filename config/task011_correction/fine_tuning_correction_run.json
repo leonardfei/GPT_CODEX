@@ -1,0 +1,7 @@
+{
+  "status": "CORRECTED_FINE_TUNE_RERUN_COMPLETE",
+  "true_binary_probes": true,
+  "pairwise_probability_diagnostics_preserved_separately": true,
+  "production_model_modified": false,
+  "ground_truth_modified": false
+}

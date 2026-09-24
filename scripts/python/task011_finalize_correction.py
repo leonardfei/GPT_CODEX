@@ -36,7 +36,20 @@ def main() -> None:
     ff = pd.read_csv(metrics / "fine_tune_fold_metrics_corrected.csv")
     fp = pd.read_csv(metrics / "fine_tune_per_class_corrected.csv")
     tb = pd.read_csv(metrics / "fine_tune_true_binary_corrected.csv")
-    tbs = pd.read_csv(metrics / "fine_tune_true_binary_summary_corrected.csv")
+    # Rebuild the five-fold summary from the fold-level probe results so that
+    # both mean and sample SD are available for every requested metric.
+    binary_metrics = ["auroc", "auprc", "f1", "sensitivity", "specificity", "precision"]
+    tb_mean = tb.groupby(["candidate", "comparison"], as_index=False)[binary_metrics].mean()
+    tb_sd = (
+        tb.groupby(["candidate", "comparison"], as_index=False)[binary_metrics]
+        .std(ddof=1)
+        .rename(columns={col: f"{col}_sd" for col in binary_metrics})
+    )
+    tb_n = tb.groupby(["candidate", "comparison"], as_index=False)["n_val"].mean()
+    tbs = tb_mean.merge(tb_sd, on=["candidate", "comparison"], how="left").merge(
+        tb_n, on=["candidate", "comparison"], how="left"
+    )
+    tbs.to_csv(metrics / "fine_tune_true_binary_summary_corrected.csv", index=False)
     pdg = pd.read_csv(metrics / "fine_tune_pairwise_probability_diagnostics_corrected.csv")
     fg = pd.read_csv(metrics / "fine_tune_geometry_corrected.csv")
     ladder_old = pd.read_csv(metrics / "model_ladder.csv")
@@ -158,15 +171,14 @@ def main() -> None:
         ),
         "true_binary_summary_corrected": {
             "n_vs_myeloid": {
-                "auroc": row["true_n_vs_myeloid_auroc"],
-                "auprc": row["true_n_vs_myeloid_auprc"],
-                "f1": row["true_n_vs_myeloid_f1"],
+                metric: mean_col(tbs[tbs["comparison"].eq("neutrophil_vs_myeloid")], metric)
+                for metric in binary_metrics
             },
             "n_vs_tb": {
-                "auroc": row["true_n_vs_tb_auroc"],
-                "auprc": row["true_n_vs_tb_auprc"],
-                "f1": row["true_n_vs_tb_f1"],
+                metric: mean_col(tbs[tbs["comparison"].eq("neutrophil_vs_tb")], metric)
+                for metric in binary_metrics
             },
+            "reported_dispersion": "sample SD across the five outer folds",
         },
         "pairwise_probability_diagnostics_are_not_true_binary": True,
         "previous_task011_decision_superseded": True,
