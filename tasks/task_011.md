@@ -1,9 +1,9 @@
 # Task 011 — Midnight Local-Morphology Optimization and Hierarchical Immune Specialist
 
 ## Status
-COMPLETED
+CORRECTION-PENDING — primary Task011 stages completed, but final fine-tuning promotion/binary summary is under methodological correction. See `tasks/task_011_correction.md`.
 
-Completion note: Task011 completed on the canonical 96,044-cell cohort with exact Task009 V3_CORE folds. FOV12 was selected; frozen fusion, hierarchy, specialist, and TTA gates were evaluated; the triggered F1 final-block gate completed and met the within-Task011 promotion criteria. No biological ground truth or production model was changed. See `reports/task_011_report.md`.
+Completion note (superseded in part): Task011 primary stages completed on the canonical 96,044-cell cohort with exact Task009 V3_CORE folds. FOV12 was selected and the final-block fine-tuning produced the highest observed macro-F1. However, subsequent audit found that the promotion gate used N-vs-Myeloid AUPRC instead of Neutrophil one-vs-rest AUPRC, and the fine-tuned binary summary was not based on independently trained binary probes. The strict promotion decision and final binary endpoints are therefore pending correction under `tasks/task_011_correction.md`. No biological ground truth or production model was changed.
 
 ## Goal
 
