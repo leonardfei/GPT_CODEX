@@ -2,7 +2,7 @@
 
 ## Current task
 
-Task 011-MUSK — gated MUSK benchmark on the canonical H&E cell-typing cohort — PENDING / READY AFTER MODEL ACCESS
+Task 011-MUSK — gated MUSK benchmark on the canonical H&E cell-typing cohort — PENDING / READY TO RUN WITH LOCAL MODEL
 
 ## Previous completed task
 
@@ -19,7 +19,7 @@ Corrected Task011 preferred development candidate:
 
 ## New MUSK benchmark
 
-The user now has gated Hugging Face access to the official MUSK model.
+The user has downloaded the official MUSK code and weights locally, uploaded them to the server, and extracted them. Task011-MUSK should now use local discovery first and run offline.
 
 Official resources:
 - code: lilab-stanford/MUSK
@@ -133,6 +133,12 @@ Production remains unchanged.
 ```text
 Execute task_011_musk.
 ```
+
+Local-first requirement:
+- discover the uploaded MUSK code and weight directories under `/data/lf_data/models/`;
+- verify source/weights/provenance and SHA256;
+- load fully offline;
+- do not contact Hugging Face unless local discovery fails.
 
 Codex must pull origin/main and follow AGENTS.md plus `tasks/task_011_musk.md`.
 
