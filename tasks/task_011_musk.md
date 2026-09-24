@@ -1,7 +1,7 @@
 # Task 011-MUSK — Gated MUSK benchmark on the canonical H&E cell-typing cohort
 
 ## Status
-PENDING / ACCESS-AND-BENCHMARK
+PENDING / READY-LOCAL-MODEL — user reports MUSK code and weights have been uploaded to the server and extracted. Execute using local files only; do not contact Hugging Face unless local discovery fails and explicit access is required.
 
 ## Goal
 
