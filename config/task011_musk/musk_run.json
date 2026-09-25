@@ -1,0 +1,93 @@
+{
+  "status": "COMPLETE",
+  "canonical_n": 96044,
+  "folds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "best_selection": {
+    "candidate": "MUSK_FOV8"
+  },
+  "decision": {
+    "status": "TASK011_MUSK_COMPLETE",
+    "best_musk_fov": "MUSK_FOV8",
+    "best_musk_fov_um": 8,
+    "best_musk_fov_native_side_px": 37,
+    "primary_ms_aug": true,
+    "multiscale_sensitivity_completed": true,
+    "frozen_gain_category": "NO_MEANINGFUL_GAIN",
+    "frozen_gain_vs_midnight_fov12": {
+      "macro_f1_gain_vs_frozen_midnight_fov12": -0.08274415645037597,
+      "neutrophil_f1_gain_vs_frozen_midnight_fov12": -0.02272607103654195,
+      "neutrophil_auprc_gain_vs_frozen_midnight_fov12": -0.02054726249917385,
+      "outer_folds_improved_macro_f1": 0,
+      "batch_purity_delta_vs_frozen_midnight_fov12": -0.10299999999999998,
+      "spatial_purity_delta_vs_frozen_midnight_fov12": -0.009929999999999998
+    },
+    "true_binary_probes": true,
+    "model_provenance": {
+      "status": "LOADED_OFFLINE",
+      "source_repository": "lilab-stanford/MUSK",
+      "source_path": "/data/lf_data/models/MUSK-code",
+      "source_commit": "714b666969c1911e5efe70d991140a21030f4ef3",
+      "model_id": "xiangjx/musk",
+      "model_architecture": "musk_large_patch16_384",
+      "weight_path": "/data/lf_data/models/musk/model.safetensors",
+      "weight_sha256": "83d9f2429ec3f04fc3bdc4bc6d8e6c78035ea196fdce9fe05d76ea0e8cad0375",
+      "image_tokenizer_path": "/data/lf_data/models/musk/image_tokenizer.pth",
+      "tokenizer_path": "/data/lf_data/models/musk/tokenizer.spm",
+      "input_size": 384,
+      "feature_flags": {
+        "with_head": false,
+        "out_norm": false,
+        "return_global": true,
+        "ms_aug_primary": true,
+        "ms_aug_sensitivity": false
+      },
+      "runtime_output_dimension_ms_aug_true": 2048,
+      "runtime_output_dimension_ms_aug_false": 1024,
+      "device": "cuda",
+      "dtype": "torch.float16",
+      "cuda_device_name": "NVIDIA RTX PRO 5000 72GB Blackwell",
+      "preprocessing": {
+        "resize": 384,
+        "center_crop": [
+          384,
+          384
+        ],
+        "mean": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "std": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      },
+      "license": "CC-BY-NC-ND-4.0; academic non-commercial use only",
+      "loaded_entirely_offline": true,
+      "hf_token_used": false,
+      "python": "3.10.14 | packaged by conda-forge | (main, Mar 20 2024, 12:45:18) [GCC 12.3.0]",
+      "packages": {
+        "torch": "2.7.1+cu128",
+        "timm": "1.0.8",
+        "torchvision": "0.22.1+cu128",
+        "fairscale": "0.4.13",
+        "pandas": "1.4.3",
+        "sklearn": "1.3.0",
+        "PIL": "10.3.0",
+        "pyvips": "2.2.3"
+      }
+    },
+    "task012_primary_replacement_recommended": false,
+    "task012_recommendation": "Retain corrected Midnight F1_FINAL_BLOCK as the primary validation candidate; MUSK is frozen and is a secondary representation candidate even if it strongly improves over frozen Midnight.",
+    "license_next_step": "Any MUSK fine-tuning requires academic non-commercial use under CC-BY-NC-ND-4.0 and must not redistribute weights.",
+    "production_model_modified": false,
+    "ground_truth_modified": false
+  }
+}

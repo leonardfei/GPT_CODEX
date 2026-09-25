@@ -2,9 +2,9 @@
 
 ## Current task
 
-Task 011-MUSK — gated MUSK benchmark on the canonical H&E cell-typing cohort — IN_PROGRESS
+Task 011-MUSK — gated MUSK benchmark on the canonical H&E cell-typing cohort — COMPLETED
 
-Current execution: official local MUSK code/weights were verified and loaded offline; FOV8 completed, FOV12 extraction is running on the server. No Hugging Face token or network model download was used. Final metrics/report/push are pending completion of the server benchmark.
+Current execution: official local MUSK code/weights were loaded fully offline and the five-FOV frozen benchmark, true binary probes, geometry QC, and single-scale sensitivity were completed on the canonical 96,044-cell cohort. The final report and small reviewable outputs are synchronized locally and are included in the completion commit. No Hugging Face token or network model download was used.
 
 ## Previous completed task
 
@@ -110,6 +110,14 @@ Metrics:
 
 No MUSK fine-tuning in this task.
 
+Completed result:
+- Best frozen MUSK candidate: `MUSK_FOV8` (8 μm; 37 native pixels).
+- Macro-F1: `0.3377 ± 0.0383`; macro-AUPRC: `0.3488 ± 0.0371`.
+- Relative to frozen Midnight FOV12: macro-F1 `−0.0827`, Neutrophil F1 `−0.0227`, Neutrophil AUPRC `−0.0205`, with `0/5` outer folds improved.
+- Official `ms_aug=True` outperformed the same-FOV single-scale sensitivity by `+0.0097` macro-F1 and `+0.0106` macro-AUPRC.
+- Task012 primary replacement is **not recommended**; retain corrected Midnight `F1_FINAL_BLOCK` as the primary validation candidate.
+- Production model, ground-truth labels, eligibility rules, and Task009 outputs were unchanged.
+
 ## Existing comparison baselines
 
 Frozen:
@@ -130,10 +138,10 @@ SHA256:
 
 Production remains unchanged.
 
-## Next execution command
+## Completion handoff
 
 ```text
-Execute task_011_musk.
+Wait for the next assigned task.
 ```
 
 Local-first requirement:
@@ -146,4 +154,4 @@ Codex must pull origin/main and follow AGENTS.md plus `tasks/task_011_musk.md`.
 
 ## Last update
 
-2026-09-24
+2026-09-25

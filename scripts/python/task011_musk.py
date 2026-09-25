@@ -426,20 +426,24 @@ def write_sensitivity(primary_fd: pd.DataFrame, primary_pc: pd.DataFrame, primar
 
 def finalize(c: pd.DataFrame, folds: dict, model_prov: dict, best: str, primary_fd: pd.DataFrame, primary_pc: pd.DataFrame, primary_bd: pd.DataFrame, primary_gd: pd.DataFrame, single_fd: pd.DataFrame, single_pc: pd.DataFrame, single_bd: pd.DataFrame) -> dict:
     summary = pd.read_csv(ROOT / "metrics/musk_fov_summary.csv")
-    base = pd.read_csv(T11 / "metrics/fov_sweep_summary.csv")
-    base = base[base.candidate.eq("FOV12")].iloc[0]
+    base_summary = pd.read_csv(T11 / "metrics/fov_sweep_summary.csv")
+    base_summary = base_summary[base_summary.candidate.eq("FOV12")].iloc[0]
+    base_per = pd.read_csv(T11 / "metrics/fov_sweep_per_class.csv")
+    base_per = base_per[(base_per.candidate.eq("FOV12")) & (base_per.class_id.eq(3))]
+    base_geom = pd.read_csv(T11 / "metrics/fov_sweep_geometry.csv")
+    base_geom = base_geom[base_geom.candidate.eq("FOV12")].iloc[0]
     s = summary[summary.candidate.eq(best)].iloc[0]
     n = primary_pc[(primary_pc.candidate.eq(best)) & (primary_pc.class_id.eq(3))]
     g = primary_gd[primary_gd.candidate.eq(best)].iloc[0]
     b = primary_bd[(primary_bd.candidate.eq(best)) & (primary_bd.comparison.eq("neutrophil_vs_myeloid"))]
     improved = int((primary_fd[primary_fd.candidate.eq(best)].sort_values("fold").macro_f1.to_numpy() > pd.read_csv(T11 / "metrics/fov_sweep_fold_metrics.csv").query("candidate == 'FOV12'").sort_values("fold").macro_f1.to_numpy()).sum())
     promotion = {
-        "macro_f1_gain_vs_frozen_midnight_fov12": float(s.macro_f1 - base.macro_f1),
-        "neutrophil_f1_gain_vs_frozen_midnight_fov12": float(n.f1.mean() - base.neutrophil_f1),
-        "neutrophil_auprc_gain_vs_frozen_midnight_fov12": float(n.auprc.mean() - base.neutrophil_auprc),
+        "macro_f1_gain_vs_frozen_midnight_fov12": float(s.macro_f1 - base_summary.macro_f1),
+        "neutrophil_f1_gain_vs_frozen_midnight_fov12": float(n.f1.mean() - base_per.f1.mean()),
+        "neutrophil_auprc_gain_vs_frozen_midnight_fov12": float(n.auprc.mean() - base_per.auprc.mean()),
         "outer_folds_improved_macro_f1": improved,
-        "batch_purity_delta_vs_frozen_midnight_fov12": float(g.knn_batch_purity - base.knn_batch_purity),
-        "spatial_purity_delta_vs_frozen_midnight_fov12": float(g.spatial_knn_purity - base.spatial_knn_purity),
+        "batch_purity_delta_vs_frozen_midnight_fov12": float(g.knn_batch_purity - base_geom.knn_batch_purity),
+        "spatial_purity_delta_vs_frozen_midnight_fov12": float(g.spatial_knn_purity - base_geom.spatial_knn_purity),
     }
     strong = bool(promotion["macro_f1_gain_vs_frozen_midnight_fov12"] >= 0.03 and (promotion["neutrophil_f1_gain_vs_frozen_midnight_fov12"] >= 0.03 or promotion["neutrophil_auprc_gain_vs_frozen_midnight_fov12"] >= 0.03) and improved >= 4 and promotion["batch_purity_delta_vs_frozen_midnight_fov12"] <= 0.05 and promotion["spatial_purity_delta_vs_frozen_midnight_fov12"] <= 0.05)
     moderate = bool(not strong and (promotion["macro_f1_gain_vs_frozen_midnight_fov12"] >= 0.01 or promotion["neutrophil_f1_gain_vs_frozen_midnight_fov12"] >= 0.02 or promotion["neutrophil_auprc_gain_vs_frozen_midnight_fov12"] >= 0.02) and improved >= 3)
@@ -452,11 +456,25 @@ def finalize(c: pd.DataFrame, folds: dict, model_prov: dict, best: str, primary_
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--stage", choices=["all", "extract"], default="all")
+    ap.add_argument("--stage", choices=["all", "extract", "finalize"], default="all")
     ap.add_argument("--fovs", default=",".join(str(x) for x in FOVS), help="comma-separated primary FOVs for --stage extract")
     args = ap.parse_args()
     seed_everything(); mkdirs()
     c = load_canonical(); folds = load_folds(c); write_geometry_config(); write_crop_manifest(c); write_montages(c)
+    if args.stage == "finalize":
+        prov = json.loads((ROOT / "config/musk_provenance.json").read_text())
+        fd = pd.read_csv(ROOT / "metrics/musk_fov_fold_metrics.csv")
+        pc = pd.read_csv(ROOT / "metrics/musk_fov_per_class.csv")
+        bd = pd.read_csv(ROOT / "metrics/musk_fov_true_binary.csv")
+        gd = pd.read_csv(ROOT / "metrics/musk_fov_representation_geometry.csv")
+        sfd = pd.read_csv(ROOT / "metrics/musk_single_scale_fold_metrics.csv")
+        spc = pd.read_csv(ROOT / "metrics/musk_single_scale_per_class.csv")
+        sbd = pd.read_csv(ROOT / "metrics/musk_single_scale_true_binary.csv")
+        best = json.loads((ROOT / "config/best_musk_fov.json").read_text())["candidate"]
+        decision = finalize(c, folds, prov, best, fd, pc, bd, gd, sfd, spc, sbd)
+        (ROOT / "config/musk_run.json").write_text(json.dumps({"status": "COMPLETE", "canonical_n": len(c), "folds": sorted(folds), "best_selection": {"candidate": best}, "decision": decision}, indent=2, allow_nan=True) + "\n")
+        print(json.dumps(decision, indent=2, allow_nan=True), flush=True)
+        return
     model, device, dim_ms, prov = load_musk_model()
     batch_size = int(os.environ.get("MUSK_BATCH_SIZE", "16"))
     if args.stage == "extract":

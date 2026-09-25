@@ -1,0 +1,49 @@
+{
+  "source_wsi": "/data/lf_data/xenium_data/ID0060276.ome.tif",
+  "scale_um_per_px": 0.2125,
+  "fovs": {
+    "8": {
+      "physical_fov_um": [
+        8,
+        8
+      ],
+      "native_side_px": 37,
+      "crop_center": "matched H&E nucleus center he_x/he_y"
+    },
+    "12": {
+      "physical_fov_um": [
+        12,
+        12
+      ],
+      "native_side_px": 57,
+      "crop_center": "matched H&E nucleus center he_x/he_y"
+    },
+    "16": {
+      "physical_fov_um": [
+        16,
+        16
+      ],
+      "native_side_px": 75,
+      "crop_center": "matched H&E nucleus center he_x/he_y"
+    },
+    "24": {
+      "physical_fov_um": [
+        24,
+        24
+      ],
+      "native_side_px": 113,
+      "crop_center": "matched H&E nucleus center he_x/he_y"
+    },
+    "56": {
+      "physical_fov_um": [
+        56,
+        56
+      ],
+      "native_side_px": 263,
+      "crop_center": "matched H&E nucleus center he_x/he_y"
+    }
+  },
+  "preprocessing": "official MUSK resize 384, center crop 384, ImageNet inception normalization",
+  "canonical_n": 96044,
+  "seed": 20260923
+}

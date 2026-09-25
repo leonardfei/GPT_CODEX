@@ -1,0 +1,2 @@
+candidate,n_geometry,class_separation_ratio,batch_separation_ratio,spatial_separation_ratio,knn_class_purity,knn_batch_purity,spatial_knn_purity
+MUSK_BEST_FOV_SINGLE_SCALE,10000,1.0324451923370361,1.074920415878296,1.411144495010376,0.26698,0.4568,0.01388

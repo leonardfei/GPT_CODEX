@@ -1,7 +1,7 @@
 # Task 011-MUSK — Gated MUSK benchmark on the canonical H&E cell-typing cohort
 
 ## Status
- IN_PROGRESS — official local MUSK benchmark is running offline on the server; primary FOV feature extraction is active.
+ COMPLETED — official local MUSK benchmark, QC, sensitivity analysis, and decision finalization completed offline on the server; reviewable outputs were synchronized locally.
 
 ## Goal
 
