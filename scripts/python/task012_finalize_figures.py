@@ -8,7 +8,7 @@ from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
+from matplotlib.patches import FancyArrowPatch, FancyBboxPatch, Rectangle
 import numpy as np
 import pandas as pd
 from sklearn.metrics import confusion_matrix
@@ -182,17 +182,18 @@ def per_class():
 def confusion(proportions):
     fig, ax = plt.subplots(figsize=(7.5, 6.3))
     cmap = matplotlib.colors.LinearSegmentedColormap.from_list("muted_blue", ["#ffffff", "#d6e1e9", BLUE])
-    im = ax.imshow(proportions * 100, cmap=cmap, vmin=0, vmax=100, interpolation="nearest")
-    ax.set_xticks(range(7), CLASSES, rotation=30, ha="right")
-    ax.set_yticks(range(7), CLASSES)
-    ax.set_xlabel("Predicted class"); ax.set_ylabel("True class")
-    ax.set_title("Corrected out-of-fold confusion", loc="left", weight="semibold")
     for i in range(7):
         for j in range(7):
             val = proportions[i, j] * 100
+            ax.add_patch(Rectangle((j - .5, i - .5), 1, 1, facecolor=cmap(val / 100),
+                                   edgecolor="#c7cbd0", linewidth=.45))
             ax.text(j, i, f"{val:.1f}", ha="center", va="center", fontsize=7,
                     color="white" if val > 55 else "black")
-    fig.colorbar(im, ax=ax, label="Row percentage", fraction=.045, pad=.03)
+    ax.set_xlim(-.5, 6.5); ax.set_ylim(6.5, -.5); ax.set_aspect("equal")
+    ax.set_xticks(range(7), CLASSES, rotation=30, ha="right")
+    ax.set_yticks(range(7), CLASSES)
+    ax.set_xlabel("Predicted class"); ax.set_ylabel("True class")
+    ax.set_title("Corrected out-of-fold confusion (row %)", loc="left", weight="semibold")
     finish(fig, "Fig10_confusion_matrix.pdf")
 
 
