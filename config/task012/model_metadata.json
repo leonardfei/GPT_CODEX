@@ -1,0 +1,57 @@
+{
+  "checkpoint_path": "/data/lf_data/result/final_model/midnight_fov12_finalblock_7class.pth",
+  "sha256": "ddb3d21f9492032b5f0509c5dc28de15a29b0074105991c5cd1168055d84f633",
+  "training_n": 96044,
+  "epochs": 3,
+  "architecture": "Midnight-12k",
+  "recipe": {
+    "encoder_trainable": "final transformer block only",
+    "classifier": "Linear(3072, 7)",
+    "optimizer": "AdamW",
+    "backbone_lr": 1e-05,
+    "head_lr": 0.001,
+    "weight_decay": 0.0001,
+    "loss": "class-balanced weighted cross entropy",
+    "batch_size": 1024,
+    "augmentation": "seeded batch-level 0/90/180/270-degree rotation, horizontal flip p=0.5, mild brightness/contrast p=0.5",
+    "epoch_selection": "last lexicographic outer-training batch as inner validation; maximize inner macro-F1 over 3 epochs; refit from source checkpoint on all outer-training cells",
+    "seed": 20260923
+  },
+  "preprocessing": {
+    "fov_um": 12,
+    "native_scale_um_per_px": 0.2125,
+    "native_crop_px": 57,
+    "input_size": 224,
+    "resize": "torch.nn.functional.interpolate, bicubic, align_corners=False",
+    "input_range": "uint8 RGB [0,255] to float32 [0,1]",
+    "normalization_mean": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "normalization_std": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "feature": "CLS token concatenated with mean of all patch tokens",
+    "feature_dim": 3072
+  },
+  "class_names": [
+    "Endothelial",
+    "Mesenchymal",
+    "Myeloid",
+    "Neutrophil",
+    "Plasma cell",
+    "T and B",
+    "Tumor"
+  ],
+  "performance_source": "corrected Task011 five-fold grouped CV",
+  "full_data_training_performance_estimated": false,
+  "runtime": {
+    "python": "3.10.14",
+    "torch": "2.7.1+cu128",
+    "pandas": "1.4.3",
+    "numpy": "1.23.5"
+  }
+}

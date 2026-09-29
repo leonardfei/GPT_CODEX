@@ -1,0 +1,3 @@
+sample_id,predicted_class_id,predicted_class_name,p_Endothelial,p_Mesenchymal,p_Myeloid,p_Neutrophil,p_Plasma,p_T_and_B,p_Tumor
+canonical_0,0,Endothelial,0.2767013,0.17296934,0.17790031,0.2321449,0.0648958,0.06580624,0.009582099
+canonical_1,3,Neutrophil,0.119538054,0.123324804,0.14593416,0.41135344,0.044528194,0.1509037,0.0044176634

@@ -71,6 +71,7 @@ def save_metrics():
         "fine_tune_fold_metrics_corrected.csv": "final_fold_metrics.csv",
         "fine_tune_per_class_corrected.csv": "final_per_class.csv",
         "fine_tune_true_binary_corrected.csv": "final_true_binary.csv",
+        "fine_tune_true_binary_summary_corrected.csv": "final_true_binary_summary.csv",
         "fine_tune_geometry_corrected.csv": "final_representation_geometry.csv",
     }
     for src, dst in mapping.items(): read(corrected / src).to_csv(ROOT / "metrics" / dst, index=False)
@@ -194,7 +195,7 @@ def confusion(proportions):
     ax.set_xticks(range(7), CLASSES, rotation=30, ha="right")
     ax.set_yticks(range(7), CLASSES)
     ax.set_xlabel("Predicted class"); ax.set_ylabel("True class")
-    ax.set_title("Corrected out-of-fold confusion (row %)", loc="left", weight="semibold")
+    ax.set_title("Task012 refit out-of-fold confusion (row %)", loc="left", weight="semibold")
     finish(fig, "Fig10_confusion_matrix.pdf")
 
 

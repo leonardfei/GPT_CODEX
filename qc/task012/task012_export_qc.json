@@ -1,0 +1,17 @@
+{
+  "canonical_n": 96044,
+  "one_oof_prediction_per_cell": true,
+  "probabilities_finite_and_normalized": true,
+  "fold_metric_max_abs_difference_vs_corrected_task011": {
+    "accuracy": 6.961122132881359e-05,
+    "balanced_accuracy": 7.914444222345551e-05,
+    "macro_f1": 8.491013309347428e-05,
+    "macro_auprc": 8.429771184093049e-06,
+    "macro_auroc": 2.6005341191570608e-06,
+    "weighted_f1": 8.099729497279551e-05,
+    "lowest_three_f1": 0.00025584431904418503
+  },
+  "fold_metrics_reproduced_within_1e-3": true,
+  "confusion_counts_total": 96044,
+  "full_data_model_evaluated_on_training_cells": false
+}

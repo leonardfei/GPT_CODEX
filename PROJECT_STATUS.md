@@ -2,9 +2,9 @@
 
 ## Current task
 
-Task 012 — Final Model Export and Publication Figure Package — IN_PROGRESS
+Task 012 — Final Model Export and Publication Figure Package — COMPLETED
 
-Execution started 2026-09-29. Canonical inputs and exact Task009 CORE folds passed input QC. Corrected Task011 fold refits and checkpoint export are running on the analysis server under `/data/lf_data/result/final_model`. The final checkpoint, OOF results, figure package, and report remain pending until training and QC complete.
+Completed 2026-09-29. Canonical inputs and exact Task009 CORE folds passed input QC. Five fold-specific checkpoints, 96,044 held-out OOF predictions, a full-data checkpoint, single/ensemble inference utilities, metadata and hashes, and 13 editable vector PDFs are available under `/data/lf_data/result/final_model`. Small results, figures, scripts, QC and reports are synchronized locally. Inference smoke tests and vector-PDF QC passed. The existing production checkpoint is unchanged. See `reports/task_012_final_model_export_report.md`.
 
 ## Selected model recipe
 
@@ -51,6 +51,9 @@ The full-data final checkpoint must not be evaluated on its own training cells a
 Primary final checkpoint:
 `/data/lf_data/result/final_model/midnight_fov12_finalblock_7class.pth`
 
+Final checkpoint SHA256:
+`ddb3d21f9492032b5f0509c5dc28de15a29b0074105991c5cd1168055d84f633`
+
 Task file:
 `tasks/task_012.md`
 
@@ -64,13 +67,9 @@ SHA256:
 
 Do not overwrite it.
 
-## Next execution command
+## Next step
 
-```text
-Execute task_012.
-```
-
-Codex must pull origin/main and follow AGENTS.md plus `tasks/task_012.md`.
+Await a new assigned task or independent slide/patient validation decision. For every next task, pull origin/main first and follow AGENTS.md.
 
 ## Last update
 

@@ -1,0 +1,15 @@
+
+(process:3513937): VIPS-WARNING **: 14:54:00.524: unable to load "/home/lf/miniconda3/envs/cellvit_env/lib/vips-modules-8.18/vips-magick.so" -- libMagickCore-7.Q16HDRI.so.10: cannot open shared object file: No such file or directory
+{
+  "fold": 1,
+  "checkpoint": "/data/lf_data/result/final_model/parallel/fold1_midnight_fov12_finalblock_7class.pth",
+  "sha256": "a4ffb7f2eeb4f1a8395d2fc9eb69ba727acbbc4428682451a3bcd3c16a067035",
+  "selected_epoch": 3,
+  "inner_val_batch": "s93",
+  "inner_macro_f1": 0.3635623563123292,
+  "macro_f1": 0.4627330923271918,
+  "corrected_reference_macro_f1": 0.4627281910647198,
+  "macro_f1_delta": 4.9012624719901865e-06,
+  "start_seed": null,
+  "eval_only": true
+}

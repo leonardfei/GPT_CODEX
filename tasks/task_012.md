@@ -1,7 +1,7 @@
 # Task 012 — Final Model Export and Publication Figure Package
 
 ## Status
-IN_PROGRESS — corrected Task011 fold refits and checkpoint export running on the analysis server.
+COMPLETED — final checkpoint, five fold checkpoints, OOF predictions, inference utilities, and 13 vector PDFs passed QC on 2026-09-29. See `reports/task_012_final_model_export_report.md`.
 
 ## Goal
 

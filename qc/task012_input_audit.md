@@ -11,7 +11,7 @@ Date: 2026-09-29. Server: `/data/lf_data`.
 - Eight source batches are present.
 - Task009 CORE split manifest exists at `/data/lf_data/result/task009_v3_retraining/metrics/split_manifest.csv`; five rows define folds 0–4 with disjoint training and validation batches.
 - Reusable corrected Task011 FOV12 crop cache exists at `/data/lf_data/result/task011_midnight_local_optimization/work/midnight_fov12_crops_uint8.npy` with approximately 893 MB on disk. Export code asserts exact shape `(96044, 57, 57, 3)` and `uint8` before training.
-- Midnight-12k source checkpoint exists at `/data/lf_data/models/midnight-12k/model.safetensors` (approximately 4.3 GB).
+- Midnight-12k source checkpoint exists at `/data/lf_data/models/midnight-12k/model.safetensors` (approximately 4.3 GB). Its Task010-verified SHA256 is `52c14f20386ca17c2af8a7bf32c31c352668a8fbf6aefc88d86be6eaa0c72ca1`.
 - H&E coordinates are native pixels; the validated scale is 0.2125 μm/px, so FOV12 uses an odd 57 × 57 native crop centered on the matched nucleus.
 
 ## Prespecified design retained

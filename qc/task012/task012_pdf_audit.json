@@ -1,0 +1,127 @@
+{
+  "status": "PASS",
+  "n_figures": 13,
+  "all_one_page": true,
+  "all_text_extractable": true,
+  "all_fonts_embedded": true,
+  "no_raster_image_xobjects": true,
+  "figures": [
+    {
+      "file": "Fig1_model_ladder_macroF1.pdf",
+      "bytes": 21045,
+      "pages": 1,
+      "extractable_text_chars": 198,
+      "image_xobjects": 0,
+      "font_resources": 2,
+      "embedded_font_resources": 2
+    },
+    {
+      "file": "Fig2_model_ladder_macroAUPRC.pdf",
+      "bytes": 22271,
+      "pages": 1,
+      "extractable_text_chars": 208,
+      "image_xobjects": 0,
+      "font_resources": 2,
+      "embedded_font_resources": 2
+    },
+    {
+      "file": "Fig3_neutrophil_F1.pdf",
+      "bytes": 21603,
+      "pages": 1,
+      "extractable_text_chars": 229,
+      "image_xobjects": 0,
+      "font_resources": 2,
+      "embedded_font_resources": 2
+    },
+    {
+      "file": "Fig4_neutrophil_AUPRC.pdf",
+      "bytes": 23404,
+      "pages": 1,
+      "extractable_text_chars": 254,
+      "image_xobjects": 0,
+      "font_resources": 2,
+      "embedded_font_resources": 2
+    },
+    {
+      "file": "Fig5_midnight_FOV_sweep.pdf",
+      "bytes": 21636,
+      "pages": 1,
+      "extractable_text_chars": 157,
+      "image_xobjects": 0,
+      "font_resources": 2,
+      "embedded_font_resources": 2
+    },
+    {
+      "file": "Fig6_musk_FOV_sweep.pdf",
+      "bytes": 22003,
+      "pages": 1,
+      "extractable_text_chars": 149,
+      "image_xobjects": 0,
+      "font_resources": 2,
+      "embedded_font_resources": 2
+    },
+    {
+      "file": "Fig7_true_binary_AUROC.pdf",
+      "bytes": 19076,
+      "pages": 1,
+      "extractable_text_chars": 132,
+      "image_xobjects": 0,
+      "font_resources": 2,
+      "embedded_font_resources": 2
+    },
+    {
+      "file": "Fig8_true_binary_AUPRC.pdf",
+      "bytes": 19250,
+      "pages": 1,
+      "extractable_text_chars": 128,
+      "image_xobjects": 0,
+      "font_resources": 2,
+      "embedded_font_resources": 2
+    },
+    {
+      "file": "Fig9_per_class_F1.pdf",
+      "bytes": 19139,
+      "pages": 1,
+      "extractable_text_chars": 178,
+      "image_xobjects": 0,
+      "font_resources": 2,
+      "embedded_font_resources": 2
+    },
+    {
+      "file": "Fig10_confusion_matrix.pdf",
+      "bytes": 21475,
+      "pages": 1,
+      "extractable_text_chars": 421,
+      "image_xobjects": 0,
+      "font_resources": 2,
+      "embedded_font_resources": 2
+    },
+    {
+      "file": "Fig11_fold_pairing.pdf",
+      "bytes": 18541,
+      "pages": 1,
+      "extractable_text_chars": 105,
+      "image_xobjects": 0,
+      "font_resources": 2,
+      "embedded_font_resources": 2
+    },
+    {
+      "file": "Fig12_final_strategy_schematic.pdf",
+      "bytes": 20703,
+      "pages": 1,
+      "extractable_text_chars": 173,
+      "image_xobjects": 0,
+      "font_resources": 2,
+      "embedded_font_resources": 2
+    },
+    {
+      "file": "Fig13_final_recipe_table.pdf",
+      "bytes": 22128,
+      "pages": 1,
+      "extractable_text_chars": 558,
+      "image_xobjects": 0,
+      "font_resources": 2,
+      "embedded_font_resources": 2
+    }
+  ]
+}

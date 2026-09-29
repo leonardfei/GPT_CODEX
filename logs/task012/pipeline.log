@@ -1,0 +1,8 @@
+nohup: ignoring input
+TASK012_PIPELINE_ERROR: fold exporter stopped without completion metadata
+Traceback (most recent call last):
+  File "/data/lf_data/result/final_model/code/task012_server_pipeline.py", line 109, in <module>
+    main()
+  File "/data/lf_data/result/final_model/code/task012_server_pipeline.py", line 78, in main
+    raise RuntimeError("fold exporter stopped without completion metadata")
+RuntimeError: fold exporter stopped without completion metadata

@@ -1,0 +1,20 @@
+{
+  "fov_um": 12,
+  "native_scale_um_per_px": 0.2125,
+  "native_crop_px": 57,
+  "input_size": 224,
+  "resize": "torch.nn.functional.interpolate, bicubic, align_corners=False",
+  "input_range": "uint8 RGB [0,255] to float32 [0,1]",
+  "normalization_mean": [
+    0.5,
+    0.5,
+    0.5
+  ],
+  "normalization_std": [
+    0.5,
+    0.5,
+    0.5
+  ],
+  "feature": "CLS token concatenated with mean of all patch tokens",
+  "feature_dim": 3072
+}

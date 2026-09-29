@@ -1,0 +1,34 @@
+{
+  "figures": [
+    "Fig10_confusion_matrix.pdf",
+    "Fig11_fold_pairing.pdf",
+    "Fig12_final_strategy_schematic.pdf",
+    "Fig13_final_recipe_table.pdf",
+    "Fig1_model_ladder_macroF1.pdf",
+    "Fig2_model_ladder_macroAUPRC.pdf",
+    "Fig3_neutrophil_F1.pdf",
+    "Fig4_neutrophil_AUPRC.pdf",
+    "Fig5_midnight_FOV_sweep.pdf",
+    "Fig6_musk_FOV_sweep.pdf",
+    "Fig7_true_binary_AUROC.pdf",
+    "Fig8_true_binary_AUPRC.pdf",
+    "Fig9_per_class_F1.pdf"
+  ],
+  "qc": {
+    "canonical_n": 96044,
+    "one_oof_prediction_per_cell": true,
+    "probabilities_finite_and_normalized": true,
+    "fold_metric_max_abs_difference_vs_corrected_task011": {
+      "accuracy": 6.961122132881359e-05,
+      "balanced_accuracy": 7.914444222345551e-05,
+      "macro_f1": 8.491013309347428e-05,
+      "macro_auprc": 8.429771184093049e-06,
+      "macro_auroc": 2.6005341191570608e-06,
+      "weighted_f1": 8.099729497279551e-05,
+      "lowest_three_f1": 0.00025584431904418503
+    },
+    "fold_metrics_reproduced_within_1e-3": true,
+    "confusion_counts_total": 96044,
+    "full_data_model_evaluated_on_training_cells": false
+  }
+}

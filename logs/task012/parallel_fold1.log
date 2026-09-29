@@ -1,0 +1,15 @@
+nohup: ignoring input
+
+(process:3502428): VIPS-WARNING **: 14:14:48.600: unable to load "/home/lf/miniconda3/envs/cellvit_env/lib/vips-modules-8.18/vips-magick.so" -- libMagickCore-7.Q16HDRI.so.10: cannot open shared object file: No such file or directory
+fine-tune epoch=1 inner_macroF1=0.3069
+fine-tune epoch=2 inner_macroF1=0.3351
+fine-tune epoch=3 inner_macroF1=0.3636
+fine-tune refit epoch=1 complete
+fine-tune refit epoch=2 complete
+fine-tune refit epoch=3 complete
+Traceback (most recent call last):
+  File "/data/lf_data/result/final_model/code/task012_fold_worker.py", line 90, in <module>
+    if __name__ == "__main__": main()
+  File "/data/lf_data/result/final_model/code/task012_fold_worker.py", line 69, in main
+    assert np.allclose(p.sum(axis=1), 1, atol=2e-3, rtol=0)
+AssertionError

@@ -1,0 +1,50 @@
+true_class_id,true_class_name,predicted_class_id,predicted_class_name,count,row_percent
+0,Endothelial,0,Endothelial,8206,61.51885448684309
+0,Endothelial,1,Mesenchymal,1888,14.15398455656346
+0,Endothelial,2,Myeloid,954,7.15196041682285
+0,Endothelial,3,Neutrophil,755,5.6600944598545615
+0,Endothelial,4,Plasma cell,358,2.6838593597720966
+0,Endothelial,5,T and B,517,3.875852762575905
+0,Endothelial,6,Tumor,661,4.955393957568034
+1,Mesenchymal,0,Endothelial,3605,21.220861784789264
+1,Mesenchymal,1,Mesenchymal,6480,38.144572639510244
+1,Mesenchymal,2,Myeloid,1493,8.788556628208147
+1,Mesenchymal,3,Neutrophil,1386,8.158700259006357
+1,Mesenchymal,4,Plasma cell,1359,7.999764539675065
+1,Mesenchymal,5,T and B,1756,10.336708264657405
+1,Mesenchymal,6,Tumor,909,5.35083588415352
+2,Myeloid,0,Endothelial,1967,12.29836188570714
+2,Myeloid,1,Mesenchymal,2509,15.687132674753032
+2,Myeloid,2,Myeloid,4022,25.146930098787045
+2,Myeloid,3,Neutrophil,2302,14.392897336501187
+2,Myeloid,4,Plasma cell,1542,9.641115418281855
+2,Myeloid,5,T and B,1761,11.010378892084532
+2,Myeloid,6,Tumor,1891,11.823183693885207
+3,Neutrophil,0,Endothelial,489,7.965466688385731
+3,Neutrophil,1,Mesenchymal,362,5.896725851115817
+3,Neutrophil,2,Myeloid,974,15.865776185046423
+3,Neutrophil,3,Neutrophil,2588,42.15670304609871
+3,Neutrophil,4,Plasma cell,540,8.796220882879947
+3,Neutrophil,5,T and B,834,13.585274474670141
+3,Neutrophil,6,Tumor,352,5.733832871803226
+4,Plasma cell,0,Endothelial,347,4.063707694109381
+4,Plasma cell,1,Mesenchymal,624,7.307647265487762
+4,Plasma cell,2,Myeloid,630,7.377913104578991
+4,Plasma cell,3,Neutrophil,536,6.277081625483078
+4,Plasma cell,4,Plasma cell,5430,63.590584377561775
+4,Plasma cell,5,T and B,698,8.174259280946247
+4,Plasma cell,6,Tumor,274,3.208806651832767
+5,T and B,0,Endothelial,1675,7.969359596536302
+5,T and B,1,Mesenchymal,2514,11.961176134741649
+5,T and B,2,Myeloid,1960,9.325340184603673
+5,T and B,3,Neutrophil,3702,17.613474165001428
+5,T and B,4,Plasma cell,1773,8.435626605766485
+5,T and B,5,T and B,8318,39.57560186506804
+5,T and B,6,Tumor,1076,5.1194214482824245
+6,Tumor,0,Endothelial,409,2.915805232765381
+6,Tumor,1,Mesenchymal,367,2.6163826905254153
+6,Tumor,2,Myeloid,723,5.154345191416554
+6,Tumor,3,Neutrophil,415,2.9585798816568047
+6,Tumor,4,Plasma cell,145,1.033720681542739
+6,Tumor,5,T and B,118,0.8412347615313324
+6,Tumor,6,Tumor,11850,84.47993156056177

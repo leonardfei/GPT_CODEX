@@ -1,0 +1,12 @@
+{
+  "single": {
+    "rows": 2,
+    "probabilities_finite": true,
+    "row_sums_one": true
+  },
+  "ensemble": {
+    "rows": 2,
+    "probabilities_finite": true,
+    "row_sums_one": true
+  }
+}
