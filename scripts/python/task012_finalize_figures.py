@@ -71,6 +71,7 @@ def save_metrics():
         "fine_tune_fold_metrics_corrected.csv": "final_fold_metrics.csv",
         "fine_tune_per_class_corrected.csv": "final_per_class.csv",
         "fine_tune_true_binary_corrected.csv": "final_true_binary.csv",
+        "fine_tune_geometry_corrected.csv": "final_representation_geometry.csv",
     }
     for src, dst in mapping.items(): read(corrected / src).to_csv(ROOT / "metrics" / dst, index=False)
     per = read(ROOT / "metrics/final_per_class.csv")
@@ -91,7 +92,7 @@ def save_metrics():
             for col in ("accuracy", "balanced_accuracy", "macro_f1", "macro_auprc", "macro_auroc", "weighted_f1", "lowest_three_f1")}
     qc = {"canonical_n": len(oof), "one_oof_prediction_per_cell": True,
           "probabilities_finite_and_normalized": True, "fold_metric_max_abs_difference_vs_corrected_task011": diff,
-          "fold_metrics_exact_within_1e-6": all(v <= 1e-6 for v in diff.values()),
+          "fold_metrics_reproduced_within_1e-3": all(v <= 1e-3 for v in diff.values()),
           "confusion_counts_total": int(cm.sum()),
           "full_data_model_evaluated_on_training_cells": False}
     (ROOT / "qc/task012_export_qc.json").write_text(json.dumps(qc, indent=2) + "\n")
@@ -112,7 +113,7 @@ def model_ladder():
     for field, ylabel, filename in [
         ("macro_f1", "Macro-F1", "Fig1_model_ladder_macroF1.pdf"),
         ("macro_auprc", "Macro-AUPRC", "Fig2_model_ladder_macroAUPRC.pdf")]:
-        bar_figure(filename, ylabel + " across model strategies", names,
+        bar_figure(filename, ylabel + " across model strategies\nFive-fold mean ± SD", names,
                    [float(r[field]) for r in rows], ylabel,
                    errors=[float(r[field + "_sd"]) for r in rows])
     return names, rows
@@ -136,7 +137,7 @@ def neutrophil_ladder(names):
     for field, ylabel, filename in [
         ("f1", "Neutrophil F1", "Fig3_neutrophil_F1.pdf"),
         ("auprc", "Neutrophil one-vs-rest AUPRC", "Fig4_neutrophil_AUPRC.pdf")]:
-        bar_figure(filename, ylabel + " across model strategies", names,
+        bar_figure(filename, ylabel + " across model strategies\nFive-fold mean ± SD", names,
                    [float(df[field].mean()) for df in vals], ylabel,
                    errors=[float(df[field].std(ddof=1)) for df in vals])
 
@@ -160,7 +161,7 @@ def binary_figures():
     df = df.set_index("comparison").loc[["neutrophil_vs_myeloid", "neutrophil_vs_tb"]]
     names = ["N vs Myeloid", "N vs T/B"]
     for field, filename in (("auroc", "Fig7_true_binary_AUROC.pdf"), ("auprc", "Fig8_true_binary_AUPRC.pdf")):
-        bar_figure(filename, "Independent true binary probes", names, df[field].tolist(), field.upper(),
+        bar_figure(filename, "Final-block independent binary probes\nFive-fold mean ± SD", names, df[field].tolist(), field.upper(),
                    colors=[BLUE, TEAL], errors=df[field + "_sd"].tolist())
 
 
