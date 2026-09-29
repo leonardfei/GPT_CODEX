@@ -136,7 +136,9 @@ def fold_export() -> None:
         src.train_epochs(m, h, crops, tr, None, y, device, epochs=best_epoch)
         p, _ = src.evaluate(m, h, crops, va, y, device, keep_z=False)
         assert p.shape == (len(va), 7) and np.isfinite(p).all()
-        assert np.allclose(p.sum(axis=1), 1, atol=1e-4)
+        # Corrected Task011 returns fp16 softmax values converted to float32;
+        # their row sums can differ from one by fp16 rounding.
+        assert np.allclose(p.sum(axis=1), 1, atol=2e-3, rtol=0)
         oof[va] = p
         row, per = src.metric_rows("F1_FINAL_BLOCK", fold, y[va], p)
         fold_rows.append(row); per_rows.extend(per)

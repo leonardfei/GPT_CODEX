@@ -79,7 +79,7 @@ def probabilities(model, head, entries, device: torch.device, batch_size: int = 
                 z = torch.cat([hidden[:, 0, :], hidden[:, 1:, :].mean(dim=1)], dim=1)
                 logits = head(z)
             p = torch.softmax(logits, dim=1).float().cpu().numpy()
-            if not np.isfinite(p).all() or not np.allclose(p.sum(axis=1), 1, atol=1e-4):
+            if not np.isfinite(p).all() or not np.allclose(p.sum(axis=1), 1, atol=2e-3, rtol=0):
                 raise RuntimeError("Non-finite or unnormalized model probabilities")
             output.append(p)
     return np.concatenate(output, axis=0)
