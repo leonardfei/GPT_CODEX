@@ -2,7 +2,9 @@
 
 ## Current task
 
-Task 012 — Final Model Export and Publication Figure Package — PENDING / READY TO RUN
+Task 012 — Final Model Export and Publication Figure Package — IN_PROGRESS
+
+Execution started 2026-09-29. Canonical inputs and exact Task009 CORE folds passed input QC. Corrected Task011 fold refits and checkpoint export are running on the analysis server under `/data/lf_data/result/final_model`. The final checkpoint, OOF results, figure package, and report remain pending until training and QC complete.
 
 ## Selected model recipe
 

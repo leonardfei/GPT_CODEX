@@ -1,7 +1,7 @@
 # Task 012 — Final Model Export and Publication Figure Package
 
 ## Status
-PENDING / READY TO RUN
+IN_PROGRESS — corrected Task011 fold refits and checkpoint export running on the analysis server.
 
 ## Goal
 
@@ -411,4 +411,3 @@ Return:
 9. final report path
 10. confirmation that production model is unchanged
 11. recommended next step: independent slide/patient validation
-
