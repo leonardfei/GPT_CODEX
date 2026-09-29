@@ -25,6 +25,8 @@ The manifest must contain `crop_path`; optional `sample_id` or `cell_id` supplie
 
 Output columns are `sample_id`, `predicted_class_id`, `predicted_class_name`, `p_Endothelial`, `p_Mesenchymal`, `p_Myeloid`, `p_Neutrophil`, `p_Plasma`, `p_T_and_B`, and `p_Tumor`.
 
+The scripts correct the small row-sum rounding error of the half-precision softmax before writing probabilities; this does not change the predicted class.
+
 The single model is simpler and faster for routine inference. The ensemble averages probability vectors from five independently refit fold models and is suitable when a larger runtime and storage budget is acceptable. Neither output should be interpreted as an externally validated clinical performance estimate.
 
 The scripts load only trusted local checkpoints and the local Midnight source checkpoint. The final model checkpoint and five fold checkpoints are intentionally kept on the analysis server and are not stored in Git.

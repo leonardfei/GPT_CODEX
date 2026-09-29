@@ -81,6 +81,9 @@ def probabilities(model, head, entries, device: torch.device, batch_size: int = 
             p = torch.softmax(logits, dim=1).float().cpu().numpy()
             if not np.isfinite(p).all() or not np.allclose(p.sum(axis=1), 1, atol=2e-3, rtol=0):
                 raise RuntimeError("Non-finite or unnormalized model probabilities")
+            # Task011's fp16 softmax has small rounding error in the row sum.
+            # Normalize exported inference probabilities without changing argmax.
+            p /= p.sum(axis=1, keepdims=True)
             output.append(p)
     return np.concatenate(output, axis=0)
 
