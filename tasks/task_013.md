@@ -1,7 +1,7 @@
 # Task 013 — P84.svs End-to-End WSI Inference to QuPath GeoJSON
 
 ## Status
-PENDING / READY TO RUN
+COMPLETED — 291,029 nuclei classified and both slide-prefixed GeoJSON files passed QC on 2026-09-30. See `reports/task_013_p84_wsi_inference.md`.
 
 ## Goal
 
@@ -387,4 +387,3 @@ Return:
    - `/data/lf_data/HCC_result/P84_cells.geojson`
 6. confirmation that `HCC_result` contains only those two files;
 7. explicit note that prediction accuracy cannot be measured without reference labels.
-

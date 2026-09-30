@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "n": 291029,
+  "slide_dimensions": [
+    45696,
+    39424
+  ],
+  "feature_classes": [
+    "Endothelial",
+    "Mesenchymal",
+    "Myeloid",
+    "Neutrophil",
+    "Plasma cell",
+    "T and B",
+    "Tumor"
+  ],
+  "per_class_counts": {
+    "Endothelial": 45067,
+    "Mesenchymal": 7886,
+    "Myeloid": 26635,
+    "Neutrophil": 234,
+    "Plasma cell": 2061,
+    "T and B": 2812,
+    "Tumor": 206334
+  },
+  "all_rings_closed": true,
+  "all_geometry_in_bounds": true,
+  "centroids_within_paired_contour_bboxes": true,
+  "output_directory_exactly_two_files": true,
+  "overlay_sample_n": 20000,
+  "overlay_seed": 20260930
+}

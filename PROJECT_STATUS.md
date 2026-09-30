@@ -2,7 +2,9 @@
 
 ## Current task
 
-Task 013 — P84.svs End-to-End WSI Inference to QuPath GeoJSON — PENDING / READY TO RUN
+Task 013 — P84.svs End-to-End WSI Inference to QuPath GeoJSON — COMPLETED
+
+Completed 2026-09-30. CellViT binary detection and Midnight single-model classification produced 291,029 level-0 nuclei/predictions. Both slide-prefixed GeoJSON files passed built-in and independent geometry/class/count checks. See `reports/task_013_p84_wsi_inference.md`. P84 has no reference labels; no independent accuracy/F1 estimate is available. The 70.9% Tumor and 0.08% Neutrophil prediction proportions need reference-label and QuPath visual review before scientific interpretation.
 
 ## Input
 
@@ -51,13 +53,9 @@ Expected classifier SHA256:
 
 `tasks/task_013.md`
 
-## Next execution command
+## Next step
 
-```text
-Execute task_013.
-```
-
-Codex must pull origin/main and follow AGENTS.md plus `tasks/task_013.md`.
+Await an assigned follow-up. Recommended validation is to open both files in QuPath against P84, inspect nucleus overlays at several tissue regions, and obtain reference labels for quantitative evaluation. Pull origin/main before the next task.
 
 ## Production guardrail
 
