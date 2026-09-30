@@ -15,16 +15,33 @@ and write **only two QuPath-compatible GeoJSON files** into:
 
 Required final files:
 
-1. `/data/lf_data/HCC_result/cell_detection.geojson`
-2. `/data/lf_data/HCC_result/cells.geojson`
+1. `/data/lf_data/HCC_result/P84_cell_detection.geojson`
+2. `/data/lf_data/HCC_result/P84_cells.geojson`
 
 No CSV, JSON, PNG, PDF, PT, checkpoint, log, or temporary file may remain inside `/data/lf_data/HCC_result`.
+
+### Slide-based output naming rule
+
+Output filenames must be derived automatically from the input slide basename.
+
+For an input:
+`/path/to/<SLIDE>.svs`
+
+write:
+- `<SLIDE>_cell_detection.geojson`
+- `<SLIDE>_cells.geojson`
+
+For this task, `P84.svs` therefore produces:
+- `P84_cell_detection.geojson`
+- `P84_cells.geojson`
+
+The reusable script must not hardcode `P84`; it must derive `<SLIDE>` from `Path(svs).stem`.
 
 Temporary files, logs, QC, and intermediate detector outputs must be stored outside that directory, under:
 
 `/data/lf_data/result/task013_p84_wsi_inference`
 
-After successful completion, verify that `HCC_result` contains exactly the two required GeoJSON files.
+After successful completion, verify that `HCC_result` contains exactly the two required slide-prefixed GeoJSON files.
 
 ---
 
@@ -186,8 +203,8 @@ Official CellViT behavior groups objects by predicted cell type:
 The official CellViT GeoJSON exporter uses its template helpers and creates one grouped GeoJSON object per detected class.
 
 Reference behavior:
-- `cells.geojson`: segmentation polygons/contours
-- `cell_detection.geojson`: detection centroids
+- `P84_cells.geojson`: segmentation polygons/contours
+- `P84_cell_detection.geojson`: detection centroids
 
 Use the **Midnight seven-class prediction** to populate classification, while retaining CellViT centroid and contour geometry. CellViT supports GeoJSON output for QuPath, and its converter groups contours or centroids by class and writes classification name/color in the feature properties. citeturn881068search0turn479133view0
 
@@ -205,7 +222,7 @@ Exactly use:
 
 ### Required stable colors
 
-Use the following RGB colors in both GeoJSON files:
+Use the following RGB colors in both slide-prefixed GeoJSON files:
 
 - Endothelial: [76, 120, 168]
 - Mesenchymal: [242, 207, 91]
@@ -219,13 +236,13 @@ Coordinates must remain in P84 level-0 pixel coordinates so the GeoJSON overlays
 
 ### Geometry
 
-`cells.geojson`
+`P84_cells.geojson`
 - use CellViT nucleus contours;
 - close every polygon ring;
 - preserve valid coordinate order [x, y];
 - grouped by predicted class following CellViT's GeoJSON convention.
 
-`cell_detection.geojson`
+`P84_cell_detection.geojson`
 - use CellViT nucleus centroids;
 - grouped by predicted class following CellViT's GeoJSON convention.
 
@@ -244,7 +261,7 @@ Internally verify:
 5. all contours lie within valid bounds after CellViT coordinate realignment;
 6. polygon rings are closed;
 7. predicted classes are limited to the seven allowed labels;
-8. both GeoJSON files parse successfully;
+8. both slide-prefixed GeoJSON files parse successfully;
 9. both files contain all predicted classes that are present;
 10. GeoJSON object counts / coordinate totals match the classified-cell counts;
 11. no old PanNuke classification names remain;
@@ -266,15 +283,19 @@ Remove stale P84 outputs from that directory if they are from this test.
 
 After all QC passes, atomically write/copy only:
 
-`/data/lf_data/HCC_result/cell_detection.geojson`
+`/data/lf_data/HCC_result/P84_cell_detection.geojson`
 
-`/data/lf_data/HCC_result/cells.geojson`
+`/data/lf_data/HCC_result/P84_cells.geojson`
 
 Final assertion:
 
 `find /data/lf_data/HCC_result -maxdepth 1 -type f`
 
-must return exactly those two files.
+must return exactly:
+- `P84_cell_detection.geojson`
+- `P84_cells.geojson`
+
+For future slides, apply the same `<SLIDE>_...` naming rule.
 
 No sidecar files in `HCC_result`.
 
@@ -326,7 +347,7 @@ For this task use:
   --output-dir /data/lf_data/HCC_result
 ```
 
-The reusable script must still preserve the rule that the specified output directory contains only the two GeoJSON files.
+The reusable script must derive output filenames from the input SVS stem and preserve the rule that the specified output directory contains only the two slide-prefixed GeoJSON files for that run.
 
 ---
 
@@ -362,8 +383,8 @@ Return:
 3. brief seven-class count summary;
 4. whether GeoJSON QC passed;
 5. exact final paths:
-   - `/data/lf_data/HCC_result/cell_detection.geojson`
-   - `/data/lf_data/HCC_result/cells.geojson`
+   - `/data/lf_data/HCC_result/P84_cell_detection.geojson`
+   - `/data/lf_data/HCC_result/P84_cells.geojson`
 6. confirmation that `HCC_result` contains only those two files;
 7. explicit note that prediction accuracy cannot be measured without reference labels.
 
