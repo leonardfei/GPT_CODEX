@@ -235,13 +235,17 @@ def export(cells: list[dict], probs: np.ndarray, stem: str, work: Path,
                         raise ValueError("Open/invalid contour ring")
     output_dir.mkdir(parents=True, exist_ok=True)
     expected_names = {path.name for path in staged.values()}
-    existing_names = {path.name for path in output_dir.iterdir()}
-    if existing_names - expected_names:
-        raise RuntimeError(f"Output directory contains unrelated files; refusing to delete: {existing_names - expected_names}")
+    # Allow slide-prefixed GeoJSON outputs from other WSIs to coexist here.
+    # Refuse non-GeoJSON sidecars, but never delete previous slide results.
+    existing_files = [p for p in output_dir.iterdir() if p.is_file()]
+    bad_sidecars = [p.name for p in existing_files if p.suffix.lower() != ".geojson"]
+    if bad_sidecars:
+        raise RuntimeError(f"Output directory contains non-GeoJSON sidecars; refusing to proceed: {bad_sidecars}")
     for name, source in staged.items():
         os.replace(source, output_dir / source.name)
-    if {p.name for p in output_dir.iterdir()} != expected_names:
-        raise AssertionError("Final output directory does not contain exactly two files")
+    final_names = {p.name for p in output_dir.iterdir() if p.is_file()}
+    if not expected_names.issubset(final_names):
+        raise AssertionError("Current slide's two GeoJSON outputs are missing after export")
     counts = Counter(int(x) for x in predictions)
     confidence = probs.max(axis=1)
     return {"n_detected": len(cells), "n_classified": len(probs),
