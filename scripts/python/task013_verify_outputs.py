@@ -27,8 +27,8 @@ def main() -> None:
     stem = args.svs.stem
     expected_files = {f"{stem}_cells.geojson", f"{stem}_cell_detection.geojson"}
     actual_files = {p.name for p in args.geojson_dir.iterdir()}
-    if actual_files != expected_files:
-        raise ValueError(f"Output directory contents mismatch: {actual_files}")
+    if not expected_files.issubset(actual_files) or any(not name.endswith(".geojson") for name in actual_files):
+        raise ValueError(f"Current slide GeoJSON pair missing or sidecar present: {actual_files}")
     source_qc = json.loads(args.qc_json.read_text())
     expected_counts = source_qc["class_counts"]
     slide = openslide.OpenSlide(str(args.svs))
@@ -101,9 +101,9 @@ def main() -> None:
                   "feature_classes": list(shapes["cells"]), "per_class_counts": expected_counts,
                   "all_rings_closed": True, "all_geometry_in_bounds": True,
                   "centroids_within_paired_contour_bboxes": True,
-                  "output_directory_exactly_two_files": True,
+                  "current_slide_pair_present_and_no_sidecars": True,
                   "overlay_sample_n": len(selected), "overlay_seed": 20260930}
-        path = args.qc_json.with_name("task013_independent_geojson_qc.json")
+        path = args.qc_json.with_name(f"{stem}_independent_geojson_qc.json")
         path.write_text(json.dumps(result, indent=2))
         print(json.dumps(result, indent=2))
     finally:

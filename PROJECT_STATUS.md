@@ -2,7 +2,9 @@
 
 ## Current task
 
-Task 014 — P169.svs End-to-End WSI Inference to QuPath GeoJSON — PENDING / READY TO RUN
+Task 014 — P169.svs End-to-End WSI Inference to QuPath GeoJSON — COMPLETED
+
+Completed 2026-09-30. CellViT binary detection and Task012 Midnight single-model classification produced 153,892 P169 level-0 nucleus predictions. Both P169 GeoJSON outputs passed built-in and independent geometry/class/count checks. Existing P84 outputs and both model checkpoints retained their SHA256 hashes. See `reports/task_014_p169_wsi_inference.md`. P169 has no reference labels; there is no independent accuracy/F1 estimate. Tumor 72.067% and Neutrophil 0.112% are unverified prediction proportions requiring visual/reference-label review.
 
 ## Input
 
@@ -61,13 +63,9 @@ These are unverified model outputs, not biological reference proportions. Task01
 
 `tasks/task_014.md`
 
-## Next execution command
+## Next step
 
-```text
-Execute task_014.
-```
-
-Codex must pull origin/main and follow AGENTS.md plus `tasks/task_014.md`.
+Await an assigned follow-up. Recommended validation: open both P169 GeoJSON files in QuPath on P169.svs, inspect representative tissue regions and nucleus contours, and obtain reference labels to quantify classifier/detector performance. Pull origin/main before the next task.
 
 ## Production guardrail
 

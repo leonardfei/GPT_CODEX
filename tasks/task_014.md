@@ -1,7 +1,7 @@
 # Task 014 — P169.svs End-to-End WSI Inference to QuPath GeoJSON
 
 ## Status
-PENDING / READY TO RUN
+COMPLETED — 153,892 nuclei classified and both P169 slide-prefixed GeoJSON files passed QC on 2026-09-30. Existing P84 files unchanged. See `reports/task_014_p169_wsi_inference.md`.
 
 ## Goal
 
@@ -164,4 +164,3 @@ Return:
    - `/data/lf_data/HCC_result/P169_cells.geojson`
 8. confirmation that existing P84 GeoJSON outputs remain intact;
 9. note that no independent accuracy estimate is available without P169 labels.
-
