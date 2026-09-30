@@ -14,8 +14,8 @@ Task 013 — P84.svs End-to-End WSI Inference to QuPath GeoJSON — PENDING / RE
 
 This directory must contain **only**:
 
-- `cell_detection.geojson`
-- `cells.geojson`
+- `P84_cell_detection.geojson`
+- `P84_cells.geojson`
 
 ## Pipeline
 
@@ -27,9 +27,9 @@ This directory must contain **only**:
 6. Classify with:
    `/data/lf_data/result/final_model/midnight_fov12_finalblock_7class.pth`
 7. Replace CellViT/PanNuke type with the final Midnight seven-class prediction.
-8. Export QuPath-compatible CellViT-style:
-   - cells.geojson = nucleus polygons
-   - cell_detection.geojson = nucleus centroids
+8. Export QuPath-compatible CellViT-style with slide-prefixed filenames:
+   - P84_cells.geojson = nucleus polygons
+   - P84_cell_detection.geojson = nucleus centroids
 9. Do not leave any sidecar files in HCC_result.
 
 ## Important
@@ -66,3 +66,12 @@ Existing production and final checkpoints remain unchanged.
 ## Last update
 
 2026-09-30
+
+
+## Output naming rule
+
+For future slides, derive filenames from the SVS basename:
+- `<SLIDE>_cell_detection.geojson`
+- `<SLIDE>_cells.geojson`
+
+The inference script must derive `<SLIDE>` automatically from the input file stem; do not hardcode P84.
