@@ -1,7 +1,7 @@
 # Task 015 — GHIST Classification-Only Retraining for HCC H&E Cell Typing
 
 ## Status
-IN_PROGRESS — official GHIST uploaded and verified; canonical contour mapping and fold/overlap QC passed; fold-0 five-epoch pilot running. See `reports/task_015_ghist_celltyping.md`.
+IN_PROGRESS — official GHIST uploaded and verified; canonical contour/fold/overlap QC and fold-0 five-epoch pilot passed; gated two-variant five-fold CV running. See `reports/task_015_ghist_celltyping.md`.
 
 ## Goal
 

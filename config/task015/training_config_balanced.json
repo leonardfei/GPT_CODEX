@@ -9,5 +9,12 @@
   "loss": "weighted_pixel_cross_entropy_plus_weighted_cell_cross_entropy",
   "ignore_index": -100,
   "focal_loss": false,
-  "note": "Per-fold numerical weights must be recorded by the training script before any balanced run; no balanced training has started."
+  "per_fold_outer_training_counts_and_weights": {
+    "0": {"counts": [10949, 13618, 13517, 5153, 7176, 15277, 11122], "weights": [1.00220503, 0.80578226, 0.81180313, 2.12946688, 1.52914477, 0.71827864, 0.98661597]},
+    "1": {"counts": [10662, 12824, 13496, 5928, 6881, 16611, 13158], "weights": [1.06600209, 0.88628464, 0.84215429, 1.91729323, 1.65175328, 0.68422818, 0.86378738]},
+    "2": {"counts": [10371, 14021, 10682, 4915, 7306, 15080, 8786], "weights": [0.98021957, 0.72504509, 0.95168107, 2.06833309, 1.39143952, 0.67412846, 1.1570518]},
+    "3": {"counts": [12092, 15829, 14887, 5809, 8390, 19756, 12567], "weights": [1.05536128, 0.80620561, 0.85721963, 2.19683742, 1.52102844, 0.64595204, 1.01547136]},
+    "4": {"counts": [9282, 11660, 11394, 2751, 4403, 17348, 10475], "weights": [1.03599901, 0.82471208, 0.8439655, 3.49550813, 2.18399792, 0.55430844, 0.91800886]}
+  },
+  "note": "No balanced training has started. Weights were computed only from each exact outer-training split and must be independently recomputed/verified by the training script."
 }

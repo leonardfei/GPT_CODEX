@@ -20,5 +20,6 @@
   "loss": "unweighted_pixel_cross_entropy_plus_unweighted_cell_cross_entropy",
   "ignore_index": -100,
   "checkpoint_selection": "training-only inner-group Macro-F1; tie Neutrophil AUPRC; then lower cross-entropy",
+  "true_binary_probe": "corrected Task011 training-only StandardScaler plus class-balanced linear LBFGS probe on fold-specific 256-d embeddings; 0.5 threshold",
   "outer_validation": "exact frozen Task009/010 grouped folds; largest-nucleus-area deduplication"
 }

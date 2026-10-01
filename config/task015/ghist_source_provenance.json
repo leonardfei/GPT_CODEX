@@ -18,5 +18,6 @@
     }
   ],
   "official_source_available_on_server": true,
-  "training_started": false
+  "training_started": true,
+  "training_stage": "pilot_passed_two_variant_five_fold_cv_running"
 }

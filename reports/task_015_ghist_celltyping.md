@@ -2,7 +2,7 @@
 
 ## Status
 
-**IN_PROGRESS** (2026-10-01). The official-source blocker was resolved by the user's authorized local download and upload. Canonical contour, fold, overlap geometry, and one-batch loss QC passed. The required five-epoch fold-0 pilot is running; no accepted pilot result, full cross-validation, or GHIST-versus-Midnight performance claim exists yet.
+**IN_PROGRESS** (2026-10-01). The official-source blocker was resolved by the user's authorized local download and upload. Canonical contour, fold, overlap geometry, and raster-mask QC passed. The required five-epoch fold-0 pilot passed its technical gate. A gated two-GPU, two-variant five-fold CV launcher is running; no completed cross-validation or GHIST-versus-Midnight performance claim exists yet.
 
 ## Official source and environment
 
@@ -20,12 +20,12 @@ The Task010 patch-level CellViT-SAM-H-x40-AMP inference was repeated on 5,005 or
 
 The canonical cells occupy 4,814 patches; no canonical-bearing patch has more than one biological batch. Exact five grouped outer folds remain intact. The corrected training-only inner-validation batches are `s93` (folds 0–3) and `s22` (fold 4). The 30-pixel-overlap geometry audit generated 136,052 candidate patch appearances and selected one largest-visible-area patch per cell, yielding exactly 96,044 unique cells; per-fold validation counts are unchanged. Machine-readable server outputs: `metrics/canonical_instance_manifest.csv.gz`, `metrics/patch_manifest.csv.gz`, `metrics/overlap_patch_candidates.csv.gz`, `metrics/overlap_largest_area_manifest.csv.gz`, plus `qc/patch_matching_summary.json`, `qc/patch_manifest_audit.json`, and `qc/overlap_geometry_audit.json` under `/data/lf_data/result/task015_ghist_celltyping`. Large contours remain server-side. See `qc/task015/canonical_instance_alignment.md`.
 
-## Model and running pilot
+## Model and completed pilot
 
 `scripts/python/task015_ghist_celltype_model.py` uses official GHIST UNet3+ pixel head (eight channels), per-instance means of the first and last feature maps plus patch means, official 256-d `Embed`, and seven-class `MLP`. It has no expression tensors or heads. A batch-size-8 forward/backward smoke test passed. Split-safe rasterization retains unlabeled nuclei as context, assigns `ignore_index=-100` to unsupervised nucleus pixels, and excludes inactive cells from cell loss. A 194-cell fold-0 training-batch loss test gave finite pixel CE `2.1089` and cell CE `1.9537`, with a successful optimizer step.
 
-Fold-0 official-variant pilot is running on GPU 0 for five epochs using training batches `s01A,s01B,s04B,s11,s22`; inner validation `s93` has 9,607 cells on 617 overlapping patches. Outer validation `s02A,s06A` is untouched. Command and audit details are in `qc/task015/pilot_audit.md`; live log is `/data/lf_data/result/task015_ghist_celltyping/logs/pilot_fold0_official.log`. Pilot pass/fail has not been asserted.
+Fold-0 official-variant pilot completed five epochs on GPU 0 using training batches `s01A,s01B,s04B,s11,s22`; inner validation `s93` had 9,607 cells on 617 overlapping patches. Outer validation `s02A,s06A` was untouched. Mean training loss fell `1.8726→1.5575`. Every epoch produced exactly 9,607 unique finite predictions; peak allocated GPU memory was stable at about 13.696 GiB. The inner-validation Macro-F1 sequence was `0.0695, 0.1864, 0.2207, 0.2455, 0.2366`; these are **not** outer-fold estimates. See `qc/task015/pilot_audit.md` and server log `/data/lf_data/result/task015_ghist_celltyping/logs/pilot_fold0_official.log`.
 
 ## Required benchmark status and next gate
 
-The five-epoch pilot has started but not completed. Five-fold GHIST_CT_OFFICIAL and GHIST_CT_BALANCED training, true binary probes, morphology-head QC, paired Midnight comparison, optional neighborhood stage, decision gate, figures and full-data model export remain **pending**. No performance claim or model-promotion decision is possible. Inspect all five pilot epochs for decreasing loss, finite unique predictions for all 9,607 inner-validation cells, stable memory, and no split leakage before beginning full CV. Do not train on P84/P169 or touch Task012 Midnight/production models.
+The gated CV launcher `/data/lf_data/result/task015_ghist_celltyping/code/task015_launch_cv.sh` has started GHIST_CT_OFFICIAL and GHIST_CT_BALANCED fold 0 on separate GPUs. It will advance through all five folds only when each pair succeeds, and stop on failure. Per-fold logs and top-level `logs/cv_launcher.log` are server-side. The corrected-Task011-style true binary probe implementation is present but has not yet processed GHIST fold embeddings. Five-fold results, morphology-head QC, paired Midnight comparison, optional neighborhood stage, decision gate, figures and full-data model export remain **pending**. No performance or model-promotion decision is possible. Do not train on P84/P169 or touch Task012 Midnight/production models.

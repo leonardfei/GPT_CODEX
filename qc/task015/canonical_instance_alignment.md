@@ -12,4 +12,10 @@ Matching-distance quantiles (pixels; 0/25/50/75/90/95/99/100%): `0.0393 / 4.4974
 
 The canonical cells occur on 4,814 of the 5,005 patches. No canonical-bearing patch contains multiple biological batches. All five exact Task010 outer folds have unique cell IDs, disjoint training/validation batches, and expected validation sizes `19,232 / 16,484 / 24,883 / 6,714 / 28,731`. The corrected training-only inner-validation batches are `s93` for folds 0–3 and `s22` for fold 4. Full machine-readable audit: `/data/lf_data/result/task015_ghist_celltyping/qc/patch_manifest_audit.json`.
 
+Patch-local rasterization was independently repeated across all 5,005 patches: **96,044/96,044 canonical instances remain visible**, none are completely overwritten by another contour, and 13,375,622 labeled nucleus pixels are present. Audit: `/data/lf_data/result/task015_ghist_celltyping/qc/raster_mask_audit.json`. The 30-pixel-overlap inference geometry creates 136,052 candidate patch appearances; largest-visible-area deduplication selects exactly one appearance for each of the 96,044 cells. Audit: `/data/lf_data/result/task015_ghist_celltyping/qc/overlap_geometry_audit.json`.
+
+The actual overlapping inference masks were also rasterized across all 6,081 selected 30-pixel-overlap patches. All **96,044/96,044** chosen canonical instances remained visible in their selected patch mask. Audit: `/data/lf_data/result/task015_ghist_celltyping/qc/overlap_mask_presence_audit.json`.
+
+Five deterministic sampled Task009 training PNGs were compared pixel-for-pixel with the native OME-TIFF at their recorded `(x,y)` origins. Every sample had RGB mean absolute error `0` and maximum difference `0`, supporting the common native coordinate/image basis for non-overlap training and overlap validation.
+
 No labels, thresholds, fold memberships, Task009–014 historical outputs, or production checkpoints were changed.

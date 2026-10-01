@@ -17,7 +17,8 @@ import pandas as pd
 import pyvips
 import torch
 from scipy.spatial import cKDTree
-from sklearn.metrics import f1_score, average_precision_score, log_loss
+from sklearn.metrics import f1_score, average_precision_score, log_loss, roc_auc_score, precision_recall_fscore_support
+from sklearn.preprocessing import StandardScaler
 from torch.utils.data import Dataset, DataLoader
 
 ROOT = Path("/data/lf_data/result/task015_ghist_celltyping")
@@ -202,7 +203,8 @@ def overlap_collate(batch):
     return torch.stack(images), torch.stack(masks), selected, coords
 
 
-def evaluate_model(model, dataset: OverlapPatchDataset, true_labels: dict, device, batch_size=8):
+def evaluate_model(model, dataset: OverlapPatchDataset, true_labels: dict, device,
+                   batch_size=8, return_predictions=False):
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=0,
                         collate_fn=overlap_collate)
     model.eval()
@@ -211,10 +213,12 @@ def evaluate_model(model, dataset: OverlapPatchDataset, true_labels: dict, devic
         for images, masks, selected, coords in loader:
             output = model(images.to(device), masks.to(device))
             probabilities = torch.softmax(output["cell_logits"].float(), dim=1).cpu().numpy()
+            embeddings = output["embeddings"].float().cpu().numpy() if return_predictions else None
             for i, (batch_idx, instance_id) in enumerate(output["ordered_ids"]):
                 if instance_id in selected[batch_idx]:
                     cell_id = selected[batch_idx][instance_id]
-                    records.append((cell_id, int(true_labels[cell_id]), probabilities[i]))
+                    records.append((cell_id, int(true_labels[cell_id]), probabilities[i],
+                                    embeddings[i] if embeddings is not None else None))
     expected = sum(len(sub) for sub in dataset.selected_by_patch.values())
     if len(records) != expected:
         raise RuntimeError(f"Validation prediction count mismatch: {len(records)}")
@@ -230,16 +234,87 @@ def evaluate_model(model, dataset: OverlapPatchDataset, true_labels: dict, devic
     n_ap = float(average_precision_score(y == 3, p[:, 3]))
     ce = float(log_loss(y, p, labels=list(range(7))))
     model.train()
-    return {"n_cells": len(ids), "macro_f1": macro_f1,
-            "neutrophil_auprc": n_ap, "cross_entropy": ce,
-            "cell_ids_unique": True, "probabilities_finite": True}
+    metrics = {"n_cells": len(ids), "macro_f1": macro_f1,
+               "neutrophil_auprc": n_ap, "cross_entropy": ce,
+               "cell_ids_unique": True, "probabilities_finite": True}
+    return (metrics, records) if return_predictions else metrics
+
+
+def overlap_mask_presence_qc():
+    selected = pd.read_csv(ROOT / "metrics/overlap_largest_area_manifest.csv.gz")
+    dataset = OverlapPatchDataset(selected, [0, 0, 0], [1, 1, 1])
+    checked = 0
+    for i in range(len(dataset)):
+        _, _, cells, _ = dataset[i]
+        checked += len(cells)
+    if checked != 96044:
+        raise RuntimeError(f"Expected 96,044 visible selected cells, got {checked}")
+    audit = {"status": "PASS", "selected_canonical_cells": checked,
+             "overlap_patches_checked": len(dataset),
+             "selected_instance_visible_in_raster_mask": True}
+    (ROOT / "qc/overlap_mask_presence_audit.json").write_text(json.dumps(audit, indent=2) + "\n")
+    print(json.dumps(audit, indent=2), flush=True)
+
+
+def true_binary_probe(z_train, y_train, z_val, y_val, fold, positive_class, negative_class):
+    """Exact corrected-Task011-style training-only linear probe on GHIST embeddings.
+
+    `y_train` and `y_val` are seven-class IDs; only the specified two classes
+    enter the binary fit/evaluation. No outer-validation data enters scaling,
+    weighting, fitting, or threshold selection.
+    """
+    train_keep = np.isin(y_train, [positive_class, negative_class])
+    val_keep = np.isin(y_val, [positive_class, negative_class])
+    ztr = np.asarray(z_train[train_keep], dtype=np.float32)
+    zva = np.asarray(z_val[val_keep], dtype=np.float32)
+    ytr = (np.asarray(y_train)[train_keep] == positive_class).astype(np.int64)
+    yva = (np.asarray(y_val)[val_keep] == positive_class).astype(np.int64)
+    if len(np.unique(ytr)) != 2 or len(np.unique(yva)) != 2:
+        raise RuntimeError("True binary probe needs both classes in train and validation")
+    scaler = StandardScaler().fit(ztr)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    xt = torch.from_numpy(scaler.transform(ztr).astype(np.float32)).to(device)
+    xv = torch.from_numpy(scaler.transform(zva).astype(np.float32)).to(device)
+    yt = torch.from_numpy(ytr).to(device)
+    torch.manual_seed(20260923 + 5000 + int(fold) * 10 + positive_class + negative_class)
+    w = torch.zeros((2, xt.shape[1]), device=device, requires_grad=True)
+    b = torch.zeros(2, device=device, requires_grad=True)
+    counts = torch.bincount(yt, minlength=2).float()
+    weights = len(yt) / (2 * torch.clamp(counts, min=1.0))
+    optimizer = torch.optim.LBFGS([w, b], lr=1.0, max_iter=40, history_size=10,
+                                  line_search_fn="strong_wolfe", tolerance_grad=1e-5)
+    regularization = 0.5 / max(len(yt), 1)
+
+    def closure():
+        optimizer.zero_grad(set_to_none=True)
+        logits = xt @ w.T + b
+        loss = torch.nn.functional.cross_entropy(logits, yt, weight=weights)
+        loss = loss + regularization * torch.sum(w * w)
+        loss.backward()
+        return loss
+
+    optimizer.step(closure)
+    with torch.no_grad():
+        probabilities = torch.softmax(xv @ w.T + b, dim=1)[:, 1].float().cpu().numpy()
+    predicted = (probabilities >= 0.5).astype(int)
+    precision, recall, f1, _ = precision_recall_fscore_support(
+        yva, predicted, labels=[1], zero_division=0)
+    tn = int(((predicted == 0) & (yva == 0)).sum())
+    return {"auroc": float(roc_auc_score(yva, probabilities)),
+            "auprc": float(average_precision_score(yva, probabilities)),
+            "f1": float(f1[0]), "sensitivity": float(recall[0]),
+            "specificity": float(tn / max(int((yva == 0).sum()), 1)),
+            "precision": float(precision[0]), "n_val": int(len(yva))}
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--overlap-qc", action="store_true")
+    parser.add_argument("--mask-presence-qc", action="store_true")
     args = parser.parse_args()
-    if args.overlap_qc:
+    if args.mask_presence_qc:
+        overlap_mask_presence_qc()
+    elif args.overlap_qc:
         overlap_qc()
     else:
         raise SystemExit("Only geometry QC is implemented; classification evaluation remains gated")

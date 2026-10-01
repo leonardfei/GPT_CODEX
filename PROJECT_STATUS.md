@@ -4,7 +4,7 @@
 
 Task 015 — GHIST Classification-Only Retraining for HCC H&E Cell Typing — IN_PROGRESS
 
-`IN_PROGRESS` (2026-10-01): official SydneyBioX/GHIST commit `917456be305fc82e92293ea272812e79675e821c` was downloaded locally, checksum-verified, and uploaded to `/data/lf_data/models/GHIST`. Repeating the exact Task010 patch-level CellViT inference recovered valid, unique contours for all 96,044 canonical cells; 35.39% have multiple candidates within the established 15-pixel threshold, but all chosen centroids numerically reproduce the frozen Task010 token matches. Five-fold batch separation and 30-pixel-overlap largest-area geometry QC passed. The classification-only adapter passed forward/backward and split-safe one-batch loss tests. The required fold-0 five-epoch GHIST_CT_OFFICIAL pilot is running on the server; full CV, probes, paired comparison, and model decision remain pending. See `reports/task_015_ghist_celltyping.md`.
+`IN_PROGRESS` (2026-10-01): official SydneyBioX/GHIST commit `917456be305fc82e92293ea272812e79675e821c` was downloaded locally, checksum-verified, and uploaded to `/data/lf_data/models/GHIST`. Exact Task010 patch-level CellViT inference recovered valid, unique contours for all 96,044 canonical cells; 35.39% have multiple candidates within 15 pixels, but chosen centroids reproduce the frozen Task010 matches. Five-fold batch separation, all 96,044 non-overlap/overlap rasterized masks, and 30-pixel-overlap largest-area geometry passed QC. The fold-0 five-epoch GHIST_CT_OFFICIAL pilot **passed** with loss `1.8726→1.5575`, stable ~13.696 GiB allocated GPU memory, and 9,607/9,607 finite unique inner-validation predictions each epoch. Pilot inner-validation metrics are not outer-fold results. The gated two-GPU, two-variant five-fold CV launcher is running on the server; full CV, probes, paired comparison, and model decision remain pending. See `reports/task_015_ghist_celltyping.md`.
 
 ## Goal
 
@@ -114,7 +114,7 @@ GHIST is not promoted unless it improves consistently under the predefined Task0
 
 ## Next gate
 
-Inspect the running five-epoch fold-0 pilot in `/data/lf_data/result/task015_ghist_celltyping/logs/pilot_fold0_official.log`. Only after its loss trend, finite logits/probabilities, exact 9,607-cell inner-validation count, unique IDs, no leakage and GPU memory pass QC should the two-variant full five-fold benchmark begin. Pull origin/main before any later execution session.
+Monitor the gated CV launcher at `/data/lf_data/result/task015_ghist_celltyping/logs/cv_launcher.log` and the per-fold logs in the same directory. The launcher stops after a failed fold pair. Do not aggregate performance or promote a model until all ten folds, binary probes, morphology QC, paired comparisons and decision gates are complete. Pull origin/main before any later execution session.
 
 ## Production guardrail
 
