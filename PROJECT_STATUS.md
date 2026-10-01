@@ -2,7 +2,9 @@
 
 ## Current task
 
-Task 015 — GHIST Classification-Only Retraining for HCC H&E Cell Typing — PENDING / READY TO RUN
+Task 015 — GHIST Classification-Only Retraining for HCC H&E Cell Typing — BLOCKED
+
+`BLOCKED_NEEDS_LOCAL_GHIST_UPLOAD` (2026-10-01): official SydneyBioX/GHIST was absent and both server-side clone attempts failed due connection interruption. Per `tasks/task_015.md`, no unofficial replacement or training was attempted. Input/fold QC passed and an already-started CellViT binary detector completed with 620,205 **unmapped** nuclei. Canonical-to-instance mapping, fold-0 pilot, five-fold metrics, and model decision remain unperformed. See `reports/task_015_ghist_celltyping.md`.
 
 ## Goal
 
@@ -110,13 +112,9 @@ GHIST is not promoted unless it improves consistently under the predefined Task0
 
 `tasks/task_015.md`
 
-## Next execution command
+## Resumption condition
 
-```text
-Execute task_015.
-```
-
-Codex must pull origin/main and follow AGENTS.md plus `tasks/task_015.md`.
+Upload an unmodified official GHIST checkout to `/data/lf_data/models/GHIST`, preserving an immutable source commit, or explicitly authorize local download and transfer. Verify provenance, then audit the one-to-one canonical-to-CellViT contour mapping before any training. Pull origin/main on resumption.
 
 ## Production guardrail
 

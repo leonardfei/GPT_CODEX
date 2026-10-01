@@ -1,7 +1,7 @@
 # Task 015 — GHIST Classification-Only Retraining for HCC H&E Cell Typing
 
 ## Status
-PENDING / READY TO RUN
+BLOCKED_NEEDS_LOCAL_GHIST_UPLOAD — official server clone failed twice on 2026-10-01; no GHIST training started. See `reports/task_015_ghist_celltyping.md`.
 
 ## Goal
 
@@ -675,4 +675,3 @@ Do not commit:
 ```text
 Execute task_015.
 ```
-

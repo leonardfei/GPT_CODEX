@@ -1,0 +1,19 @@
+{
+  "status": "BLOCKED_NEEDS_LOCAL_GHIST_UPLOAD",
+  "official_repository": "https://github.com/SydneyBioX/GHIST.git",
+  "expected_server_path": "/data/lf_data/models/GHIST",
+  "official_license": "GPL-3.0",
+  "source_commit_sha": null,
+  "server_clone_attempts": [
+    {
+      "command": "git clone https://github.com/SydneyBioX/GHIST.git /data/lf_data/models/GHIST",
+      "result": "RPC failed: curl 56 Recv failure: Connection timed out; early EOF; invalid index-pack output"
+    },
+    {
+      "command": "git clone --depth 1 --filter=blob:none https://github.com/SydneyBioX/GHIST.git /data/lf_data/models/GHIST",
+      "result": "GnuTLS recv error (-110): The TLS connection was non-properly terminated"
+    }
+  ],
+  "official_source_available_on_server": false,
+  "training_started": false
+}
