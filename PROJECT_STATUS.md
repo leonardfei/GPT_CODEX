@@ -2,75 +2,126 @@
 
 ## Current task
 
-Task 014 — P169.svs End-to-End WSI Inference to QuPath GeoJSON — COMPLETED
+Task 015 — GHIST Classification-Only Retraining for HCC H&E Cell Typing — PENDING / READY TO RUN
 
-Completed 2026-09-30. CellViT binary detection and Task012 Midnight single-model classification produced 153,892 P169 level-0 nucleus predictions. Both P169 GeoJSON outputs passed built-in and independent geometry/class/count checks. Existing P84 outputs and both model checkpoints retained their SHA256 hashes. See `reports/task_014_p169_wsi_inference.md`. P169 has no reference labels; there is no independent accuracy/F1 estimate. Tumor 72.067% and Neutrophil 0.112% are unverified prediction proportions requiring visual/reference-label review.
+## Goal
 
-## Input
+Train an HCC-specific GHIST cell-type model using H&E morphology and the existing frozen seven-class Xenium-derived labels, while excluding gene-expression prediction entirely.
 
-`/data/lf_data/he_image/P169.svs`
+Primary model:
 
-## Shared output directory
+`H&E 256×256 patch + CellViT nucleus instance masks -> GHIST UNet3+ morphology backbone -> official GHIST per-nucleus feature pooling -> 256-d nucleus embedding -> 7-class cell-type MLP`
 
-`/data/lf_data/HCC_result`
+Primary losses:
+- GHIST morphology/pixel classification loss;
+- GHIST direct cell-type classification loss.
 
-Required new outputs:
+No gene-expression heads or gene-expression losses.
 
-- `P169_cell_detection.geojson`
-- `P169_cells.geojson`
+## Official GHIST reference
 
-Existing P84 outputs must be preserved.
+Use the official:
+`SydneyBioX/GHIST`
 
-The reusable WSI inference script now supports multiple slide-prefixed GeoJSON pairs in this shared directory and refuses non-GeoJSON sidecars.
+Reuse/adapt:
+- UNet3+ Backbone;
+- Embed;
+- MLP;
+- official nucleus-level + patch-level feature pooling.
 
-## Pipeline
+Do not modify the upstream clone in place.
 
-Same validated P84 workflow:
+## Training data
 
-1. CellViT++ SAM-H x40 binary nucleus detection/segmentation
-2. preserve level-0 centroid and contour geometry
-3. read P169 MPP
-4. extract 12 μm physical target-centered crops
-5. resample to 57×57
-6. Task012 Midnight full-data final classifier
-7. export QuPath-compatible slide-prefixed contour and centroid GeoJSON
+H&E:
+`/data/lf_data/xenium_data/ID0060276.ome.tif`
 
-## Models
+Canonical cell cohort:
+`/data/lf_data/result/task010_representation_benchmark/metrics/canonical_cell_order.csv.gz`
 
-CellViT detector:
-`/data/lf_data/CellViT-plus-plus/checkpoints/CellViT-SAM-H-x40-AMP.pth`
+Expected n:
+`96,044`
 
-Midnight classifier:
-`/data/lf_data/result/final_model/midnight_fov12_finalblock_7class.pth`
+Frozen classes:
+- Endothelial
+- Mesenchymal
+- Myeloid
+- Neutrophil
+- Plasma cell
+- T and B
+- Tumor
 
-Expected SHA256:
-`ddb3d21f9492032b5f0509c5dc28de15a29b0074105991c5cd1168055d84f633`
+Use CellViT binary contours as the external nucleus instance masks required by GHIST.
 
-## P84 reference run
+## Validation
 
-P84 completed successfully:
-- 291,029 detected/classified nuclei
-- Tumor 70.898%
-- Neutrophil 0.080%
+Reuse exact Task009 V3_CORE five outer folds.
 
-These are unverified model outputs, not biological reference proportions. Task014 should compare P169 descriptively as a domain-shift sanity check only.
+No random cell-level split.
 
-## Work directory
+Checkpoint selection is training-only inner grouped validation.
 
-`/data/lf_data/result/task014_p169_wsi_inference`
+Validation predictions must be deduplicated across overlapping GHIST patches by retaining the prediction from the patch containing the largest nucleus area.
+
+## Primary variants
+
+1. `GHIST_CT_OFFICIAL`
+   - L_Morph + L_CT
+   - unweighted classification losses
+
+2. `GHIST_CT_BALANCED`
+   - same architecture
+   - training-fold-only class-balanced weighting for rare classes
+
+Optional GHIST neighborhood-composition auxiliary loss is allowed only after primary cell-typing benchmarks and still without gene expression.
+
+## Official-like starting hyperparameters
+
+- patch size 256×256
+- training overlap 0
+- validation overlap 30 px
+- batch size 8
+- max epochs 50
+- AdamW
+- LR 1e-3
+- betas 0.9 / 0.999
+- weight decay 1e-4
+- horizontal/vertical flips
+- 90/180/270° rotations
+- train-fold-only RGB standardization
+
+## Main comparison
+
+Corrected Midnight final-block reference:
+- Macro-F1 0.4522 ± 0.0294
+- Macro-AUPRC 0.4893 ± 0.0428
+- Neutrophil F1 0.2352 ± 0.1214
+- Neutrophil AUPRC 0.1976 ± 0.1181
+- N-vs-Myeloid AUROC/AUPRC 0.7202 / 0.4385
+- N-vs-T/B AUROC/AUPRC 0.7069 / 0.3930
+
+GHIST is not promoted unless it improves consistently under the predefined Task015 gate.
+
+## Output root
+
+`/data/lf_data/result/task015_ghist_celltyping`
 
 ## Task file
 
-`tasks/task_014.md`
+`tasks/task_015.md`
 
-## Next step
+## Next execution command
 
-Await an assigned follow-up. Recommended validation: open both P169 GeoJSON files in QuPath on P169.svs, inspect representative tissue regions and nucleus contours, and obtain reference labels to quantify classifier/detector performance. Pull origin/main before the next task.
+```text
+Execute task_015.
+```
+
+Codex must pull origin/main and follow AGENTS.md plus `tasks/task_015.md`.
 
 ## Production guardrail
 
-Existing production/final checkpoints and P84 outputs remain unchanged.
+Midnight final model, production model, frozen biological labels and P84/P169 outputs remain unchanged.
 
 ## Last update
 
-2026-09-30
+2026-10-01
