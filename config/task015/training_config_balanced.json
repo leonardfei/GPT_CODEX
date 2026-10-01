@@ -1,0 +1,13 @@
+{
+  "variant": "GHIST_CT_BALANCED",
+  "official_ghist_commit": "917456be305fc82e92293ea272812e79675e821c",
+  "same_architecture_and_training_geometry_as": "training_config_official.json",
+  "cell_class_weight_formula": "w_c=N_outer_training_cells/(7*n_outer_training_class_c)",
+  "morphology_background_weight": 1.0,
+  "morphology_foreground_weight_formula": "w_(c+1)=N_outer_training_cells/(7*n_outer_training_class_c)",
+  "weight_source": "current outer-training cells only; never outer-validation cells",
+  "loss": "weighted_pixel_cross_entropy_plus_weighted_cell_cross_entropy",
+  "ignore_index": -100,
+  "focal_loss": false,
+  "note": "Per-fold numerical weights must be recorded by the training script before any balanced run; no balanced training has started."
+}

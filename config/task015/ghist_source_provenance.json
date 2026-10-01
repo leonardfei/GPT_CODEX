@@ -1,9 +1,12 @@
 {
-  "status": "BLOCKED_NEEDS_LOCAL_GHIST_UPLOAD",
+  "status": "OFFICIAL_SOURCE_VERIFIED",
   "official_repository": "https://github.com/SydneyBioX/GHIST.git",
   "expected_server_path": "/data/lf_data/models/GHIST",
   "official_license": "GPL-3.0",
-  "source_commit_sha": null,
+  "source_commit_sha": "917456be305fc82e92293ea272812e79675e821c",
+  "local_download_path": "/private/tmp/task015-ghist.rS7oCT/GHIST",
+  "transfer_archive_sha256": "15eaad78a595eba4f85d8026743bbcb4756f9ac32225d226b01e046094f897cd",
+  "transfer_method": "local shallow git clone; tar archive; scp to server; extract without modifying upstream clone",
   "server_clone_attempts": [
     {
       "command": "git clone https://github.com/SydneyBioX/GHIST.git /data/lf_data/models/GHIST",
@@ -14,6 +17,6 @@
       "result": "GnuTLS recv error (-110): The TLS connection was non-properly terminated"
     }
   ],
-  "official_source_available_on_server": false,
+  "official_source_available_on_server": true,
   "training_started": false
 }
