@@ -7,6 +7,15 @@ PYTHON=/data/lf_data/task010_env/bin/python
 TRAINER=$ROOT/code/task015_train_ghist_celltype.py
 export PYTHONPATH=$ROOT/code
 
+# Root filesystem /tmp filled during the first fold-0 selection run. Keep all
+# Python/PyTorch multiprocessing sockets and temporary files on /data.
+TASK015_TMPDIR=$ROOT/work/tmp
+mkdir -p "$TASK015_TMPDIR"
+export TMPDIR=$TASK015_TMPDIR
+export TMP=$TASK015_TMPDIR
+export TEMP=$TASK015_TMPDIR
+"$PYTHON" -c 'import pathlib, shutil, tempfile; p=pathlib.Path("/data/lf_data/result/task015_ghist_celltyping/work/tmp").resolve(); q=pathlib.Path(tempfile.gettempdir()).resolve(); assert q == p, (p,q); assert shutil.disk_usage(p).free > 50*1024**3, "Less than 50 GiB free on Task015 data volume"; print("Task015 temporary directory:", q, flush=True)'
+
 "$PYTHON" -c 'import json, pathlib; p=pathlib.Path("/data/lf_data/result/task015_ghist_celltyping/qc/pilot_summary.json"); assert p.is_file() and json.loads(p.read_text())["status"] == "PILOT_GATE_PASS", "Task015 pilot gate has not passed"'
 
 run_pair() {
