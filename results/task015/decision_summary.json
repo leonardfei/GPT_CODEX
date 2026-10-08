@@ -1,0 +1,56 @@
+{
+  "status": "CV_AGGREGATED",
+  "primary_endpoint": "mean outer-fold cell-level Macro-F1",
+  "best_ghist_variant": "GHIST_CT_OFFICIAL",
+  "variants": {
+    "GHIST_CT_OFFICIAL": {
+      "classification": "MODERATE",
+      "mean_paired_delta": {
+        "macro_f1": -0.017674173422954763,
+        "macro_auprc": -0.03649580258444914,
+        "neutrophil_f1": 0.008419210119559251,
+        "neutrophil_auprc": 0.03824089863708889
+      },
+      "positive_fold_counts": {
+        "macro_f1": 2,
+        "macro_auprc": 1,
+        "neutrophil_f1": 4,
+        "neutrophil_auprc": 5
+      },
+      "selected_epochs": [
+        30,
+        28,
+        25,
+        25,
+        42
+      ]
+    },
+    "GHIST_CT_BALANCED": {
+      "classification": "MODERATE",
+      "mean_paired_delta": {
+        "macro_f1": -0.029733020275790667,
+        "macro_auprc": -0.039447916234079214,
+        "neutrophil_f1": 0.042244014209327094,
+        "neutrophil_auprc": 0.03468104345042573
+      },
+      "positive_fold_counts": {
+        "macro_f1": 1,
+        "macro_auprc": 1,
+        "neutrophil_f1": 5,
+        "neutrophil_auprc": 5
+      },
+      "selected_epochs": [
+        35,
+        25,
+        25,
+        24,
+        43
+      ]
+    }
+  },
+  "full_data_export_eligible": true,
+  "production_checkpoint_replacement_authorized": false,
+  "optional_neighborhood_stage": "NOT_RUN_SECONDARY_OPTIONAL",
+  "midnight_reference": "/data/lf_data/result/task011_midnight_local_optimization/metrics",
+  "morphology_qc": "PENDING_SEPARATE_PIXEL_HEAD_EVALUATION"
+}

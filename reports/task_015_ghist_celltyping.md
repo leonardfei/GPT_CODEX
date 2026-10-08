@@ -2,7 +2,7 @@
 
 ## Status
 
-**IN_PROGRESS** (2026-10-01). The official-source blocker was resolved by the user's authorized local download and upload. Canonical contour, fold, overlap geometry, and raster-mask QC passed. The required five-epoch fold-0 pilot passed its technical gate. The first fold-0 CV pair stalled after epoch 25 because root `/tmp` filled; those outputs were preserved and the pair restarted from epoch 1 with temporary files on `/data` and unchanged scientific settings. Both restarted jobs have passed 100/399 steps in epoch 1. The gated two-GPU, two-variant five-fold CV launcher is running; no completed cross-validation or GHIST-versus-Midnight performance claim exists yet.
+**IN_PROGRESS** (2026-10-08). The official-source blocker was resolved by the user's authorized local download and upload. Canonical contour, fold, overlap geometry, and raster-mask QC passed. The required five-epoch fold-0 pilot passed its technical gate. The first fold-0 CV pair stalled after epoch 25 because root `/tmp` filled; those outputs were preserved and the pair restarted from epoch 1 with temporary files on `/data` and unchanged scientific settings. All ten CV runs have now finished successfully. Five-fold aggregation, OOF checks, paired Midnight comparison and figures are complete. Full outer-fold morphology-head QC and gate-eligible full-data model training remain in progress; no production model has been replaced.
 
 ## Official source and environment
 
@@ -28,4 +28,28 @@ Fold-0 official-variant pilot completed five epochs on GPU 0 using training batc
 
 ## Required benchmark status and next gate
 
-The gated CV launcher `/data/lf_data/result/task015_ghist_celltyping/code/task015_launch_cv.sh` has restarted GHIST_CT_OFFICIAL and GHIST_CT_BALANCED fold 0 on separate GPUs. It will advance through all five folds only when each pair succeeds, and stop on failure. Python/PyTorch temporary files now use `/data/lf_data/result/task015_ghist_celltyping/work/tmp`; the root filesystem itself remains full. The previous failed logs and 25 model-only checkpoints per variant were preserved. Because optimizer and RNG states were not saved, exact epoch-26 continuation was not reproducible; see `qc/task015/cv_restart_audit.md`. Per-fold logs and top-level `logs/cv_launcher.log` are server-side. The corrected-Task011-style true binary probe implementation is present but has not yet processed GHIST fold embeddings. Five-fold results, morphology-head QC, paired Midnight comparison, optional neighborhood stage, decision gate, figures and full-data model export remain **pending**. No performance or model-promotion decision is possible. Do not train on P84/P169 or touch Task012 Midnight/production models.
+The gated CV launcher `/data/lf_data/result/task015_ghist_celltyping/code/task015_launch_cv.sh` completed all ten GHIST folds with status 0. Python/PyTorch temporary files used `/data/lf_data/result/task015_ghist_celltyping/work/tmp`; the root filesystem remains nearly full and was not cleaned. The previous failed logs and 25 model-only checkpoints per variant were preserved. Because optimizer and RNG states were not saved, exact epoch-26 continuation was not reproducible; see `qc/task015/cv_restart_audit.md`. Per-fold logs and top-level `logs/cv_launcher.log` are server-side.
+
+### Five-fold outer-validation results
+
+Means and sample SDs below are across the five exact Task009 grouped outer folds, not pooled-cell point estimates. The corrected Task011 Midnight `F1_FINAL_BLOCK` is the paired baseline.
+
+| Model | Macro-F1 | Macro-AUPRC | Neutrophil F1 | Neutrophil one-vs-rest AUPRC |
+|---|---:|---:|---:|---:|
+| Midnight | 0.4522 | 0.4893 | 0.2352 | 0.1976 |
+| GHIST_CT_OFFICIAL | 0.4345 | 0.4528 | 0.2436 | 0.2359 |
+| GHIST_CT_BALANCED | 0.4225 | 0.4499 | 0.2774 | 0.2323 |
+
+The five selected training-only epochs were OFFICIAL `30, 28, 25, 25, 42` and BALANCED `35, 25, 25, 24, 43`. Each fold was refit from its saved initialization for the selected count before one untouched outer-validation evaluation. Both models yielded exactly 96,044 unique OOF cell IDs across five folds, with the frozen class IDs, correct per-fold batches, finite probabilities summing to one, and reproduced Macro-F1/Macro-AUPRC from the saved OOF tables. Corrected Midnight per-class supports match GHIST in every fold. Full audit code: `scripts/python/task015_finalize_ghist.py`; server outputs: `metrics/ghist_*.csv` and `qc/oof_coverage_qc.csv`.
+
+The true binary N-vs-Myeloid AUROC/AUPRC means were `0.7369/0.4659` (OFFICIAL), `0.7371/0.4702` (BALANCED), versus `0.7202/0.4385` (Midnight). N-vs-T/B means were `0.7693/0.4574` (OFFICIAL), `0.7588/0.4441` (BALANCED), versus `0.7069/0.3930` (Midnight). These are independently trained training-only probes on 256-d embeddings, not seven-class probability ratios. Fold-level metrics, per-class metrics, binary metrics and paired deltas are in the corresponding CSV files.
+
+Per-class F1 changes versus Midnight are mixed. OFFICIAL improves Myeloid by `+0.0439` and T/B by `+0.1004`, but lowers Endothelial by `-0.1325`, Plasma by `-0.0792`, and Tumor by `-0.0700`. BALANCED improves Neutrophil by `+0.0422` and T/B by `+0.0617`, but lowers Endothelial by `-0.1271`, Plasma by `-0.0887`, and Tumor by `-0.0672`. These are quantitative comparisons, not evidence of a biological mechanism.
+
+### Prespecified decision gate and remaining work
+
+OFFICIAL has the higher primary endpoint, mean cell-level Macro-F1 (`0.4345` versus `0.4225`), and is the selected GHIST variant. Relative to Midnight, its paired mean Macro-F1 delta is `-0.0177` (positive in 2/5 folds), while Neutrophil AUPRC is `+0.0382` (positive in 5/5). BALANCED's paired mean Macro-F1 delta is `-0.0297` (positive in 1/5), while Neutrophil F1 is `+0.0422` (positive in 5/5). Neither meets the strong gate. Both meet the task's moderate gate via consistent Neutrophil improvement; improvements above +0.03 are treated as at least moderate when the strong *conjunction* fails. This gate permits an auditable full-data GHIST model export, **not** replacement of the Task012 Midnight production checkpoint. The optional neighborhood-composition stage is eligible by its technical threshold but is not required for the primary benchmark and has not been run.
+
+The full-data OFFICIAL model is training for the median selected epoch count, `28`, on all 96,044 frozen canonical cells. The outer-fold pixel-head morphology QC is running independently on the unused GPU. Until both finish and their outputs are checked, Task015 remains `IN_PROGRESS`. No P84/P169 inference or production replacement has been performed. An independently assessed external test would require a separate supervisory scientific decision.
+
+Environment: `/data/lf_data/task010_env/bin/python`, Python 3.10.14, PyTorch 2.7.1+cu128, NumPy 1.23.5, pandas 1.4.3, SciPy 1.8.1, scikit-learn 1.3.0, Matplotlib 3.7.1. Fixed seed `20260923`; AdamW, batch 8, linear epoch-wise LR schedule, 256×256 native patches at 0.2125 μm/px, 30-pixel validation overlap, and training-only RGB standardization were preserved. Commands: `python code/task015_finalize_ghist.py`, `python code/task015_morphology_qc.py --gpu 1`, and `python code/task015_full_data_train.py` with the Task015 `/data/.../work/tmp` directory exported as `TMPDIR`. Large OOF tables, checkpoints and instance data remain on the server. The official GHIST source was not edited.
