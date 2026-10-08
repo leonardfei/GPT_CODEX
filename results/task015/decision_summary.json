@@ -52,5 +52,5 @@
   "production_checkpoint_replacement_authorized": false,
   "optional_neighborhood_stage": "NOT_RUN_SECONDARY_OPTIONAL",
   "midnight_reference": "/data/lf_data/result/task011_midnight_local_optimization/metrics",
-  "morphology_qc": "PENDING_SEPARATE_PIXEL_HEAD_EVALUATION"
+  "morphology_qc": "COMPLETE_10_FOLDS"
 }

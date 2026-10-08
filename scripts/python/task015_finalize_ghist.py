@@ -193,13 +193,24 @@ def main():
     # Cell-level Macro-F1 is the primary endpoint; use it to identify the best
     # GHIST variant, then apply the explicit promotion gate independently.
     best = max(VARIANTS, key=lambda v: float(fs.loc[fs.variant.eq(v), "macro_f1"].iloc[0]))
+    morph_path = out / "ghist_morphology_qc.csv"
+    if morph_path.exists():
+        morph = pd.read_csv(morph_path)
+        if len(morph) != 10 or set(zip(morph.variant, morph.fold)) != {
+                (v, f) for v in VARIANTS for f in range(5)}:
+            raise RuntimeError("Incomplete morphology-head QC table")
+        finite_table(morph, ("foreground_dice", "foreground_iou", "supervised_nucleus_pixel_accuracy"),
+                     "Morphology-head QC")
+        morphology_status = "COMPLETE_10_FOLDS"
+    else:
+        morphology_status = "PENDING_SEPARATE_PIXEL_HEAD_EVALUATION"
     decision = {"status": "CV_AGGREGATED", "primary_endpoint": "mean outer-fold cell-level Macro-F1",
                 "best_ghist_variant": best, "variants": decisions,
                 "full_data_export_eligible": decisions[best]["classification"] in ("STRONG", "MODERATE"),
                 "production_checkpoint_replacement_authorized": False,
                 "optional_neighborhood_stage": "NOT_RUN_SECONDARY_OPTIONAL",
                 "midnight_reference": str(base),
-                "morphology_qc": "PENDING_SEPARATE_PIXEL_HEAD_EVALUATION"}
+                "morphology_qc": morphology_status}
     fd.to_csv(out / "ghist_fold_metrics.csv", index=False)
     fs.to_csv(out / "ghist_summary.csv", index=False)
     pc.to_csv(out / "ghist_per_class.csv", index=False)
